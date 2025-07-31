@@ -9,6 +9,7 @@ type ExamCardProps = {
   isOpenForApplications?: boolean;
 };
 
+// eslint-disable-next-line
 const ExamCard = ({ id, title, salary, vacancies,period, isOpenForApplications = false}: ExamCardProps) => {
   return (
     <div className={`border border-zinc-200 bg-white rounded-lg w-96 flex flex-col shadow-md`}>
