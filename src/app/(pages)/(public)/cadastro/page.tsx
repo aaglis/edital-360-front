@@ -25,7 +25,7 @@ export default function RegisterPage() {
 
   const onSubmit = (data: RegisterSchema) => {
     console.log("Cadastro parcial:", data);
-    router.push("/cadastro-completo"); // rota de completar cadastro
+    router.push("/finalizar-cadastro");
   };
 
   return (
