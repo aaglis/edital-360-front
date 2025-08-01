@@ -223,7 +223,7 @@ export default function RegisterComponent() {
   }, [passwordsMatch, form.formState.isValid]);
 
   return (
-    <div className="flex flex-col items-center mt-20 mx-8 min-h-screen bg-gray-100">
+    <div className="flex flex-col items-center mt-20 mx-8 min-h-screen">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -910,7 +910,7 @@ export default function RegisterComponent() {
           <div className="w-full max-w-[843px] mt-6">
             <Button
               type="submit"
-              className="w-full"
+              className="w-full mb-6"
               onClick={(e) => {
                 if (!canSubmit) {
                   e.preventDefault();
