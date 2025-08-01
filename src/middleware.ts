@@ -3,7 +3,7 @@ import { jwtDecode } from "jwt-decode";
 
 const publicRoutes = [
   { path: '/login', whenAuthenticated: 'redirect'},
-  { path: '/registro', whenAuthenticated: 'redirect'},
+  { path: '/cadastro', whenAuthenticated: 'redirect'},
   { path: '/', whenAuthenticated: 'next'},
 ] as const;
 
