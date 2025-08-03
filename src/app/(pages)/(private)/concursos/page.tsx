@@ -85,7 +85,7 @@ export default function ConcursoDisponiveisPage() {
   return (
     <div className="flex flex-col items-center mt-20 mx-8 min-h-screen mb-10">
       <h1 className="text-4xl font-bold">Inscrição para Eventos</h1>
-      <span className="text-lg mt-4 mb-14">
+      <span className="text-lg mt-4 mb-14 text-gray-500">
         Selecione os concursos de seu interesse e realize sua inscrição
       </span>
       <div className="w-full max-w-[843px] bg-white shadow-md rounded-lg p-6 border border-gray-300 flex items-center gap-4">
