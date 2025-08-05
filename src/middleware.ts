@@ -6,6 +6,7 @@ const publicRoutes = [
   { path: '/cadastro', whenAuthenticated: 'redirect'},
   { path: '/finalizar-cadastro', whenAuthenticated: 'redirect'},
   { path: '/concursos', whenAuthenticated: 'next'},
+  { path: '/', whenAuthenticated: 'next' },
 ] as const;
 
 const REDIRECT_WHEN_NOT_AUTHENTICATED = '/login';
