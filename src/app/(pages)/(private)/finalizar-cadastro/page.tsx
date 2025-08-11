@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   CadastroCompletoSchema,
@@ -181,6 +181,30 @@ export default function RegisterComponent() {
     },
   });
 
+  useEffect(() => {
+    const dadosIniciais = localStorage.getItem("dadosIniciais");
+    if (dadosIniciais) {
+      try {
+        const dados = JSON.parse(dadosIniciais);
+
+        form.setValue("nome", dados.nomeCompleto || "");
+        form.setValue("cpf", dados.cpf || "");
+        form.setValue("cep", dados.cep || "");
+
+        if (dados.endereco) {
+          form.setValue("uf", dados.endereco.uf || "");
+          form.setValue("cidade", dados.endereco.cidade || "");
+          form.setValue("bairro", dados.endereco.bairro || "");
+          form.setValue("logradouro", dados.endereco.logradouro || "");
+        }
+
+        localStorage.removeItem("dadosIniciais");
+      } catch (error) {
+        console.error("Erro ao carregar dados iniciais:", error);
+      }
+    }
+  }, [form]);
+
   const onSubmit = async (data: CadastroCompletoSchema) => {
     setIsSubmitting(true);
 
@@ -219,14 +243,11 @@ export default function RegisterComponent() {
     };
 
     const mappedData = cleanData(data);
-    console.log("Dados limpos para API:", mappedData);
 
     try {
       const result = await userService.cadastrar(mappedData);
-      console.log("Resultado do cadastro:", result);
 
       if (result.success) {
-        console.log("Cadastro realizado com sucesso:", result.data);
         toast({
           title: "Cadastro realizado com sucesso! 🎉",
           description: "Redirecionando para a página de login...",
@@ -234,9 +255,7 @@ export default function RegisterComponent() {
           duration: 3000,
         });
 
-        setTimeout(() => {
-          router.push("/login?cadastro=sucesso");
-        }, 1000);
+        router.push("/login?cadastro=sucesso");
       } else {
         toast({
           title: "Erro no cadastro",

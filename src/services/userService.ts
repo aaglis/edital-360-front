@@ -1,5 +1,5 @@
-import api from './api';
-import axios from 'axios';
+import api from "./api";
+import axios from "axios";
 
 export interface CadastroUsuarioData {
   cpf: string;
@@ -35,61 +35,32 @@ export interface CadastroUsuarioResponse {
 }
 
 export const userService = {
-
   async cadastrar(data: CadastroUsuarioData): Promise<CadastroUsuarioResponse> {
     try {
-      const response = await api.post('/cadastro/completar', data);
-      console.log('Cadastro realizado com sucesso:', response);
-      return {
-        success: true,
-        message: 'Cadastro realizado com sucesso!',
-        data: response.data,
-      };
-    } catch (error: unknown) {
-        console.error('Erro ao cadastrar usuário:', error);
-      if (axios.isAxiosError(error)) {
-        const errorMessage = 
-          error.response?.data?.message || 
-          error.response?.data?.error || 
-          `Erro ${error.response?.status}: ${error.response?.statusText}`;
-        
-        return {
-          success: false,
-          message: errorMessage,
-        };
-      }
-      
-      return {
-        success: false,
-        message: 'Erro inesperado. Tente novamente mais tarde.',
-      };
-    }
-  },
+      const response = await api.post("/cadastro/completar", data);
 
-  async login(email: string, senha: string) {
-    try {
-      const response = await api.post('/auth/login', { email, senha });
       return {
         success: true,
-        message: 'Login realizado com sucesso!',
+        message: "Cadastro realizado com sucesso!",
         data: response.data,
       };
     } catch (error: unknown) {
+      console.error("Erro ao cadastrar usuário:", error);
       if (axios.isAxiosError(error)) {
-        const errorMessage = 
-          error.response?.data?.message || 
-          error.response?.data?.error || 
-          'Credenciais inválidas';
-        
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          `Erro ${error.response?.status}: ${error.response?.statusText}`;
+
         return {
           success: false,
           message: errorMessage,
         };
       }
-      
+
       return {
         success: false,
-        message: 'Erro inesperado. Tente novamente mais tarde.',
+        message: "Erro inesperado. Tente novamente mais tarde.",
       };
     }
   },
