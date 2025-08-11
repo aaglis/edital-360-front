@@ -4,7 +4,7 @@ export const cadastroCompletoSchema = z
   .object({
     nome: z.string().min(2, "Nome obrigatório"),
     dataNascimento: z.string().min(10, "Data de nascimento obrigatória"),
-    sexo: z.enum(["masculino", "feminino"], {
+    sexo: z.enum(["MASCULINO", "FEMININO"], {
       message: "Selecione o sexo",
     }),
     nomePai: z.string().min(2, "Nome do pai obrigatório"),
