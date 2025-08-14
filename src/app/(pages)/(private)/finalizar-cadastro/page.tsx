@@ -1,5 +1,6 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   CadastroCompletoSchema,
   cadastroCompletoSchema,
@@ -7,7 +8,9 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
 import InputMask from "react-input-mask";
-import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { EyeIcon, EyeOffIcon, Loader2 } from "lucide-react";
+import { userService, type CadastroUsuarioData } from "@/services/userService";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
@@ -28,9 +31,12 @@ import {
 } from "@/components/ui/form";
 
 export default function RegisterComponent() {
+  const { toast } = useToast();
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fieldOrder = [
     "nome",
@@ -175,8 +181,98 @@ export default function RegisterComponent() {
     },
   });
 
-  const onSubmit = (data: CadastroCompletoSchema) => {
-    console.log("Dados do cadastro:", data);
+  useEffect(() => {
+    const dadosIniciais = localStorage.getItem("dadosIniciais");
+    if (dadosIniciais) {
+      try {
+        const dados = JSON.parse(dadosIniciais);
+
+        form.setValue("nome", dados.nomeCompleto || "");
+        form.setValue("cpf", dados.cpf || "");
+        form.setValue("cep", dados.cep || "");
+
+        if (dados.endereco) {
+          form.setValue("uf", dados.endereco.uf || "");
+          form.setValue("cidade", dados.endereco.cidade || "");
+          form.setValue("bairro", dados.endereco.bairro || "");
+          form.setValue("logradouro", dados.endereco.logradouro || "");
+        }
+
+        localStorage.removeItem("dadosIniciais");
+      } catch (error) {
+        console.error("Erro ao carregar dados iniciais:", error);
+      }
+    }
+  }, [form]);
+
+  const onSubmit = async (data: CadastroCompletoSchema) => {
+    setIsSubmitting(true);
+
+    const cleanData = (
+      rawData: CadastroCompletoSchema
+    ): CadastroUsuarioData => {
+      return {
+        cpf: rawData.cpf.replace(/\D/g, ""),
+        nomeCompleto: rawData.nome.trim(),
+        dataNascimento: rawData.dataNascimento,
+        sexo: rawData.sexo,
+        nomePai: rawData.nomePai.trim(),
+        nomeMae: rawData.nomeMae.trim(),
+        escolaridade: rawData.escolaridade,
+
+        identidade: rawData.documentoIdentidade.replace(/\D/g, ""),
+        ufIdentidade: rawData.ufIdentidade,
+
+        cep: rawData.cep.replace(/\D/g, ""),
+        uf: rawData.uf,
+        cidade: rawData.cidade.trim(),
+        bairro: rawData.bairro.trim(),
+        logradouro: rawData.logradouro.trim(),
+        complemento: (rawData.complemento || "").trim(),
+        numeroCasa: rawData.numero,
+
+        telefoneDdd: rawData.dddTelefone.replace(/\D/g, ""),
+        telefoneNumero: rawData.telefone.replace(/\D/g, ""),
+        celularDdd: rawData.dddCelular.replace(/\D/g, ""),
+        celularNumero: rawData.celular.replace(/\D/g, ""),
+        email: rawData.email.toLowerCase().trim(),
+        confirmarEmail: rawData.confirmarEmail.toLowerCase().trim(),
+        senha: rawData.senha,
+        confirmarSenha: rawData.confirmarSenha,
+      };
+    };
+
+    const mappedData = cleanData(data);
+
+    try {
+      const result = await userService.cadastrar(mappedData);
+
+      if (result.success) {
+        toast({
+          title: "Cadastro realizado com sucesso! 🎉",
+          description: "Redirecionando para a página de login...",
+          variant: "default",
+          duration: 3000,
+        });
+
+        router.push("/login?cadastro=sucesso");
+      } else {
+        toast({
+          title: "Erro no cadastro",
+          description: result.message,
+          variant: "destructive",
+        });
+      }
+    } catch (error: unknown) {
+      console.error("Erro inesperado:", error);
+      toast({
+        title: "Erro inesperado",
+        description: "Tente novamente mais tarde.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const calculatePasswordStrength = (
@@ -278,8 +374,8 @@ export default function RegisterComponent() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="masculino">Masculino</SelectItem>
-                        <SelectItem value="feminino">Feminino</SelectItem>
+                        <SelectItem value="MASCULINO">Masculino</SelectItem>
+                        <SelectItem value="FEMININO">Feminino</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -744,7 +840,6 @@ export default function RegisterComponent() {
               Senha de Acesso
             </h1>
             <div className="space-y-6">
-              
               <FormField
                 control={form.control}
                 name="senha"
@@ -911,6 +1006,7 @@ export default function RegisterComponent() {
             <Button
               type="submit"
               className="w-full mb-6"
+              disabled={!canSubmit || isSubmitting}
               onClick={(e) => {
                 if (!canSubmit) {
                   e.preventDefault();
@@ -918,7 +1014,11 @@ export default function RegisterComponent() {
                 }
               }}
             >
-              Finalizar Cadastro
+              {isSubmitting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                "Finalizar Cadastro"
+              )}
             </Button>
             {!passwordsMatch && senha && confirmarSenha && (
               <p className="text-sm text-red-600 text-center mt-2">
