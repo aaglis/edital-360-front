@@ -5,6 +5,7 @@ const publicRoutes = [
   { path: '/login', whenAuthenticated: 'redirect'},
   { path: '/cadastro', whenAuthenticated: 'redirect'},
   { path: '/finalizar-cadastro', whenAuthenticated: 'redirect'},
+  { path: '/recuperar-senha', whenAuthenticated: 'next'},
   { path: '/concursos', whenAuthenticated: 'next'},
   { path: '/', whenAuthenticated: 'next' },
 ] as const;

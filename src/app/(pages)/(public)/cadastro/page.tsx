@@ -9,7 +9,7 @@ import InputMask from "react-input-mask";
 import { Loader2 } from "lucide-react";
 
 import { registerSchema, RegisterSchema } from "@/core/schemas/register.schema";
-import { verificacaoService } from "@/services/verificacaoService";
+import { verificacaoService } from "@/core/services/verificacaoService";
 import { useToast } from "@/hooks/use-toast";
 
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -131,95 +132,102 @@ export default function RegisterPage() {
   };
 
   return (
-    <>
-      <div className="max-w-96 mx-auto mt-20 bg-white shadow-md rounded-lg p-6">
-        <div className="flex flex-col items-center justify-center gap-2 pb-3">
-          <h1 className="text-2xl font-bold">Criar conta</h1>
-          <span className="text-zinc-500">Informe seus dados iniciais</span>
-        </div>
+    <div className="flex flex-col space-y-6">
+      <div className="w-96 mx-auto">
+        <Card className="w-full shadow-lg">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl font-bold">Criar conta</CardTitle>
+            <CardDescription>
+              Informe seus dados iniciais
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="cpf"
+                  render={() => (
+                    <FormItem>
+                      <FormLabel>CPF</FormLabel>
+                      <FormControl>
+                        <Controller
+                          name="cpf"
+                          control={form.control}
+                          render={({ field }) => (
+                            <InputMask
+                              mask="999.999.999-99"
+                              placeholder="000.000.000-00"
+                              value={field.value}
+                              onChange={field.onChange}
+                            >
+                              {(
+                                inputProps: React.InputHTMLAttributes<HTMLInputElement>
+                              ) => <Input {...inputProps} />}
+                            </InputMask>
+                          )}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="cpf"
-              render={() => (
-                <FormItem>
-                  <FormLabel>CPF</FormLabel>
-                  <FormControl>
-                    <Controller
-                      name="cpf"
-                      control={form.control}
-                      render={({ field }) => (
-                        <InputMask
-                          mask="999.999.999-99"
-                          placeholder="000.000.000-00"
-                          value={field.value}
-                          onChange={field.onChange}
-                        >
-                          {(
-                            inputProps: React.InputHTMLAttributes<HTMLInputElement>
-                          ) => <Input {...inputProps} />}
-                        </InputMask>
-                      )}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                <FormField
+                  control={form.control}
+                  name="cep"
+                  render={() => (
+                    <FormItem>
+                      <FormLabel>CEP</FormLabel>
+                      <FormControl>
+                        <Controller
+                          name="cep"
+                          control={form.control}
+                          render={({ field }) => (
+                            <InputMask
+                              mask="99999-999"
+                              placeholder="00000-000"
+                              value={field.value}
+                              onChange={field.onChange}
+                            >
+                              {(
+                                inputProps: React.InputHTMLAttributes<HTMLInputElement>
+                              ) => <Input {...inputProps} />}
+                            </InputMask>
+                          )}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-            <FormField
-              control={form.control}
-              name="cep"
-              render={() => (
-                <FormItem>
-                  <FormLabel>CEP</FormLabel>
-                  <FormControl>
-                    <Controller
-                      name="cep"
-                      control={form.control}
-                      render={({ field }) => (
-                        <InputMask
-                          mask="99999-999"
-                          placeholder="00000-000"
-                          value={field.value}
-                          onChange={field.onChange}
-                        >
-                          {(
-                            inputProps: React.InputHTMLAttributes<HTMLInputElement>
-                          ) => <Input {...inputProps} />}
-                        </InputMask>
-                      )}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                <Button type="submit" className="w-full" disabled={isVerifying}>
+                  {isVerifying ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      Verificando...
+                    </>
+                  ) : (
+                    "Avançar"
+                  )}
+                </Button>
 
-            <Button type="submit" className="w-full" disabled={isVerifying}>
-              {isVerifying ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  Verificando...
-                </>
-              ) : (
-                "Avançar"
-              )}
-            </Button>
+                <div className="text-center text-sm text-zinc-500 mt-4">
+                  Já tem uma conta?{" "}
+                  <Link href="/login" className="text-primary hover:underline">
+                    Entrar
+                  </Link>
+                </div>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
 
-            <div className="text-center text-sm text-zinc-500 mt-4">
-              Já tem uma conta?{" "}
-              <Link href="/login" className="text-primary hover:underline">
-                Entrar
-              </Link>
-            </div>
-          </form>
-        </Form>
+        
       </div>
       <div className="mx-auto">
-        <p className="text-center text-sm text-zinc-500 mt-4">
+        <p className="text-center text-sm text-zinc-500">
           Ao criar uma conta, você concorda com nossos{" "}
           <Link
             href="/termos-de-servico"
@@ -237,6 +245,6 @@ export default function RegisterPage() {
           .
         </p>
       </div>
-    </>
+    </div>
   );
 }

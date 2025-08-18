@@ -9,7 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
 import InputMask from "react-input-mask";
 import { EyeIcon, EyeOffIcon, Loader2 } from "lucide-react";
-import { userService, type CadastroUsuarioData } from "@/services/userService";
+import { userService, type CadastroUsuarioData } from "@/core/services/userService";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

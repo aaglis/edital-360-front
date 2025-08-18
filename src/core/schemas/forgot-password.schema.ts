@@ -30,13 +30,12 @@ function validarCPF(cpf: string): boolean {
   return true;
 }
 
-export const loginSchema = z.object({
-  cpf: z.string().min(11, "CPF obrigatório").max(14, "CPF inválido").refine((cpf) => validarCPF(cpf), {
+export const recoverPasswordSchema = z.object({
+  cpf: z.string().min(11, "Informe um CPF válido").refine((cpf) => validarCPF(cpf), {
     message: "CPF inválido",
   }),
-  password: z.string().min(6, "Senha muito curta"),
-  recaptchaResponse: z.string().min(1, "Verifique o reCAPTCHA"),
-
+  channel: z.enum(["EMAIL", "SMS"], { error: "Selecione um canal" }),
+  recaptchaToken: z.string().min(1, "Confirme o reCAPTCHA"),
 });
 
-export type LoginSchema = z.infer<typeof loginSchema>;
+export type RecoverPasswordSchema = z.infer<typeof recoverPasswordSchema>;

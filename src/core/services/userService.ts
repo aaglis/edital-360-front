@@ -1,5 +1,7 @@
+import type { RecoverPasswordSchema } from "../schemas/forgot-password.schema";
+import type { LoginSchema } from "../schemas/login.schema";
 import api from "./api";
-import axios from "axios";
+import axios, { isAxiosError } from "axios";
 
 export interface CadastroUsuarioData {
   cpf: string;
@@ -62,6 +64,43 @@ export const userService = {
         success: false,
         message: "Erro inesperado. Tente novamente mais tarde.",
       };
+    }
+  },
+  async login(data: LoginSchema) {
+    try {
+      const response = await api.post("auth/login", data);
+      console.log("Login realizado com sucesso:", response.data);
+      return response.data;
+    } catch (error) {
+      if (isAxiosError(error)) {
+        return Promise.reject(error.response?.data);
+      } else {
+        return Promise.reject(new Error("Erro inesperado durante o login"));
+      }
+    }
+  },
+  async recoverPasswordRequest(data: RecoverPasswordSchema) {
+    try {
+      const response = await api.post("api/recuperacao/password/request", data); 
+      return response.data;
+    } catch (error) {
+      if (isAxiosError(error)) {
+        return Promise.reject(error.response?.data);
+      } else {
+        return Promise.reject(new Error("Erro inesperado durante a recuperação de senha"));
+      }
+    }
+  },
+  async recoverPasswordConfirm(data: { code: string, channel: string, senha: string, confirmarSenha: string }) {
+    try {
+      const response = await api.post("api/recuperacao/password/reset", data);
+      return response.data;
+    } catch (error) {
+      if (isAxiosError(error)) {
+        return Promise.reject(error.response?.data);
+      } else {
+        return Promise.reject(new Error("Erro inesperado durante a confirmação de recuperação de senha"));
+      }
     }
   },
 };
