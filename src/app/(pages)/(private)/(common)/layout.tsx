@@ -1,7 +1,7 @@
-import HeaderComponent from "@/app/components/HeaderComponent";
+import HeaderComponent from "@/components/HeaderComponent";
 
 
-export default function PublicLayout({
+export default function CommonPrivateLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -9,8 +9,7 @@ export default function PublicLayout({
   return (
     <div>
         <HeaderComponent />
-        {children}
-       
+        {children}   
     </div>
   );
 }

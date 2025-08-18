@@ -29,6 +29,7 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
+import Cookies from "js-cookie";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -52,10 +53,11 @@ export default function LoginPage() {
       .then((response: {token: string}) => {
         const { token } = response;
         sessionStorage.setItem("auth_token", token);
+        Cookies.set("token", token, { expires: 1 }); // Store token in cookies for 7 days
 
         setIsLoading(false);
         recaptchaRef.current?.reset();
-        router.push("/dashboard");
+        router.push("/configuracoes");
       })
       .catch((error) => {
         toast.error("Erro ao realizar login: ", {
@@ -85,6 +87,7 @@ export default function LoginPage() {
               <FormField
                 control={form.control}
                 name="cpf"
+                //eslint-disable-next-line
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>CPF</FormLabel>

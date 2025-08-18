@@ -44,7 +44,7 @@ export function middleware(request: NextRequest) {
       const decodedToken = jwtDecode<{ exp: number }>(token);
       const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
       if (decodedToken.exp < currentTime) {
-        // Token is expired, redirect to sign-in
+        console.log('Token expired, redirecting to login');
         const redirectUrl = request.nextUrl.clone();
         redirectUrl.pathname = REDIRECT_WHEN_NOT_AUTHENTICATED;
         return NextResponse.redirect(redirectUrl);

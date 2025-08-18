@@ -2,6 +2,7 @@ import type { RecoverPasswordSchema } from "../schemas/forgot-password.schema";
 import type { LoginSchema } from "../schemas/login.schema";
 import api from "./api";
 import axios, { isAxiosError } from "axios";
+import Cookies from "js-cookie";
 
 export interface CadastroUsuarioData {
   cpf: string;
@@ -78,6 +79,11 @@ export const userService = {
         return Promise.reject(new Error("Erro inesperado durante o login"));
       }
     }
+  },
+  logout() {
+    sessionStorage.removeItem("auth_token");
+    Cookies.remove("token");
+
   },
   async recoverPasswordRequest(data: RecoverPasswordSchema) {
     try {

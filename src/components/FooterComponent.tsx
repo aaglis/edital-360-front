@@ -1,14 +1,11 @@
+import Logo from "./Logo";
+
 const FooterComponent = () => {
     return (
       <footer className="bg-gray-900 text-gray-200 py-8 mt-12">
         <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between">
           <div className="mb-4 md:mb-0">
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-primary text-white flex items-center justify-center rounded-lg">
-                  <span className="uppercase font-bold text-xl">e</span>
-              </div>
-              <span className="font-bold text-lg">Edital 360</span>
-            </div>
+            <Logo />
             <p className="text-xs mt-1">Transformando processos seletivos</p>
           </div>
           <div className="flex space-x-6 mb-4 md:mb-0">

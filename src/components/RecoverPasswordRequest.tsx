@@ -66,7 +66,7 @@ const RecoverPasswordRequestStep = ({ onSuccess }: { onSuccess: () => void }) =>
 
   return (
     <div className="max-w-96">
-      <Card>
+      <Card className="shadow-lg">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">Recuperar Senha</CardTitle>
           <CardDescription>
