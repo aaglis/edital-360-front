@@ -6,7 +6,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cadastrarEditalSchema, CadastrarEditalSchema } from "@/core/schemas/cadastrar-edital.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray } from "react-hook-form";
@@ -140,8 +139,8 @@ export default function CadastrarEditalPage() {
   ];
 
   return (
-    <div className="flex flex-col items-center justify-center mt-20 mx-8 min-h-screen">
-      <div className="w-full max-w-[1200px] bg-white shadow-md rounded-lg p-8 border border-gray-300">
+    <div className="flex flex-col items-center mt-20 mx-8 min-h-screen">
+      <div className="w-full max-w-[843px]">
         <h1 className="text-3xl font-bold text-center mb-8">Cadastrar Novo Edital</h1>
         
         <StepIndicator currentStep={currentStep} />
@@ -151,16 +150,16 @@ export default function CadastrarEditalPage() {
             
             {/* ETAPA 1 - Informações Básicas */}
             {currentStep === 1 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Etapa 1 - Informações Básicas</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
+              <div className="bg-white shadow-md rounded-lg p-6 border border-gray-300">
+                <h2 className="text-xl font-bold border-l-4 border-blue-500 pl-2 mb-6">
+                  Etapa 1 - Informações Básicas
+                </h2>
+                <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
                   <FormField
                     control={form.control}
                     name="titulo"
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="col-span-2">
                         <FormLabel>Título do Edital *</FormLabel>
                         <FormControl>
                           <Input placeholder="Digite o título do edital" {...field} />
@@ -174,7 +173,7 @@ export default function CadastrarEditalPage() {
                     control={form.control}
                     name="descricao"
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="col-span-2">
                         <FormLabel>Descrição *</FormLabel>
                         <FormControl>
                           <Textarea 
@@ -188,129 +187,128 @@ export default function CadastrarEditalPage() {
                     )}
                   />
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="dataInicioInscricoes"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Data de Início das Inscrições *</FormLabel>
-                          <FormControl>
-                            <Input 
-                              type="date" 
-                              {...field} 
-                              value={field.value ? field.value.toISOString().split('T')[0] : ''}
-                              onChange={(e) => field.onChange(new Date(e.target.value))}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="dataFimInscricoes"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Data de Fim das Inscrições *</FormLabel>
-                          <FormControl>
-                            <Input 
-                              type="date" 
-                              {...field} 
-                              value={field.value ? field.value.toISOString().split('T')[0] : ''}
-                              onChange={(e) => field.onChange(new Date(e.target.value))}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="dataProva"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Data da Prova/Avaliação *</FormLabel>
-                          <FormControl>
-                            <Input 
-                              type="date" 
-                              {...field} 
-                              value={field.value ? field.value.toISOString().split('T')[0] : ''}
-                              onChange={(e) => field.onChange(new Date(e.target.value))}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* ETAPA 2 - Requisitos e Detalhes */}
-            {currentStep === 2 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Etapa 2 - Requisitos e Detalhes</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  
-                  {/* Tipo de Prova */}
                   <FormField
                     control={form.control}
-                    name="tipoProva"
-                    render={() => (
-                      <FormItem>
-                        <FormLabel>Tipo de Prova * (selecione uma ou mais)</FormLabel>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                          {tiposProva.map((tipo) => (
-                            <FormField
-                              key={tipo.value}
-                              control={form.control}
-                              name="tipoProva"
-                              render={({ field }) => {
-                                return (
-                                  <FormItem
-                                    key={tipo.value}
-                                    className="flex flex-row items-start space-x-3 space-y-0"
-                                  >
-                                    <FormControl>
-                                      <Checkbox
-                                        checked={field.value?.includes(tipo.value as "objetiva" | "discursiva" | "testes_fisicos" | "psicologicos" | "pericias" | "entrevistas")}
-                                        onCheckedChange={(checked) => {
-                                          return checked
-                                            ? field.onChange([...field.value, tipo.value])
-                                            : field.onChange(
-                                                field.value?.filter(
-                                                  (value) => value !== tipo.value
-                                                )
-                                              )
-                                        }}
-                                      />
-                                    </FormControl>
-                                    <FormLabel className="font-normal">
-                                      {tipo.label}
-                                    </FormLabel>
-                                  </FormItem>
-                                )
-                              }}
-                            />
-                          ))}
-                        </div>
+                    name="dataInicioInscricoes"
+                    render={({ field }) => (
+                      <FormItem className="col-span-2 md:col-span-1">
+                        <FormLabel>Data de Início das Inscrições *</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="date" 
+                            {...field} 
+                            value={field.value ? field.value.toISOString().split('T')[0] : ''}
+                            onChange={(e) => field.onChange(new Date(e.target.value))}
+                          />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="dataFimInscricoes"
+                    render={({ field }) => (
+                      <FormItem className="col-span-2 md:col-span-1">
+                        <FormLabel>Data de Fim das Inscrições *</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="date" 
+                            {...field} 
+                            value={field.value ? field.value.toISOString().split('T')[0] : ''}
+                            onChange={(e) => field.onChange(new Date(e.target.value))}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="dataProva"
+                    render={({ field }) => (
+                      <FormItem className="col-span-2">
+                        <FormLabel>Data da Prova/Avaliação *</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="date" 
+                            {...field} 
+                            value={field.value ? field.value.toISOString().split('T')[0] : ''}
+                            onChange={(e) => field.onChange(new Date(e.target.value))}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* ETAPA 2 - Requisitos e Detalhes */}
+            {currentStep === 2 && (
+              <div className="space-y-8">
+                
+                {/* Detalhes da Prova */}
+                <div className="bg-white shadow-md rounded-lg p-6 border border-gray-300">
+                  <h2 className="text-xl font-bold border-l-4 border-blue-500 pl-2 mb-6">
+                    Detalhes da Prova
+                  </h2>
+                  <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
+                    
+                    <FormField
+                      control={form.control}
+                      name="tipoProva"
+                      render={() => (
+                        <FormItem className="col-span-2">
+                          <FormLabel>Tipo de Prova * (selecione uma ou mais)</FormLabel>
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-2">
+                            {tiposProva.map((tipo) => (
+                              <FormField
+                                key={tipo.value}
+                                control={form.control}
+                                name="tipoProva"
+                                render={({ field }) => {
+                                  return (
+                                    <FormItem
+                                      key={tipo.value}
+                                      className="flex flex-row items-start space-x-3 space-y-0"
+                                    >
+                                      <FormControl>
+                                        <Checkbox
+                                          checked={field.value?.includes(tipo.value as "objetiva" | "discursiva" | "testes_fisicos" | "psicologicos" | "pericias" | "entrevistas")}
+                                          onCheckedChange={(checked) => {
+                                            return checked
+                                              ? field.onChange([...field.value, tipo.value])
+                                              : field.onChange(
+                                                  field.value?.filter(
+                                                    (value) => value !== tipo.value
+                                                  )
+                                                )
+                                          }}
+                                        />
+                                      </FormControl>
+                                      <FormLabel className="font-normal">
+                                        {tipo.label}
+                                      </FormLabel>
+                                    </FormItem>
+                                  )
+                                }}
+                              />
+                            ))}
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
                     <FormField
                       control={form.control}
                       name="numeroVagas"
                       render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="col-span-2 md:col-span-1">
                           <FormLabel>Número de Vagas *</FormLabel>
                           <FormControl>
                             <Input 
@@ -330,7 +328,7 @@ export default function CadastrarEditalPage() {
                       control={form.control}
                       name="taxaInscricao"
                       render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="col-span-2 md:col-span-1">
                           <FormLabel>Taxa de Inscrição (R$) *</FormLabel>
                           <FormControl>
                             <Input 
@@ -347,16 +345,20 @@ export default function CadastrarEditalPage() {
                       )}
                     />
                   </div>
+                </div>
 
-                  {/* Requisitos para Candidatos */}
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">Requisitos para Candidatos</h3>
+                {/* Requisitos para Candidatos */}
+                <div className="bg-white shadow-md rounded-lg p-6 border border-gray-300">
+                  <h2 className="text-xl font-bold border-l-4 border-blue-500 pl-2 mb-6">
+                    Requisitos para Candidatos
+                  </h2>
+                  <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
                     
                     <FormField
                       control={form.control}
                       name="escolaridadeMinima"
                       render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="col-span-2">
                           <FormLabel>Escolaridade Mínima *</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
@@ -377,55 +379,53 @@ export default function CadastrarEditalPage() {
                       )}
                     />
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="idadeMinima"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Idade Mínima</FormLabel>
-                            <FormControl>
-                              <Input 
-                                type="number" 
-                                min="16" 
-                                max="100"
-                                placeholder="16" 
-                                {...field}
-                                onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                    <FormField
+                      control={form.control}
+                      name="idadeMinima"
+                      render={({ field }) => (
+                        <FormItem className="col-span-2 md:col-span-1">
+                          <FormLabel>Idade Mínima</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="number" 
+                              min="16" 
+                              max="100"
+                              placeholder="16" 
+                              {...field}
+                              onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                      <FormField
-                        control={form.control}
-                        name="idadeMaxima"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Idade Máxima</FormLabel>
-                            <FormControl>
-                              <Input 
-                                type="number" 
-                                min="16" 
-                                max="100"
-                                placeholder="100" 
-                                {...field}
-                                onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
+                    <FormField
+                      control={form.control}
+                      name="idadeMaxima"
+                      render={({ field }) => (
+                        <FormItem className="col-span-2 md:col-span-1">
+                          <FormLabel>Idade Máxima</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="number" 
+                              min="16" 
+                              max="100"
+                              placeholder="100" 
+                              {...field}
+                              onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
                     <FormField
                       control={form.control}
                       name="outrosRequisitos"
                       render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="col-span-2">
                           <FormLabel>Outros Requisitos</FormLabel>
                           <FormControl>
                             <Textarea 
@@ -438,78 +438,80 @@ export default function CadastrarEditalPage() {
                       )}
                     />
                   </div>
+                </div>
 
-                  {/* Cotas e Reservas de Vagas */}
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">Cotas e Reservas de Vagas</h3>
+                {/* Cotas e Reservas de Vagas */}
+                <div className="bg-white shadow-md rounded-lg p-6 border border-gray-300">
+                  <h2 className="text-xl font-bold border-l-4 border-blue-500 pl-2 mb-6">
+                    Cotas e Reservas de Vagas
+                  </h2>
+                  <div className="grid gap-6 grid-cols-1 md:grid-cols-3">
                     
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="cotas.pcd"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Vagas PCD</FormLabel>
-                            <FormControl>
-                              <Input 
-                                type="number" 
-                                min="0"
-                                placeholder="0" 
-                                {...field}
-                                onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                    <FormField
+                      control={form.control}
+                      name="cotas.pcd"
+                      render={({ field }) => (
+                        <FormItem className="col-span-3 md:col-span-1">
+                          <FormLabel>Vagas PCD</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="number" 
+                              min="0"
+                              placeholder="0" 
+                              {...field}
+                              onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                      <FormField
-                        control={form.control}
-                        name="cotas.negros"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Vagas para Negros</FormLabel>
-                            <FormControl>
-                              <Input 
-                                type="number" 
-                                min="0"
-                                placeholder="0" 
-                                {...field}
-                                onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                    <FormField
+                      control={form.control}
+                      name="cotas.negros"
+                      render={({ field }) => (
+                        <FormItem className="col-span-3 md:col-span-1">
+                          <FormLabel>Vagas para Negros</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="number" 
+                              min="0"
+                              placeholder="0" 
+                              {...field}
+                              onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                      <FormField
-                        control={form.control}
-                        name="cotas.indigenas"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Vagas para Indígenas</FormLabel>
-                            <FormControl>
-                              <Input 
-                                type="number" 
-                                min="0"
-                                placeholder="0" 
-                                {...field}
-                                onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
+                    <FormField
+                      control={form.control}
+                      name="cotas.indigenas"
+                      render={({ field }) => (
+                        <FormItem className="col-span-3 md:col-span-1">
+                          <FormLabel>Vagas para Indígenas</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="number" 
+                              min="0"
+                              placeholder="0" 
+                              {...field}
+                              onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
                     <FormField
                       control={form.control}
                       name="cotas.outras"
                       render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="col-span-3">
                           <FormLabel>Outras Cotas</FormLabel>
                           <FormControl>
                             <Input 
@@ -522,11 +524,14 @@ export default function CadastrarEditalPage() {
                       )}
                     />
                   </div>
+                </div>
 
-                  {/* Documentos Exigidos */}
+                {/* Documentos Exigidos */}
+                <div className="bg-white shadow-md rounded-lg p-6 border border-gray-300">
+                  <h2 className="text-xl font-bold border-l-4 border-blue-500 pl-2 mb-6">
+                    Documentos Exigidos
+                  </h2>
                   <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">Documentos Exigidos</h3>
-                    
                     {documentosFields.map((field, index) => (
                       <div key={field.id} className="flex gap-2">
                         <FormField
@@ -565,20 +570,21 @@ export default function CadastrarEditalPage() {
                       Adicionar Documento
                     </Button>
                   </div>
-                  
-                </CardContent>
-              </Card>
+                </div>
+                
+              </div>
             )}
 
             {/* ETAPA 3 - Cronograma e Documentos */}
             {currentStep === 3 && (
               <div className="space-y-8">
+                
                 {/* Cronograma */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Etapa 3 - Cronograma Detalhado</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
+                <div className="bg-white shadow-md rounded-lg p-6 border border-gray-300">
+                  <h2 className="text-xl font-bold border-l-4 border-blue-500 pl-2 mb-6">
+                    Cronograma Detalhado
+                  </h2>
+                  <div className="space-y-4">
                     {cronogramaFields.map((field, index) => (
                       <div key={field.id} className="grid grid-cols-1 md:grid-cols-12 gap-2 items-end p-4 border rounded-lg">
                         <FormField
@@ -638,82 +644,80 @@ export default function CadastrarEditalPage() {
                       <Plus className="h-4 w-4 mr-2" />
                       Adicionar Item ao Cronograma
                     </Button>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
 
                 {/* Upload do Edital */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Upload do Edital</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <FormField
-                      control={form.control}
-                      name="arquivoEdital"
-                      render={({ field: { onChange, ...field } }) => (
-                        <FormItem>
-                          <FormLabel>Arquivo do Edital (PDF) *</FormLabel>
-                          <FormControl>
-                            <Input 
-                              type="file" 
-                              accept=".pdf"
-                              onChange={(e) => {
-                                const file = e.target.files?.[0];
-                                if (file) onChange(file);
-                              }}
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </CardContent>
-                </Card>
+                <div className="bg-white shadow-md rounded-lg p-6 border border-gray-300">
+                  <h2 className="text-xl font-bold border-l-4 border-blue-500 pl-2 mb-6">
+                    Upload do Edital
+                  </h2>
+                  <FormField
+                    control={form.control}
+                    name="arquivoEdital"
+                    render={({ field: { onChange, ...field } }) => (
+                      <FormItem>
+                        <FormLabel>Arquivo do Edital (PDF) *</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="file" 
+                            accept=".pdf"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) onChange(file);
+                            }}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
                 {/* Resumo dos Documentos Exigidos */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Resumo dos Documentos Exigidos</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <h4 className="font-semibold mb-2">Documentos que serão solicitados:</h4>
-                      <ul className="list-disc list-inside space-y-1">
-                        {form.watch("documentosExigidos")?.filter(doc => doc.trim() !== "").map((doc, index) => (
-                          <li key={index} className="text-sm">{doc}</li>
-                        ))}
-                      </ul>
-                      {form.watch("documentosExigidos")?.filter(doc => doc.trim() !== "").length === 0 && (
-                        <p className="text-sm text-gray-500 italic">Nenhum documento especificado ainda</p>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
+                <div className="bg-white shadow-md rounded-lg p-6 border border-gray-300">
+                  <h2 className="text-xl font-bold border-l-4 border-blue-500 pl-2 mb-6">
+                    Resumo dos Documentos Exigidos
+                  </h2>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h4 className="font-semibold mb-2">Documentos que serão solicitados:</h4>
+                    <ul className="list-disc list-inside space-y-1">
+                      {form.watch("documentosExigidos")?.filter(doc => doc.trim() !== "").map((doc, index) => (
+                        <li key={index} className="text-sm">{doc}</li>
+                      ))}
+                    </ul>
+                    {form.watch("documentosExigidos")?.filter(doc => doc.trim() !== "").length === 0 && (
+                      <p className="text-sm text-gray-500 italic">Nenhum documento especificado ainda</p>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
 
             {/* Botões de Navegação */}
-            <div className="flex gap-4 justify-between pt-6">
-              <Button 
-                type="button" 
-                variant="outline"
-                onClick={prevStep}
-                disabled={currentStep === 1}
-              >
-                Voltar
-              </Button>
-              
-              <div className="flex gap-2">
-                {currentStep < 3 ? (
-                  <Button type="button" onClick={nextStep}>
-                    Próximo
-                  </Button>
-                ) : (
-                  <Button type="submit">
-                    Cadastrar Edital
-                  </Button>
-                )}
+            <div className="w-full max-w-[843px] mt-6">
+              <div className="flex gap-4 justify-between pt-6">
+                <Button 
+                  type="button" 
+                  variant="outline"
+                  onClick={prevStep}
+                  disabled={currentStep === 1}
+                >
+                  Voltar
+                </Button>
+                
+                <div className="flex gap-2">
+                  {currentStep < 3 ? (
+                    <Button type="button" onClick={nextStep}>
+                      Próximo
+                    </Button>
+                  ) : (
+                    <Button type="submit" className="w-full md:w-auto">
+                      Cadastrar Edital
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
 
