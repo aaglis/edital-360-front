@@ -40,7 +40,7 @@ export interface CadastroUsuarioResponse {
 export const userService = {
   async cadastrar(data: CadastroUsuarioData): Promise<CadastroUsuarioResponse> {
     try {
-      const response = await api.post("/cadastro/completar", data);
+      const response = await api.post("cadastro/completar", data);
 
       return {
         success: true,
