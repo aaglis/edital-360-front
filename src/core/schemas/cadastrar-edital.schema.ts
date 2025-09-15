@@ -21,10 +21,11 @@ export const cadastrarEditalSchema = z.object({
     "entrevistas"
   ])).min(1, "Selecione pelo menos um tipo de prova"),
   
- 
-  numeroVagas: z.number()
-    .min(1, "Número de vagas deve ser maior que zero")
-    .int("Número de vagas deve ser um número inteiro"),
+  // Cargos
+  cargos: z.array(z.object({
+    nomeCargo: z.string().min(2, "Nome do cargo deve ter pelo menos 2 caracteres").max(100, "Nome do cargo deve ter no máximo 100 caracteres"),
+    numeroVagas: z.number().min(1, "Número de vagas deve ser maior que zero").int("Número de vagas deve ser um número inteiro")
+  })).min(1, "Adicione pelo menos um cargo"),
   
   
   escolaridadeMinima: z.enum([

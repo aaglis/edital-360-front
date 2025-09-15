@@ -7,10 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cadastrarEditalSchema, CadastrarEditalSchema } from "@/core/schemas/cadastrar-edital.schema";
+import { cadastrarEditalService } from "@/core/services/cadastrar-edital-service";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray } from "react-hook-form";
 import { Plus, Trash2, CheckCircle } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 // Componente do Stepper
 function StepIndicator({ currentStep }: { currentStep: number }) {
@@ -59,6 +61,7 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
 
 export default function CadastrarEditalPage() {
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const form = useForm<CadastrarEditalSchema>({
     resolver: zodResolver(cadastrarEditalSchema),
@@ -68,7 +71,7 @@ export default function CadastrarEditalPage() {
       titulo: "",
       descricao: "",
       tipoProva: [],
-      numeroVagas: 1,
+      cargos: [{ nomeCargo: "", numeroVagas: 1 }],
       taxaInscricao: 0,
       documentosExigidos: [""],
       cronograma: [{ data: new Date(), evento: "", observacoes: "" }],
@@ -81,6 +84,11 @@ export default function CadastrarEditalPage() {
     }
   });
 
+  const { fields: cargosFields, append: appendCargo, remove: removeCargo } = useFieldArray({
+    control: form.control,
+    name: "cargos"
+  });
+
   const { fields: documentosFields, append: appendDocumento, remove: removeDocumento } = useFieldArray({
     control: form.control,
     name: "documentosExigidos"
@@ -91,9 +99,44 @@ export default function CadastrarEditalPage() {
     name: "cronograma"
   });
 
-  const onSubmit = (data: CadastrarEditalSchema) => {
-    console.log(data);
-    // Aqui você implementa o envio dos dados
+  const onSubmit = async (data: CadastrarEditalSchema) => {
+    console.log("Dados do formulário:", data);
+    setIsSubmitting(true);
+    
+    try {
+      toast.loading("Cadastrando edital...", { id: "cadastrar-edital" });
+      
+      const result = await cadastrarEditalService.cadastrar(data);
+      
+      if (result.success) {
+        toast.success(result.message, { 
+          id: "cadastrar-edital",
+          description: "O edital foi cadastrado com sucesso e está disponível para consulta."
+        });
+        
+        // Resetar o formulário
+        form.reset();
+        setCurrentStep(1);
+        
+        // Opcional: redirecionar para lista de editais
+        // router.push('/concursos');
+        
+      } else {
+        toast.error(result.message, { 
+          id: "cadastrar-edital",
+          description: "Verifique os dados e tente novamente."
+        });
+      }
+      
+    } catch (error) {
+      console.error('Erro inesperado:', error);
+      toast.error("Erro inesperado ao cadastrar edital", { 
+        id: "cadastrar-edital",
+        description: "Tente novamente em alguns instantes."
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const nextStep = async () => {
@@ -102,7 +145,9 @@ export default function CadastrarEditalPage() {
     if (currentStep === 1) {
       fieldsToValidate = ["titulo", "descricao", "dataInicioInscricoes", "dataFimInscricoes", "dataProva"];
     } else if (currentStep === 2) {
-      fieldsToValidate = ["tipoProva", "numeroVagas", "taxaInscricao", "escolaridadeMinima", "documentosExigidos"];
+      fieldsToValidate = ["tipoProva", "cargos", "taxaInscricao", "escolaridadeMinima", "documentosExigidos"];
+    } else if (currentStep === 3) {
+      fieldsToValidate = ["cronograma", "arquivoEdital"];
     }
     
     const isValid = await form.trigger(fieldsToValidate);
@@ -304,31 +349,76 @@ export default function CadastrarEditalPage() {
                       )}
                     />
 
-                    <FormField
-                      control={form.control}
-                      name="numeroVagas"
-                      render={({ field }) => (
-                        <FormItem className="col-span-2 md:col-span-1">
-                          <FormLabel>Número de Vagas *</FormLabel>
-                          <FormControl>
-                            <Input 
-                              type="number" 
-                              min="1"
-                              placeholder="1" 
-                              {...field}
-                              onChange={(e) => field.onChange(parseInt(e.target.value))}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    {/* Seção de Cargos */}
+                    <div className="col-span-2 space-y-4">
+                      <FormLabel>Cargos e Vagas *</FormLabel>
+                      {cargosFields.map((field, index) => (
+                        <div key={field.id} className="grid grid-cols-1 md:grid-cols-12 gap-2 items-end p-4 border rounded-lg">
+                          <FormField
+                            control={form.control}
+                            name={`cargos.${index}.nomeCargo`}
+                            render={({ field }) => (
+                              <FormItem className="md:col-span-7">
+                                <FormLabel>Nome do Cargo</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    placeholder="Ex: Analista, Técnico, Professor..." 
+                                    {...field} 
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name={`cargos.${index}.numeroVagas`}
+                            render={({ field }) => (
+                              <FormItem className="md:col-span-3">
+                                <FormLabel>Nº Vagas</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    type="number" 
+                                    min="1"
+                                    placeholder="1" 
+                                    {...field}
+                                    onChange={(e) => field.onChange(parseInt(e.target.value))}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={() => removeCargo(index)}
+                            disabled={cargosFields.length === 1}
+                            className="md:col-span-2"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => appendCargo({ nomeCargo: "", numeroVagas: 1 })}
+                        className="w-full"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Adicionar Cargo
+                      </Button>
+                    </div>
 
                     <FormField
                       control={form.control}
                       name="taxaInscricao"
                       render={({ field }) => (
-                        <FormItem className="col-span-2 md:col-span-1">
+                        <FormItem className="col-span-2">
                           <FormLabel>Taxa de Inscrição (R$) *</FormLabel>
                           <FormControl>
                             <Input 
@@ -655,7 +745,7 @@ export default function CadastrarEditalPage() {
                   <FormField
                     control={form.control}
                     name="arquivoEdital"
-                    render={({ field: { onChange, ...field } }) => (
+                    render={({ field: { onChange, value, ...field } }) => (
                       <FormItem>
                         <FormLabel>Arquivo do Edital (PDF) *</FormLabel>
                         <FormControl>
@@ -667,8 +757,17 @@ export default function CadastrarEditalPage() {
                               if (file) onChange(file);
                             }}
                             {...field}
+                            value=""
                           />
                         </FormControl>
+                        <p className="text-sm text-gray-600 mt-1">
+                          O arquivo PDF do edital completo é obrigatório para o cadastro.
+                        </p>
+                        {value && (
+                          <p className="text-sm text-green-600 mt-1">
+                            ✓ Arquivo selecionado: {value.name}
+                          </p>
+                        )}
                         <FormMessage />
                       </FormItem>
                     )}
@@ -713,8 +812,12 @@ export default function CadastrarEditalPage() {
                       Próximo
                     </Button>
                   ) : (
-                    <Button type="submit" className="w-full md:w-auto">
-                      Cadastrar Edital
+                    <Button 
+                      type="submit" 
+                      className="w-full md:w-auto" 
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? "Cadastrando..." : "Cadastrar Edital"}
                     </Button>
                   )}
                 </div>

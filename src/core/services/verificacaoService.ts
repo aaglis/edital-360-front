@@ -25,7 +25,7 @@ export interface VerificarCadastroResponse {
 export const verificacaoService = {
   async verificarCadastro(data: VerificarCadastroData): Promise<VerificarCadastroResponse> {
     try {
-      // GET com query parameters em vez de POST
+     
       const cpfLimpo = data.cpf.replace(/\D/g, "");
       const cepLimpo = data.cep.replace(/\D/g, "");
       
@@ -36,16 +36,16 @@ export const verificacaoService = {
         },
       });
 
-      // Trata a resposta da API que retorna string em vez de objeto
+      
       let responseData;
       
       if (typeof response.data === 'string') {
-        // Se a API retorna string "CPF e CEP válidos."
+        
         if (response.data.includes('válidos') || response.data.includes('válido')) {
           responseData = {
             cpfValido: true,
             cepValido: true,
-            endereco: null, // API não retorna endereço por enquanto
+            endereco: null, 
           };
         } else {
           responseData = {
@@ -55,7 +55,6 @@ export const verificacaoService = {
           };
         }
       } else {
-        // Se a API retorna objeto estruturado
         responseData = response.data;
       }
 
@@ -68,7 +67,6 @@ export const verificacaoService = {
       console.error("Erro ao verificar cadastro:", error);
       
       if (axios.isAxiosError(error)) {
-        // Erro 403 - Forbidden 
         if (error.response?.status === 403) {
           return {
             success: false,
@@ -76,7 +74,6 @@ export const verificacaoService = {
           };
         }
         
-        // Outros erros da API
         if (error.response?.data?.message) {
           return {
             success: false,
