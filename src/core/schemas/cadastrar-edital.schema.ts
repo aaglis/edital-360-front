@@ -7,9 +7,15 @@ export const cadastrarEditalSchema = z.object({
   descricao: z.string().min(10, "Descrição deve ter pelo menos 10 caracteres").max(2000, "Descrição deve ter no máximo 2000 caracteres"),
 
 
-  dataInicioInscricoes: z.date(),
-  dataFimInscricoes: z.date(),
-  dataProva: z.date(),
+  dataInicioInscricoes: z.date({
+    message: "Data de início das inscrições é obrigatória"
+  }),
+  dataFimInscricoes: z.date({
+    message: "Data de fim das inscrições é obrigatória"
+  }),
+  dataProva: z.date({
+    message: "Data da prova é obrigatória"
+  }),
   
  
   tipoProva: z.array(z.enum([
@@ -62,8 +68,7 @@ export const cadastrarEditalSchema = z.object({
   
   
   taxaInscricao: z.number()
-    .min(0, "Taxa de inscrição deve ser maior ou igual a zero")
-    .default(0),
+    .min(0, "Taxa de inscrição deve ser maior ou igual a zero"),
   
   documentosExigidos: z.array(z.string().min(2, "Nome do documento deve ter pelo menos 2 caracteres"))
     .min(1, "Selecione pelo menos um documento exigido"),
@@ -96,9 +101,16 @@ export const cadastrarEditalSchema = z.object({
     path: ["idadeMaxima"]
   }
 ).refine(
-  (data) => data.dataInicioInscricoes > new Date(),
+  (data) => {
+    // Permitir datas de hoje para frente (mais flexível para testes)
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0); // Resetar horário para comparação apenas de data
+    const dataInicio = new Date(data.dataInicioInscricoes);
+    dataInicio.setHours(0, 0, 0, 0);
+    return dataInicio >= hoje;
+  },
   {
-    message: "Data de início das inscrições deve ser futura",
+    message: "Data de início das inscrições deve ser hoje ou futura",
     path: ["dataInicioInscricoes"]
   }
 );

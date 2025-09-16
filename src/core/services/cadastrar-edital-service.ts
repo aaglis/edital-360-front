@@ -66,7 +66,7 @@ const escolaridadeMap: Record<string, RequirementType> = {
   "superior_completo": "SUPERIOR_COMPLETO",
   "pos_graduacao": "POS_GRADUACAO",
   "mestrado": "MESTRADO",
-  "doutorado": "DOUTORADO"
+  "doutorado": "DOUTORADO",
 };
 
 export const cadastrarEditalService = {

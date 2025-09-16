@@ -14,8 +14,43 @@ import { Plus, Trash2, CheckCircle } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+// Componente para checkbox de tipo de prova
+function TipoProvaCheckbox({ 
+  tipo, 
+  field 
+}: { 
+  tipo: { value: string; label: string }; 
+  field: { value: string[]; onChange: (value: string[]) => void } 
+}) {
+  return (
+    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+      <FormControl>
+        <Checkbox
+          checked={field.value?.includes(tipo.value as "objetiva" | "discursiva" | "testes_fisicos" | "psicologicos" | "pericias" | "entrevistas")}
+          onCheckedChange={(checked) => {
+            if (checked) {
+              field.onChange([...field.value, tipo.value]);
+            } else {
+              field.onChange(field.value?.filter((value: string) => value !== tipo.value));
+            }
+          }}
+        />
+      </FormControl>
+      <FormLabel className="font-normal">
+        {tipo.label}
+      </FormLabel>
+    </FormItem>
+  );
+}
+
 // Componente do Stepper
 function StepIndicator({ currentStep }: { currentStep: number }) {
+  const getStepClasses = (current: number, step: number) => {
+    if (current > step) return 'bg-green-500 border-green-500 text-white';
+    if (current === step) return 'bg-blue-500 border-blue-500 text-white';
+    return 'bg-gray-200 border-gray-300 text-gray-500';
+  };
+
   const steps = [
     { number: 1, title: "Informações Básicas" },
     { number: 2, title: "Requisitos e Detalhes" },
@@ -29,11 +64,7 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
           <div key={step.number} className="flex items-center">
             <div className="flex flex-col items-center">
               <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${
-                currentStep > step.number
-                  ? 'bg-green-500 border-green-500 text-white'
-                  : currentStep === step.number
-                  ? 'bg-blue-500 border-blue-500 text-white'
-                  : 'bg-gray-200 border-gray-300 text-gray-500'
+                getStepClasses(currentStep, step.number)
               }`}>
                 {currentStep > step.number ? (
                   <CheckCircle className="w-6 h-6" />
@@ -63,10 +94,10 @@ export default function CadastrarEditalPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const form = useForm<CadastrarEditalSchema>({
+  const form = useForm({
     resolver: zodResolver(cadastrarEditalSchema),
-    mode: "onChange",
-    reValidateMode: "onChange",
+    mode: "onChange" as const,
+    reValidateMode: "onChange" as const,
     defaultValues: {
       titulo: "",
       descricao: "",
@@ -82,16 +113,11 @@ export default function CadastrarEditalPage() {
         outras: ""
       }
     }
-  });
+  } as const);
 
   const { fields: cargosFields, append: appendCargo, remove: removeCargo } = useFieldArray({
     control: form.control,
     name: "cargos"
-  });
-
-  const { fields: documentosFields, append: appendDocumento, remove: removeDocumento } = useFieldArray({
-    control: form.control,
-    name: "documentosExigidos"
   });
 
   const { fields: cronogramaFields, append: appendCronograma, remove: removeCronograma } = useFieldArray({
@@ -99,8 +125,27 @@ export default function CadastrarEditalPage() {
     name: "cronograma"
   });
 
+  // Função para gerenciar documentos manualmente
+  const documentosExigidos = form.watch("documentosExigidos") || [""];
+  
+  const addDocumento = () => {
+    const current = form.getValues("documentosExigidos") || [""];
+    form.setValue("documentosExigidos", [...current, ""]);
+  };
+  
+  const removeDocumento = (index: number) => {
+    const current = form.getValues("documentosExigidos") || [""];
+    if (current.length > 1) {
+      const newDocs = current.filter((_, i) => i !== index);
+      form.setValue("documentosExigidos", newDocs);
+    }
+  };
+
   const onSubmit = async (data: CadastrarEditalSchema) => {
-    console.log("Dados do formulário:", data);
+    console.log("🚀 onSubmit executado!");
+    console.log("📋 Dados do formulário:", data);
+    console.log("✅ Validação passou!");
+    
     setIsSubmitting(true);
     
     try {
@@ -139,6 +184,40 @@ export default function CadastrarEditalPage() {
     }
   };
 
+  // Função para mostrar erros de validação
+  const showValidationErrors = (errors: Record<string, { message?: string }>) => {
+    const fieldNames: Record<string, string> = {
+      dataInicioInscricoes: "Data de início",
+      dataFimInscricoes: "Data de fim", 
+      dataProva: "Data da prova",
+      titulo: "Título",
+      descricao: "Descrição",
+      tipoProva: "Tipo de prova",
+      cargos: "Cargos",
+      escolaridadeMinima: "Escolaridade",
+      documentosExigidos: "Documentos",
+      cronograma: "Cronograma",
+      arquivoEdital: "Arquivo"
+    };
+    
+    const errorMessages = Object.entries(errors)
+      .filter(([, error]) => error?.message)
+      .map(([field, error]) => {
+        const fieldName = fieldNames[field] || field;
+        return `${fieldName}: ${error.message}`;
+      });
+    
+    if (errorMessages.length > 0) {
+      toast.error("Corrija os erros antes de continuar:", {
+        description: errorMessages.join(" • ")
+      });
+    } else {
+      toast.error("Há campos obrigatórios não preenchidos", {
+        description: "Verifique todos os campos marcados com * e tente novamente."
+      });
+    }
+  };
+
   const nextStep = async () => {
     let fieldsToValidate: (keyof CadastrarEditalSchema)[] = [];
     
@@ -150,8 +229,66 @@ export default function CadastrarEditalPage() {
       fieldsToValidate = ["cronograma", "arquivoEdital"];
     }
     
+    console.log("🔍 Validando campos:", fieldsToValidate);
+    
+    // Validar apenas os campos da etapa atual
     const isValid = await form.trigger(fieldsToValidate);
-    if (isValid && currentStep < 3) {
+    
+    if (currentStep === 1) {
+      // Para a primeira etapa, validar também as regras de data manualmente
+      const values = form.getValues();
+      const hoje = new Date();
+      hoje.setHours(0, 0, 0, 0);
+      
+      let hasDateError = false;
+      
+      // Verificar se data de início é hoje ou futura
+      if (values.dataInicioInscricoes) {
+        const dataInicio = new Date(values.dataInicioInscricoes);
+        dataInicio.setHours(0, 0, 0, 0);
+        if (dataInicio < hoje) {
+          form.setError("dataInicioInscricoes", {
+            message: "Data de início das inscrições deve ser hoje ou futura"
+          });
+          hasDateError = true;
+        }
+      }
+      
+      // Verificar se data fim é posterior à data início
+      if (values.dataInicioInscricoes && values.dataFimInscricoes) {
+        if (values.dataFimInscricoes <= values.dataInicioInscricoes) {
+          form.setError("dataFimInscricoes", {
+            message: "Data de fim das inscrições deve ser posterior à data de início"
+          });
+          hasDateError = true;
+        }
+      }
+      
+      // Verificar se data da prova é posterior à data fim
+      if (values.dataFimInscricoes && values.dataProva) {
+        if (values.dataProva <= values.dataFimInscricoes) {
+          form.setError("dataProva", {
+            message: "Data da prova deve ser posterior ao fim das inscrições"
+          });
+          hasDateError = true;
+        }
+      }
+      
+      if (hasDateError) {
+        const errors = form.formState.errors;
+        showValidationErrors(errors);
+        return;
+      }
+    }
+    
+    console.log("📋 Resultado da validação:", { isValid, errors: form.formState.errors });
+    
+    if (!isValid) {
+      showValidationErrors(form.formState.errors);
+      return;
+    }
+    
+    if (currentStep < 3) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -191,7 +328,23 @@ export default function CadastrarEditalPage() {
         <StepIndicator currentStep={currentStep} />
         
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form 
+            onSubmit={(e) => {
+              console.log("📝 Form submit iniciado!");
+              console.log("🔍 Event:", e);
+              form.handleSubmit(onSubmit, (errors) => {
+                console.error("❌ Erros de validação:", errors);
+                console.error("🔍 Detalhes dos erros:");
+                Object.entries(errors).forEach(([field, error]) => {
+                  console.error(`  - ${field}:`, error);
+                });
+                toast.error("Há campos obrigatórios não preenchidos", {
+                  description: "Verifique todos os campos marcados com * e tente novamente."
+                });
+              })(e);
+            }} 
+            className="space-y-8"
+          >
             
             {/* ETAPA 1 - Informações Básicas */}
             {currentStep === 1 && (
@@ -246,6 +399,9 @@ export default function CadastrarEditalPage() {
                             onChange={(e) => field.onChange(new Date(e.target.value))}
                           />
                         </FormControl>
+                        <p className="text-xs text-gray-600">
+                          Deve ser hoje ou uma data futura
+                        </p>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -265,6 +421,9 @@ export default function CadastrarEditalPage() {
                             onChange={(e) => field.onChange(new Date(e.target.value))}
                           />
                         </FormControl>
+                        <p className="text-xs text-gray-600">
+                          Deve ser posterior à data de início
+                        </p>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -284,6 +443,9 @@ export default function CadastrarEditalPage() {
                             onChange={(e) => field.onChange(new Date(e.target.value))}
                           />
                         </FormControl>
+                        <p className="text-xs text-gray-600">
+                          Deve ser posterior ao fim das inscrições
+                        </p>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -315,32 +477,9 @@ export default function CadastrarEditalPage() {
                                 key={tipo.value}
                                 control={form.control}
                                 name="tipoProva"
-                                render={({ field }) => {
-                                  return (
-                                    <FormItem
-                                      key={tipo.value}
-                                      className="flex flex-row items-start space-x-3 space-y-0"
-                                    >
-                                      <FormControl>
-                                        <Checkbox
-                                          checked={field.value?.includes(tipo.value as "objetiva" | "discursiva" | "testes_fisicos" | "psicologicos" | "pericias" | "entrevistas")}
-                                          onCheckedChange={(checked) => {
-                                            return checked
-                                              ? field.onChange([...field.value, tipo.value])
-                                              : field.onChange(
-                                                  field.value?.filter(
-                                                    (value) => value !== tipo.value
-                                                  )
-                                                )
-                                          }}
-                                        />
-                                      </FormControl>
-                                      <FormLabel className="font-normal">
-                                        {tipo.label}
-                                      </FormLabel>
-                                    </FormItem>
-                                  )
-                                }}
+                                render={({ field }) => (
+                                  <TipoProvaCheckbox key={tipo.value} tipo={tipo} field={field} />
+                                )}
                               />
                             ))}
                           </div>
@@ -622,8 +761,9 @@ export default function CadastrarEditalPage() {
                     Documentos Exigidos
                   </h2>
                   <div className="space-y-4">
-                    {documentosFields.map((field, index) => (
-                      <div key={field.id} className="flex gap-2">
+                    {documentosExigidos.map((doc, index) => (
+                      // eslint-disable-next-line react/no-array-index-key
+                      <div key={index} className="flex gap-2">
                         <FormField
                           control={form.control}
                           name={`documentosExigidos.${index}`}
@@ -644,7 +784,7 @@ export default function CadastrarEditalPage() {
                           variant="outline"
                           size="icon"
                           onClick={() => removeDocumento(index)}
-                          disabled={documentosFields.length === 1}
+                          disabled={documentosExigidos.length === 1}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -653,7 +793,7 @@ export default function CadastrarEditalPage() {
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={() => appendDocumento("")}
+                      onClick={addDocumento}
                       className="w-full"
                     >
                       <Plus className="h-4 w-4 mr-2" />
@@ -783,7 +923,7 @@ export default function CadastrarEditalPage() {
                     <h4 className="font-semibold mb-2">Documentos que serão solicitados:</h4>
                     <ul className="list-disc list-inside space-y-1">
                       {form.watch("documentosExigidos")?.filter(doc => doc.trim() !== "").map((doc, index) => (
-                        <li key={index} className="text-sm">{doc}</li>
+                        <li key={`doc-${index}-${doc}`} className="text-sm">{doc}</li>
                       ))}
                     </ul>
                     {form.watch("documentosExigidos")?.filter(doc => doc.trim() !== "").length === 0 && (
@@ -808,7 +948,11 @@ export default function CadastrarEditalPage() {
                 
                 <div className="flex gap-2">
                   {currentStep < 3 ? (
-                    <Button type="button" onClick={nextStep}>
+                    <Button 
+                      type="button" 
+                      onClick={nextStep}
+                      className="min-w-24"
+                    >
                       Próximo
                     </Button>
                   ) : (
@@ -816,6 +960,14 @@ export default function CadastrarEditalPage() {
                       type="submit" 
                       className="w-full md:w-auto" 
                       disabled={isSubmitting}
+                      onClick={() => {
+                        console.log("🔘 Botão submit clicado!");
+                        console.log("📝 Estado do formulário:", {
+                          isValid: form.formState.isValid,
+                          errors: form.formState.errors,
+                          isSubmitting: form.formState.isSubmitting
+                        });
+                      }}
                     >
                       {isSubmitting ? "Cadastrando..." : "Cadastrar Edital"}
                     </Button>
