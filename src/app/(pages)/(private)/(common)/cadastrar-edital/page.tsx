@@ -93,6 +93,27 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
 export default function CadastrarEditalPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Função auxiliar para validar e converter data
+  const handleDateChange = (dateString: string, onChange: (date: Date | undefined) => void) => {
+    if (!dateString) {
+      onChange(undefined);
+      return;
+    }
+    
+    try {
+      const date = new Date(dateString);
+      // Verificar se a data é válida
+      if (!isNaN(date.getTime())) {
+        onChange(date);
+      } else {
+        // Se a data não é válida, não fazer nada (manter o valor anterior)
+        console.warn('Data inválida:', dateString);
+      }
+    } catch (error) {
+      console.warn('Erro ao processar data:', error);
+    }
+  };
   
   const form = useForm({
     resolver: zodResolver(cadastrarEditalSchema),
@@ -396,7 +417,7 @@ export default function CadastrarEditalPage() {
                             type="date" 
                             {...field} 
                             value={field.value ? field.value.toISOString().split('T')[0] : ''}
-                            onChange={(e) => field.onChange(new Date(e.target.value))}
+                            onChange={(e) => handleDateChange(e.target.value, field.onChange)}
                           />
                         </FormControl>
                         <p className="text-xs text-gray-600">
@@ -418,7 +439,7 @@ export default function CadastrarEditalPage() {
                             type="date" 
                             {...field} 
                             value={field.value ? field.value.toISOString().split('T')[0] : ''}
-                            onChange={(e) => field.onChange(new Date(e.target.value))}
+                            onChange={(e) => handleDateChange(e.target.value, field.onChange)}
                           />
                         </FormControl>
                         <p className="text-xs text-gray-600">
@@ -440,7 +461,7 @@ export default function CadastrarEditalPage() {
                             type="date" 
                             {...field} 
                             value={field.value ? field.value.toISOString().split('T')[0] : ''}
-                            onChange={(e) => field.onChange(new Date(e.target.value))}
+                            onChange={(e) => handleDateChange(e.target.value, field.onChange)}
                           />
                         </FormControl>
                         <p className="text-xs text-gray-600">
@@ -828,7 +849,7 @@ export default function CadastrarEditalPage() {
                                   type="date" 
                                   {...field} 
                                   value={field.value ? field.value.toISOString().split('T')[0] : ''}
-                                  onChange={(e) => field.onChange(new Date(e.target.value))}
+                                  onChange={(e) => handleDateChange(e.target.value, field.onChange)}
                                 />
                               </FormControl>
                               <FormMessage />
