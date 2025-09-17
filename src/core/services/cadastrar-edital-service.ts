@@ -44,29 +44,29 @@ export interface CadastrarEditalResponse {
 
 
 type ExamType = "OBJETIVA" | "DISCURSIVA";
-type RequirementType = "ENSINO_MEDIO_COMPLETO" | "FUNDAMENTAL_INCOMPLETO" | "FUNDAMENTAL_COMPLETO" | "MEDIO_INCOMPLETO" | "MEDIO_COMPLETO" | "SUPERIOR_INCOMPLETO" | "SUPERIOR_COMPLETO" | "POS_GRADUACAO" | "MESTRADO" | "DOUTORADO";
+type RequirementType = "ENSINO_MEDIO_COMPLETO";
 
 
 const tipoProvaMap: Record<string, ExamType> = {
   "objetiva": "OBJETIVA",
   "discursiva": "DISCURSIVA",
-  "testes_fisicos": "OBJETIVA", // API não aceita TESTES_FISICOS, mapeando para OBJETIVA
-  "psicologicos": "OBJETIVA", // API não aceita PSICOLOGICOS, mapeando para OBJETIVA
-  "pericias": "OBJETIVA", // API não aceita PERICIAS, mapeando para OBJETIVA
-  "entrevistas": "OBJETIVA" // API não aceita ENTREVISTAS, mapeando para OBJETIVA
+  "testes_fisicos": "OBJETIVA", 
+  "psicologicos": "OBJETIVA", 
+  "pericias": "OBJETIVA", 
+  "entrevistas": "OBJETIVA" 
 };
 
 
 const escolaridadeMap: Record<string, RequirementType> = {
-  "fundamental_incompleto": "FUNDAMENTAL_INCOMPLETO",
-  "fundamental_completo": "FUNDAMENTAL_COMPLETO",
-  "medio_incompleto": "MEDIO_INCOMPLETO",
-  "medio_completo": "ENSINO_MEDIO_COMPLETO",
-  "superior_incompleto": "SUPERIOR_INCOMPLETO",
-  "superior_completo": "SUPERIOR_COMPLETO",
-  "pos_graduacao": "POS_GRADUACAO",
-  "mestrado": "MESTRADO",
-  "doutorado": "DOUTORADO",
+  "fundamental_incompleto": "ENSINO_MEDIO_COMPLETO", 
+  "fundamental_completo": "ENSINO_MEDIO_COMPLETO", 
+  "medio_incompleto": "ENSINO_MEDIO_COMPLETO", 
+  "medio_completo": "ENSINO_MEDIO_COMPLETO", 
+  "superior_incompleto": "ENSINO_MEDIO_COMPLETO", 
+  "superior_completo": "ENSINO_MEDIO_COMPLETO",
+  "pos_graduacao": "ENSINO_MEDIO_COMPLETO", 
+  "mestrado": "ENSINO_MEDIO_COMPLETO",
+  "doutorado": "ENSINO_MEDIO_COMPLETO", 
 };
 
 export const cadastrarEditalService = {
