@@ -14,7 +14,6 @@ import { Plus, Trash2, CheckCircle } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-// Componente para checkbox de tipo de prova
 function TipoProvaCheckbox({ 
   tipo, 
   field 
@@ -43,7 +42,6 @@ function TipoProvaCheckbox({
   );
 }
 
-// Componente do Stepper
 function StepIndicator({ currentStep }: { currentStep: number }) {
   const getStepClasses = (current: number, step: number) => {
     if (current > step) return 'bg-green-500 border-green-500 text-white';
@@ -94,7 +92,6 @@ export default function CadastrarEditalPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Função auxiliar para validar e converter data
   const handleDateChange = (dateString: string, onChange: (date: Date | undefined) => void) => {
     if (!dateString) {
       onChange(undefined);
@@ -103,15 +100,11 @@ export default function CadastrarEditalPage() {
     
     try {
       const date = new Date(dateString);
-      // Verificar se a data é válida
       if (!isNaN(date.getTime())) {
         onChange(date);
-      } else {
-        // Se a data não é válida, não fazer nada (manter o valor anterior)
-        console.warn('Data inválida:', dateString);
       }
-    } catch (error) {
-      console.warn('Erro ao processar data:', error);
+    } catch {
+      
     }
   };
   
@@ -146,7 +139,7 @@ export default function CadastrarEditalPage() {
     name: "cronograma"
   });
 
-  // Função para gerenciar documentos manualmente
+ 
   const documentosExigidos = form.watch("documentosExigidos") || [""];
   
   const addDocumento = () => {
@@ -163,18 +156,14 @@ export default function CadastrarEditalPage() {
   };
 
   const onSubmit = async (data: CadastrarEditalSchema) => {
-    // Só permitir submit se estiver na etapa 3
     if (currentStep !== 3) {
-      console.log("⚠️ Submit bloqueado - não está na etapa 3. Etapa atual:", currentStep);
       return;
     }
 
-    // Validação final do arquivo PDF
     if (!data.arquivoEdital) {
       toast.error("Arquivo obrigatório", {
         description: "Selecione um arquivo PDF do edital para finalizar o cadastro."
       });
-      // Rolar para o campo do arquivo
       const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
       if (fileInput) {
         fileInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -183,7 +172,6 @@ export default function CadastrarEditalPage() {
       return;
     }
 
-    console.log("✅ Iniciando cadastro do edital na etapa 3");
     setIsSubmitting(true);
     
     try {
@@ -197,12 +185,9 @@ export default function CadastrarEditalPage() {
           description: "O edital foi cadastrado com sucesso e está disponível para consulta."
         });
         
-        // Resetar o formulário
+     
         form.reset();
         setCurrentStep(1);
-        
-        // Opcional: redirecionar para lista de editais
-        // router.push('/concursos');
         
       } else {
         toast.error(result.message, { 
@@ -211,8 +196,7 @@ export default function CadastrarEditalPage() {
         });
       }
       
-    } catch (error) {
-      console.error('Erro inesperado:', error);
+    } catch {
       toast.error("Erro inesperado ao cadastrar edital", { 
         id: "cadastrar-edital",
         description: "Tente novamente em alguns instantes."
@@ -223,7 +207,6 @@ export default function CadastrarEditalPage() {
   };
 
   const nextStep = async () => {
-    console.log("🔄 nextStep chamado - Etapa atual:", currentStep);
     
     let fieldsToValidate: (keyof CadastrarEditalSchema)[] = [];
     
@@ -232,7 +215,6 @@ export default function CadastrarEditalPage() {
     } else if (currentStep === 2) {
       fieldsToValidate = ["tipoProva", "cargos", "taxaInscricao", "escolaridadeMinima", "documentosExigidos", "cotas"];
       
-      // Validação específica para campos de cotas
       const values = form.getValues();
       if (values.cotas?.pcd === undefined) {
         form.setError("cotas.pcd", { message: "Vagas PCD é obrigatório" });
@@ -247,22 +229,17 @@ export default function CadastrarEditalPage() {
       fieldsToValidate = ["cronograma"];
     }
     
-    // Validar apenas os campos da etapa atual
     const isValid = await form.trigger(fieldsToValidate);
-    console.log("✅ Validação dos campos:", { isValid, fieldsToValidate });
     
     if (currentStep === 1) {
-      // Para a primeira etapa, validar também as regras de data manualmente
       const values = form.getValues();
       
       let hasDateError = false;
       
-      // Verificar se data de início é hoje ou futura
       if (values.dataInicioInscricoes) {
         const hoje = new Date();
         const dataInicio = new Date(values.dataInicioInscricoes);
         
-        // Comparar apenas as datas (ignorar horário) usando strings
         const hojeStr = hoje.toISOString().split('T')[0];
         const dataInicioStr = dataInicio.toISOString().split('T')[0];
         
@@ -274,7 +251,6 @@ export default function CadastrarEditalPage() {
         }
       }
       
-      // Verificar se data fim é posterior à data início
       if (values.dataInicioInscricoes && values.dataFimInscricoes) {
         if (values.dataFimInscricoes <= values.dataInicioInscricoes) {
           form.setError("dataFimInscricoes", {
@@ -284,7 +260,6 @@ export default function CadastrarEditalPage() {
         }
       }
       
-      // Verificar se data da prova é posterior à data fim
       if (values.dataFimInscricoes && values.dataProva) {
         if (values.dataProva <= values.dataFimInscricoes) {
           form.setError("dataProva", {
@@ -300,15 +275,11 @@ export default function CadastrarEditalPage() {
     }
     
     if (!isValid) {
-      console.log("❌ Validação falhou - não avançando para próxima etapa");
       return;
     }
     
     if (currentStep < 3) {
-      console.log("📝 Avançando da etapa", currentStep, "para", currentStep + 1);
       setCurrentStep(currentStep + 1);
-    } else {
-      console.log("⚠️ Já está na última etapa");
     }
   };
 
@@ -349,31 +320,18 @@ export default function CadastrarEditalPage() {
         <Form {...form}>
           <form 
             onSubmit={(e) => {
-              console.log("🚀 Form onSubmit disparado - Etapa atual:", currentStep);
-              
-              // SEMPRE prevenir o submit padrão primeiro
               e.preventDefault();
               e.stopPropagation();
               
-              // Só permitir submit se estiver na etapa 3 E se não estiver carregando
               if (currentStep !== 3) {
-                console.log("⚠️ Submit bloqueado - não está na etapa 3");
                 return false;
               }
               
               if (isSubmitting) {
-                console.log("⚠️ Submit bloqueado - já está submetendo");
                 return false;
               }
               
-              console.log("✅ Submit permitido - executando handleSubmit");
-              // Executar o handleSubmit do React Hook Form
-              form.handleSubmit(onSubmit, (errors) => {
-                console.error("❌ Erros de validação:", errors);
-                console.error("🔍 Detalhes dos erros:");
-                Object.entries(errors).forEach(([field, error]) => {
-                  console.error(`  - ${field}:`, error);
-                });
+              form.handleSubmit(onSubmit, () => {
                 toast.error("Há campos obrigatórios não preenchidos", {
                   description: "Verifique todos os campos marcados com * e tente novamente."
                 });
@@ -793,8 +751,7 @@ export default function CadastrarEditalPage() {
                   </h2>
                   <div className="space-y-4">
                     {documentosExigidos.map((doc, index) => (
-                      // eslint-disable-next-line react/no-array-index-key
-                      <div key={index} className="flex gap-2">
+                      <div key={`documento-${index}-${doc || 'empty'}`} className="flex gap-2">
                         <FormField
                           control={form.control}
                           name={`documentosExigidos.${index}`}
@@ -926,26 +883,23 @@ export default function CadastrarEditalPage() {
                             onChange={(e) => {
                               const file = e.target.files?.[0];
                               if (file) {
-                                // Validar tipo de arquivo
                                 if (file.type !== 'application/pdf') {
                                   toast.error("Tipo de arquivo inválido", {
                                     description: "Apenas arquivos PDF são aceitos. Selecione um arquivo com extensão .pdf"
                                   });
-                                  e.target.value = ''; // Limpar o campo
+                                  e.target.value = '';
                                   return;
                                 }
                                 
-                                // Validar tamanho do arquivo (máximo 10MB)
-                                const maxSize = 10 * 1024 * 1024; // 10MB em bytes
+                                const maxSize = 10 * 1024 * 1024;
                                 if (file.size > maxSize) {
                                   toast.error("Arquivo muito grande", {
                                     description: `O arquivo deve ter no máximo 10MB. Arquivo selecionado: ${(file.size / 1024 / 1024).toFixed(1)}MB`
                                   });
-                                  e.target.value = ''; // Limpar o campo
+                                  e.target.value = '';
                                   return;
                                 }
                                 
-                                // Se passou nas validações, aceitar o arquivo
                                 onChange(file);
                               }
                             }}
@@ -1009,7 +963,6 @@ export default function CadastrarEditalPage() {
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        console.log("🔄 Botão 'Próximo' clicado na etapa", currentStep);
                         nextStep();
                       }}
                       className="min-w-24"
@@ -1021,9 +974,6 @@ export default function CadastrarEditalPage() {
                       type="submit" 
                       className="w-full md:w-auto" 
                       disabled={isSubmitting}
-                      onClick={() => {
-                        console.log("🚀 Botão 'Cadastrar Edital' clicado na etapa", currentStep);
-                      }}
                     >
                       {isSubmitting ? "Cadastrando..." : "Cadastrar Edital"}
                     </Button>

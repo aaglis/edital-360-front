@@ -72,8 +72,6 @@ const escolaridadeMap: Record<string, RequirementType> = {
 export const cadastrarEditalService = {
   async cadastrar(data: CadastrarEditalSchema): Promise<CadastrarEditalResponse> {
     try {
-      console.log("📤 Dados recebidos do formulário:", data);
-      
       const payload: CadastrarEditalRequest = {
         title: data.titulo,
         description: data.descricao,
@@ -122,14 +120,8 @@ export const cadastrarEditalService = {
         })).filter(item => item.description && item.description.trim() !== "") : undefined
       };
 
-      console.log("📋 Payload preparado para API:", payload);
-
       const formData = new FormData();
       
-      console.log("📄 Payload completo:", payload);
-      console.log("📎 PDF File:", payload.pdf);
-      
-      // Validação do PDF (apenas se estiver presente)
       if (payload.pdf) {
         if (!(payload.pdf instanceof File)) {
           throw new Error("Arquivo PDF inválido");
@@ -139,14 +131,13 @@ export const cadastrarEditalService = {
           throw new Error("Apenas arquivos PDF são aceitos");
         }
         
-        if (payload.pdf.size > 10 * 1024 * 1024) { // 10MB
+        if (payload.pdf.size > 10 * 1024 * 1024) {
           throw new Error("Arquivo PDF deve ter no máximo 10MB");
         }
       } else {
         throw new Error("Arquivo PDF é obrigatório");
       }
       
-      // Adicionar campos simples
       formData.append('title', payload.title);
       formData.append('description', payload.description);
       formData.append('remuneration', payload.remuneration?.toString() || '0');
@@ -155,19 +146,16 @@ export const cadastrarEditalService = {
       formData.append('examDate', payload.examDate);
       formData.append('subscription', payload.subscription.toString());
       
-      // Adicionar phases individualmente
       payload.phases.forEach((phase, index) => {
         formData.append(`phases[${index}].order`, phase.order.toString());
         formData.append(`phases[${index}].exam`, phase.exam);
       });
       
-      // Adicionar roles individualmente
       payload.roles.forEach((role, index) => {
         formData.append(`roles[${index}].role`, role.role);
         formData.append(`roles[${index}].vacancies`, role.vacancies.toString());
       });
       
-      // Adicionar requirements
       formData.append('requirements.requirementType', payload.requirements.requirementType);
       if (payload.requirements.minimumAge !== undefined) {
         formData.append('requirements.minimumAge', payload.requirements.minimumAge.toString());
@@ -176,12 +164,10 @@ export const cadastrarEditalService = {
         formData.append('requirements.maximumAge', payload.requirements.maximumAge.toString());
       }
       
-      // Adicionar documents individualmente
       payload.documents.forEach((document, index) => {
         formData.append(`documents[${index}]`, document);
       });
       
-      // Adicionar quotas (se existir)
       if (payload.quotas) {
         formData.append('quotas.vagasPcd', payload.quotas.vagasPcd.toString());
         formData.append('quotas.vagasNegros', payload.quotas.vagasNegros.toString());
@@ -191,30 +177,16 @@ export const cadastrarEditalService = {
         }
       }
       
-      // Adicionar schedule (se existir)
       if (payload.schedule) {
         payload.schedule.forEach((item, index) => {
           formData.append(`schedule[${index}].description`, item.description);
-          // Converter data para formato LocalDateTime sem timezone
           const date = new Date(item.date);
           const formattedDate = date.toISOString().replace('Z', '');
           formData.append(`schedule[${index}].date`, formattedDate);
         });
       }
       
-      // Adicionar o arquivo PDF
       formData.append('pdf', payload.pdf, payload.pdf.name);
-      
-      console.log("📤 Enviando requisição para:", `${process.env.NEXT_PUBLIC_API_URL}/editais/cadastrar`);
-      console.log("📦 FormData criado com campos individuais para Spring Boot");
-      
-      // Debug do FormData
-      console.log("🔍 Campos do FormData:");
-      console.log("  - title:", payload.title);
-      console.log("  - description:", payload.description);
-      console.log("  - phases:", payload.phases.length, "items");
-      console.log("  - roles:", payload.roles.length, "items");
-      console.log("  - documents:", payload.documents.length, "items");
       
       const response = await api.post('/editais/cadastrar', formData, {
         headers: {
@@ -229,17 +201,8 @@ export const cadastrarEditalService = {
       };
       
     } catch (error: unknown) {
-      console.error('Erro ao cadastrar edital:', error);
-      
       if (error && typeof error === 'object' && 'response' in error) {
         const axiosError = error as { response?: { data?: Record<string, unknown>; status?: number } };
-        
-        // Log detalhado do erro da API
-        if (axiosError.response) {
-          console.error('📋 Resposta da API:', axiosError.response.data);
-          console.error('📊 Status:', axiosError.response.status);
-          console.error('📄 Headers:', axiosError.response);
-        }
         
         if (axiosError.response?.data && typeof axiosError.response.data === 'object' && 'message' in axiosError.response.data) {
           return {

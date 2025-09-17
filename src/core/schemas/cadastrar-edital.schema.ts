@@ -27,7 +27,6 @@ export const cadastrarEditalSchema = z.object({
     "entrevistas"
   ])).min(1, "Selecione pelo menos um tipo de prova"),
   
-  // Cargos
   cargos: z.array(z.object({
     nomeCargo: z.string().min(2, "Nome do cargo deve ter pelo menos 2 caracteres").max(100, "Nome do cargo deve ter no máximo 100 caracteres"),
     numeroVagas: z.number().min(1, "Número de vagas deve ser maior que zero").int("Número de vagas deve ser um número inteiro")
@@ -102,11 +101,9 @@ export const cadastrarEditalSchema = z.object({
   }
 ).refine(
   (data) => {
-    // Permitir datas de hoje para frente
     const hoje = new Date();
     const dataInicio = new Date(data.dataInicioInscricoes);
     
-    // Comparar apenas as datas (ignorar horário)
     const hojeStr = hoje.toISOString().split('T')[0];
     const dataInicioStr = dataInicio.toISOString().split('T')[0];
     
