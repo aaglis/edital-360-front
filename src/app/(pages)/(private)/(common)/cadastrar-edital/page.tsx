@@ -254,16 +254,19 @@ export default function CadastrarEditalPage() {
     if (currentStep === 1) {
       // Para a primeira etapa, validar também as regras de data manualmente
       const values = form.getValues();
-      const hoje = new Date();
-      hoje.setHours(0, 0, 0, 0);
       
       let hasDateError = false;
       
       // Verificar se data de início é hoje ou futura
       if (values.dataInicioInscricoes) {
+        const hoje = new Date();
         const dataInicio = new Date(values.dataInicioInscricoes);
-        dataInicio.setHours(0, 0, 0, 0);
-        if (dataInicio < hoje) {
+        
+        // Comparar apenas as datas (ignorar horário) usando strings
+        const hojeStr = hoje.toISOString().split('T')[0];
+        const dataInicioStr = dataInicio.toISOString().split('T')[0];
+        
+        if (dataInicioStr < hojeStr) {
           form.setError("dataInicioInscricoes", {
             message: "Data de início das inscrições deve ser hoje ou futura"
           });

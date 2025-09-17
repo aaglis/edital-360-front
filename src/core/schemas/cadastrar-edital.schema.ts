@@ -102,12 +102,15 @@ export const cadastrarEditalSchema = z.object({
   }
 ).refine(
   (data) => {
-    // Permitir datas de hoje para frente (mais flexível para testes)
+    // Permitir datas de hoje para frente
     const hoje = new Date();
-    hoje.setHours(0, 0, 0, 0); // Resetar horário para comparação apenas de data
     const dataInicio = new Date(data.dataInicioInscricoes);
-    dataInicio.setHours(0, 0, 0, 0);
-    return dataInicio >= hoje;
+    
+    // Comparar apenas as datas (ignorar horário)
+    const hojeStr = hoje.toISOString().split('T')[0];
+    const dataInicioStr = dataInicio.toISOString().split('T')[0];
+    
+    return dataInicioStr >= hojeStr;
   },
   {
     message: "Data de início das inscrições deve ser hoje ou futura",
