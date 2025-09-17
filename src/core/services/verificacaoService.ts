@@ -29,7 +29,7 @@ export const verificacaoService = {
       const cpfLimpo = data.cpf.replace(/\D/g, "");
       const cepLimpo = data.cep.replace(/\D/g, "");
       
-      const response = await axios.get(`${API_BASE_URL}cadastro/verificar`, {
+      const response = await axios.get(`${API_BASE_URL}/cadastro/verificar`, {
         params: {
           cpf: cpfLimpo,
           cep: cepLimpo,
