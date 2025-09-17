@@ -10,14 +10,14 @@ export interface CadastrarEditalRequest {
   examDate: string; 
   phases: Array<{
     order: number;
-    exam: "OBJETIVA" | "DISCURSIVA";
+    exam: "OBJETIVA" | "DISCURSIVA" | "TESTE_FISICO" | "TESTE_PSICOLOGICO" | "PERICIAS" | "ENTREVISTAS";
   }>;
   roles: Array<{
     role: string;
     vacancies: number;
   }>;
   requirements: {
-    requirementType: "ENSINO_MEDIO_COMPLETO" | "FUNDAMENTAL_INCOMPLETO" | "FUNDAMENTAL_COMPLETO" | "MEDIO_INCOMPLETO" | "MEDIO_COMPLETO" | "SUPERIOR_INCOMPLETO" | "SUPERIOR_COMPLETO" | "POS_GRADUACAO" | "MESTRADO" | "DOUTORADO";
+    requirementType: "FUNDAMENTAL_INCOMPLETO" | "FUNDAMENTAL_COMPLETO" | "MEDIO_INCOMPLETO" | "MEDIO_COMPLETO" | "SUPERIOR_INCOMPLETO" | "SUPERIOR_COMPLETO" | "POS_GRADUACAO" | "MESTRADO" | "DOUTORADO";
     minimumAge?: number;
     maximumAge?: number;
   };
@@ -43,30 +43,30 @@ export interface CadastrarEditalResponse {
 }
 
 
-type ExamType = "OBJETIVA" | "DISCURSIVA";
-type RequirementType = "ENSINO_MEDIO_COMPLETO";
+type ExamType = "OBJETIVA" | "DISCURSIVA" | "TESTE_FISICO" | "TESTE_PSICOLOGICO" | "PERICIAS" | "ENTREVISTAS";
+type RequirementType = "FUNDAMENTAL_INCOMPLETO" | "FUNDAMENTAL_COMPLETO" | "MEDIO_INCOMPLETO" | "MEDIO_COMPLETO" | "SUPERIOR_INCOMPLETO" | "SUPERIOR_COMPLETO" | "POS_GRADUACAO" | "MESTRADO" | "DOUTORADO";
 
 
 const tipoProvaMap: Record<string, ExamType> = {
   "objetiva": "OBJETIVA",
   "discursiva": "DISCURSIVA",
-  "testes_fisicos": "OBJETIVA", 
-  "psicologicos": "OBJETIVA", 
-  "pericias": "OBJETIVA", 
-  "entrevistas": "OBJETIVA" 
+  "testes_fisicos": "TESTE_FISICO",
+  "psicologicos": "TESTE_PSICOLOGICO",
+  "pericias": "PERICIAS",
+  "entrevistas": "ENTREVISTAS"
 };
 
 
 const escolaridadeMap: Record<string, RequirementType> = {
-  "fundamental_incompleto": "ENSINO_MEDIO_COMPLETO", 
-  "fundamental_completo": "ENSINO_MEDIO_COMPLETO", 
-  "medio_incompleto": "ENSINO_MEDIO_COMPLETO", 
-  "medio_completo": "ENSINO_MEDIO_COMPLETO", 
-  "superior_incompleto": "ENSINO_MEDIO_COMPLETO", 
-  "superior_completo": "ENSINO_MEDIO_COMPLETO",
-  "pos_graduacao": "ENSINO_MEDIO_COMPLETO", 
-  "mestrado": "ENSINO_MEDIO_COMPLETO",
-  "doutorado": "ENSINO_MEDIO_COMPLETO", 
+  "fundamental_incompleto": "FUNDAMENTAL_INCOMPLETO",
+  "fundamental_completo": "FUNDAMENTAL_COMPLETO",
+  "medio_incompleto": "MEDIO_INCOMPLETO",
+  "medio_completo": "MEDIO_COMPLETO",
+  "superior_incompleto": "SUPERIOR_INCOMPLETO",
+  "superior_completo": "SUPERIOR_COMPLETO",
+  "pos_graduacao": "POS_GRADUACAO",
+  "mestrado": "MESTRADO",
+  "doutorado": "DOUTORADO",
 };
 
 export const cadastrarEditalService = {
@@ -96,7 +96,7 @@ export const cadastrarEditalService = {
         })) : [],
         
         requirements: {
-          requirementType: escolaridadeMap[data.escolaridadeMinima] || "ENSINO_MEDIO_COMPLETO",
+          requirementType: escolaridadeMap[data.escolaridadeMinima] || "MEDIO_COMPLETO",
           minimumAge: data.idadeMinima || undefined,
           maximumAge: data.idadeMaxima || undefined
         },
