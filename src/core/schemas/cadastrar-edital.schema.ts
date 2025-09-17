@@ -60,28 +60,28 @@ export const cadastrarEditalSchema = z.object({
   
  
   cotas: z.object({
-    pcd: z.number().min(0).default(0),
-    negros: z.number().min(0).default(0),
-    indigenas: z.number().min(0).default(0),
+    pcd: z.number().min(0, "Vagas PCD deve ser 0 ou maior").optional(),
+    negros: z.number().min(0, "Vagas para Negros deve ser 0 ou maior").optional(),
+    indigenas: z.number().min(0, "Vagas para Indígenas deve ser 0 ou maior").optional(),
     outras: z.string().optional()
-  }).optional(),
+  }),
   
   
   taxaInscricao: z.number()
-    .min(0, "Taxa de inscrição deve ser maior ou igual a zero"),
+    .min(0, "Taxa de inscrição deve ser maior ou igual a zero")
+    .optional()
+    .or(z.literal(undefined)),
   
   documentosExigidos: z.array(z.string().min(2, "Nome do documento deve ter pelo menos 2 caracteres"))
     .min(1, "Selecione pelo menos um documento exigido"),
   
   cronograma: z.array(z.object({
     data: z.date(),
-    evento: z.string().min(3).max(200),
+    evento: z.string().min(1, "Evento é obrigatório").max(200, "Evento deve ter no máximo 200 caracteres"),
     observacoes: z.string().optional()
   })).min(1, "Adicione pelo menos um evento no cronograma"),
   
-  arquivoEdital: z.instanceof(File, {
-    message: "Arquivo do edital é obrigatório"
-  })
+  arquivoEdital: z.any().optional()
 }).refine(
   (data) => data.dataFimInscricoes > data.dataInicioInscricoes,
   {

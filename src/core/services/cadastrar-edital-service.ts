@@ -129,17 +129,21 @@ export const cadastrarEditalService = {
       console.log("📄 Payload completo:", payload);
       console.log("📎 PDF File:", payload.pdf);
       
-      // Validação do PDF
-      if (!payload.pdf || !(payload.pdf instanceof File)) {
+      // Validação do PDF (apenas se estiver presente)
+      if (payload.pdf) {
+        if (!(payload.pdf instanceof File)) {
+          throw new Error("Arquivo PDF inválido");
+        }
+        
+        if (payload.pdf.type !== 'application/pdf') {
+          throw new Error("Apenas arquivos PDF são aceitos");
+        }
+        
+        if (payload.pdf.size > 10 * 1024 * 1024) { // 10MB
+          throw new Error("Arquivo PDF deve ter no máximo 10MB");
+        }
+      } else {
         throw new Error("Arquivo PDF é obrigatório");
-      }
-      
-      if (payload.pdf.type !== 'application/pdf') {
-        throw new Error("Apenas arquivos PDF são aceitos");
-      }
-      
-      if (payload.pdf.size > 10 * 1024 * 1024) { // 10MB
-        throw new Error("Arquivo PDF deve ter no máximo 10MB");
       }
       
       // Adicionar campos simples

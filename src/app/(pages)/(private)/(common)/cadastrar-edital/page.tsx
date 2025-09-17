@@ -124,13 +124,13 @@ export default function CadastrarEditalPage() {
       descricao: "",
       tipoProva: [],
       cargos: [{ nomeCargo: "", numeroVagas: 1 }],
-      taxaInscricao: 0,
+      taxaInscricao: undefined,
       documentosExigidos: [""],
-      cronograma: [{ data: new Date(), evento: "", observacoes: "" }],
+      cronograma: [{ data: new Date(), evento: "Início das inscrições", observacoes: "" }],
       cotas: {
-        pcd: 0,
-        negros: 0,
-        indigenas: 0,
+        pcd: undefined,
+        negros: undefined,
+        indigenas: undefined,
         outras: ""
       }
     }
@@ -163,10 +163,27 @@ export default function CadastrarEditalPage() {
   };
 
   const onSubmit = async (data: CadastrarEditalSchema) => {
-    console.log("🚀 onSubmit executado!");
-    console.log("📋 Dados do formulário:", data);
-    console.log("✅ Validação passou!");
-    
+    // Só permitir submit se estiver na etapa 3
+    if (currentStep !== 3) {
+      console.log("⚠️ Submit bloqueado - não está na etapa 3. Etapa atual:", currentStep);
+      return;
+    }
+
+    // Validação final do arquivo PDF
+    if (!data.arquivoEdital) {
+      toast.error("Arquivo obrigatório", {
+        description: "Selecione um arquivo PDF do edital para finalizar o cadastro."
+      });
+      // Rolar para o campo do arquivo
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+      if (fileInput) {
+        fileInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        fileInput.focus();
+      }
+      return;
+    }
+
+    console.log("✅ Iniciando cadastro do edital na etapa 3");
     setIsSubmitting(true);
     
     try {
@@ -205,55 +222,34 @@ export default function CadastrarEditalPage() {
     }
   };
 
-  // Função para mostrar erros de validação
-  const showValidationErrors = (errors: Record<string, { message?: string }>) => {
-    const fieldNames: Record<string, string> = {
-      dataInicioInscricoes: "Data de início",
-      dataFimInscricoes: "Data de fim", 
-      dataProva: "Data da prova",
-      titulo: "Título",
-      descricao: "Descrição",
-      tipoProva: "Tipo de prova",
-      cargos: "Cargos",
-      escolaridadeMinima: "Escolaridade",
-      documentosExigidos: "Documentos",
-      cronograma: "Cronograma",
-      arquivoEdital: "Arquivo"
-    };
-    
-    const errorMessages = Object.entries(errors)
-      .filter(([, error]) => error?.message)
-      .map(([field, error]) => {
-        const fieldName = fieldNames[field] || field;
-        return `${fieldName}: ${error.message}`;
-      });
-    
-    if (errorMessages.length > 0) {
-      toast.error("Corrija os erros antes de continuar:", {
-        description: errorMessages.join(" • ")
-      });
-    } else {
-      toast.error("Há campos obrigatórios não preenchidos", {
-        description: "Verifique todos os campos marcados com * e tente novamente."
-      });
-    }
-  };
-
   const nextStep = async () => {
+    console.log("🔄 nextStep chamado - Etapa atual:", currentStep);
+    
     let fieldsToValidate: (keyof CadastrarEditalSchema)[] = [];
     
     if (currentStep === 1) {
       fieldsToValidate = ["titulo", "descricao", "dataInicioInscricoes", "dataFimInscricoes", "dataProva"];
     } else if (currentStep === 2) {
-      fieldsToValidate = ["tipoProva", "cargos", "taxaInscricao", "escolaridadeMinima", "documentosExigidos"];
+      fieldsToValidate = ["tipoProva", "cargos", "taxaInscricao", "escolaridadeMinima", "documentosExigidos", "cotas"];
+      
+      // Validação específica para campos de cotas
+      const values = form.getValues();
+      if (values.cotas?.pcd === undefined) {
+        form.setError("cotas.pcd", { message: "Vagas PCD é obrigatório" });
+      }
+      if (values.cotas?.negros === undefined) {
+        form.setError("cotas.negros", { message: "Vagas para Negros é obrigatório" });
+      }
+      if (values.cotas?.indigenas === undefined) {
+        form.setError("cotas.indigenas", { message: "Vagas para Indígenas é obrigatório" });
+      }
     } else if (currentStep === 3) {
-      fieldsToValidate = ["cronograma", "arquivoEdital"];
+      fieldsToValidate = ["cronograma"];
     }
-    
-    console.log("🔍 Validando campos:", fieldsToValidate);
     
     // Validar apenas os campos da etapa atual
     const isValid = await form.trigger(fieldsToValidate);
+    console.log("✅ Validação dos campos:", { isValid, fieldsToValidate });
     
     if (currentStep === 1) {
       // Para a primeira etapa, validar também as regras de data manualmente
@@ -296,21 +292,20 @@ export default function CadastrarEditalPage() {
       }
       
       if (hasDateError) {
-        const errors = form.formState.errors;
-        showValidationErrors(errors);
         return;
       }
     }
     
-    console.log("📋 Resultado da validação:", { isValid, errors: form.formState.errors });
-    
     if (!isValid) {
-      showValidationErrors(form.formState.errors);
+      console.log("❌ Validação falhou - não avançando para próxima etapa");
       return;
     }
     
     if (currentStep < 3) {
+      console.log("📝 Avançando da etapa", currentStep, "para", currentStep + 1);
       setCurrentStep(currentStep + 1);
+    } else {
+      console.log("⚠️ Já está na última etapa");
     }
   };
 
@@ -351,8 +346,25 @@ export default function CadastrarEditalPage() {
         <Form {...form}>
           <form 
             onSubmit={(e) => {
-              console.log("📝 Form submit iniciado!");
-              console.log("🔍 Event:", e);
+              console.log("🚀 Form onSubmit disparado - Etapa atual:", currentStep);
+              
+              // SEMPRE prevenir o submit padrão primeiro
+              e.preventDefault();
+              e.stopPropagation();
+              
+              // Só permitir submit se estiver na etapa 3 E se não estiver carregando
+              if (currentStep !== 3) {
+                console.log("⚠️ Submit bloqueado - não está na etapa 3");
+                return false;
+              }
+              
+              if (isSubmitting) {
+                console.log("⚠️ Submit bloqueado - já está submetendo");
+                return false;
+              }
+              
+              console.log("✅ Submit permitido - executando handleSubmit");
+              // Executar o handleSubmit do React Hook Form
               form.handleSubmit(onSubmit, (errors) => {
                 console.error("❌ Erros de validação:", errors);
                 console.error("🔍 Detalhes dos erros:");
@@ -363,6 +375,8 @@ export default function CadastrarEditalPage() {
                   description: "Verifique todos os campos marcados com * e tente novamente."
                 });
               })(e);
+              
+              return false;
             }} 
             className="space-y-8"
           >
@@ -541,9 +555,10 @@ export default function CadastrarEditalPage() {
                                   <Input 
                                     type="number" 
                                     min="1"
-                                    placeholder="1" 
+                                    placeholder="Digite o número" 
                                     {...field}
-                                    onChange={(e) => field.onChange(parseInt(e.target.value))}
+                                    value={field.value === 1 ? "" : field.value || ""}
+                                    onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : 1)}
                                   />
                                 </FormControl>
                                 <FormMessage />
@@ -585,9 +600,10 @@ export default function CadastrarEditalPage() {
                               type="number" 
                               step="0.01"
                               min="0"
-                              placeholder="0.00" 
+                              placeholder="Digite o valor" 
                               {...field}
-                              onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                              value={field.value || ""}
+                              onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
                             />
                           </FormControl>
                           <FormMessage />
@@ -640,8 +656,9 @@ export default function CadastrarEditalPage() {
                               type="number" 
                               min="16" 
                               max="100"
-                              placeholder="16" 
+                              placeholder="Ex: 18" 
                               {...field}
+                              value={field.value || ""}
                               onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
                             />
                           </FormControl>
@@ -661,26 +678,10 @@ export default function CadastrarEditalPage() {
                               type="number" 
                               min="16" 
                               max="100"
-                              placeholder="100" 
+                              placeholder="Ex: 65" 
                               {...field}
+                              value={field.value || ""}
                               onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="outrosRequisitos"
-                      render={({ field }) => (
-                        <FormItem className="col-span-2">
-                          <FormLabel>Outros Requisitos</FormLabel>
-                          <FormControl>
-                            <Textarea 
-                              placeholder="Descreva outros requisitos específicos para o cargo" 
-                              {...field} 
                             />
                           </FormControl>
                           <FormMessage />
@@ -695,6 +696,9 @@ export default function CadastrarEditalPage() {
                   <h2 className="text-xl font-bold border-l-4 border-blue-500 pl-2 mb-6">
                     Cotas e Reservas de Vagas
                   </h2>
+                  <p className="text-sm text-gray-600 mb-4">
+                    * <strong>Campos obrigatórios:</strong> Informe a quantidade de vagas reservadas para cada cota. Digite 0 (zero) caso não haja vagas reservadas para a categoria.
+                  </p>
                   <div className="grid gap-6 grid-cols-1 md:grid-cols-3">
                     
                     <FormField
@@ -702,14 +706,15 @@ export default function CadastrarEditalPage() {
                       name="cotas.pcd"
                       render={({ field }) => (
                         <FormItem className="col-span-3 md:col-span-1">
-                          <FormLabel>Vagas PCD</FormLabel>
+                          <FormLabel>Vagas PCD *</FormLabel>
                           <FormControl>
                             <Input 
                               type="number" 
                               min="0"
-                              placeholder="0" 
+                              placeholder="Digite o número" 
                               {...field}
-                              onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                              value={field.value ?? ""}
+                              onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
                             />
                           </FormControl>
                           <FormMessage />
@@ -722,14 +727,15 @@ export default function CadastrarEditalPage() {
                       name="cotas.negros"
                       render={({ field }) => (
                         <FormItem className="col-span-3 md:col-span-1">
-                          <FormLabel>Vagas para Negros</FormLabel>
+                          <FormLabel>Vagas para Negros *</FormLabel>
                           <FormControl>
                             <Input 
                               type="number" 
                               min="0"
-                              placeholder="0" 
+                              placeholder="Digite o número" 
                               {...field}
-                              onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                              value={field.value ?? ""}
+                              onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
                             />
                           </FormControl>
                           <FormMessage />
@@ -742,14 +748,15 @@ export default function CadastrarEditalPage() {
                       name="cotas.indigenas"
                       render={({ field }) => (
                         <FormItem className="col-span-3 md:col-span-1">
-                          <FormLabel>Vagas para Indígenas</FormLabel>
+                          <FormLabel>Vagas para Indígenas *</FormLabel>
                           <FormControl>
                             <Input 
                               type="number" 
                               min="0"
-                              placeholder="0" 
+                              placeholder="Digite o número" 
                               {...field}
-                              onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                              value={field.value ?? ""}
+                              onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
                             />
                           </FormControl>
                           <FormMessage />
@@ -889,7 +896,7 @@ export default function CadastrarEditalPage() {
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={() => appendCronograma({ data: new Date(), evento: "", observacoes: "" })}
+                      onClick={() => appendCronograma({ data: new Date(), evento: "Novo evento", observacoes: "" })}
                       className="w-full"
                     >
                       <Plus className="h-4 w-4 mr-2" />
@@ -915,19 +922,44 @@ export default function CadastrarEditalPage() {
                             accept=".pdf"
                             onChange={(e) => {
                               const file = e.target.files?.[0];
-                              if (file) onChange(file);
+                              if (file) {
+                                // Validar tipo de arquivo
+                                if (file.type !== 'application/pdf') {
+                                  toast.error("Tipo de arquivo inválido", {
+                                    description: "Apenas arquivos PDF são aceitos. Selecione um arquivo com extensão .pdf"
+                                  });
+                                  e.target.value = ''; // Limpar o campo
+                                  return;
+                                }
+                                
+                                // Validar tamanho do arquivo (máximo 10MB)
+                                const maxSize = 10 * 1024 * 1024; // 10MB em bytes
+                                if (file.size > maxSize) {
+                                  toast.error("Arquivo muito grande", {
+                                    description: `O arquivo deve ter no máximo 10MB. Arquivo selecionado: ${(file.size / 1024 / 1024).toFixed(1)}MB`
+                                  });
+                                  e.target.value = ''; // Limpar o campo
+                                  return;
+                                }
+                                
+                                // Se passou nas validações, aceitar o arquivo
+                                onChange(file);
+                              }
                             }}
                             {...field}
                             value=""
                           />
                         </FormControl>
                         <p className="text-sm text-gray-600 mt-1">
-                          O arquivo PDF do edital completo é obrigatório para o cadastro.
+                          O arquivo PDF do edital completo é obrigatório para o cadastro. Tamanho máximo: 10MB.
                         </p>
                         {value && (
-                          <p className="text-sm text-green-600 mt-1">
-                            ✓ Arquivo selecionado: {value.name}
-                          </p>
+                          <div className="text-sm text-green-600 bg-green-50 p-2 rounded border border-green-200 mt-1">
+                            <p className="font-medium">✓ Arquivo selecionado: {value.name}</p>
+                            <p className="text-xs text-green-700">
+                              Tamanho: {(value.size / 1024 / 1024).toFixed(1)}MB
+                            </p>
+                          </div>
                         )}
                         <FormMessage />
                       </FormItem>
@@ -971,7 +1003,12 @@ export default function CadastrarEditalPage() {
                   {currentStep < 3 ? (
                     <Button 
                       type="button" 
-                      onClick={nextStep}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log("🔄 Botão 'Próximo' clicado na etapa", currentStep);
+                        nextStep();
+                      }}
                       className="min-w-24"
                     >
                       Próximo
@@ -982,12 +1019,7 @@ export default function CadastrarEditalPage() {
                       className="w-full md:w-auto" 
                       disabled={isSubmitting}
                       onClick={() => {
-                        console.log("🔘 Botão submit clicado!");
-                        console.log("📝 Estado do formulário:", {
-                          isValid: form.formState.isValid,
-                          errors: form.formState.errors,
-                          isSubmitting: form.formState.isSubmitting
-                        });
+                        console.log("🚀 Botão 'Cadastrar Edital' clicado na etapa", currentStep);
                       }}
                     >
                       {isSubmitting ? "Cadastrando..." : "Cadastrar Edital"}
