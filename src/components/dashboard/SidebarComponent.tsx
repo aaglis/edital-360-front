@@ -30,6 +30,7 @@ const SidebarComponent = ({ ...props }: React.ComponentProps<typeof Sidebar>) =>
         { title: "Inscrições", url: "/concursos/inscricoes", icon: CreditCard },
         { title: "Calendário", url: "/concursos/calendario", icon: CalendarCheck },
         { title: "Resultados", url: "/concursos/resultados", icon: BarChart2 },
+        { title: "Cadastrar um concurso", url: "/cadastrar-edital", icon: FileText },
       ],
     },
     {
