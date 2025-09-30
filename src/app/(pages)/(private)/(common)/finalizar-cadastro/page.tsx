@@ -987,53 +987,117 @@ export default function RegisterComponent() {
 
                   {/* Requisitos da senha */}
                   {senha && (
-                    <div className={`p-4 rounded-lg mb-6 border transition-all duration-300 ${
-                      // Verifica se todos os requisitos estão sendo atendidos
-                      senha.length >= 8 && /[A-Z]/.test(senha) && /[a-z]/.test(senha) && /\d/.test(senha)
-                        ? "bg-green-50 border-green-500" 
-                        : "bg-blue-50 border-blue-500"
-                    }`}>
-                      <div className="text-sm text-gray-600 mb-3">Sua senha deve conter:</div>
-                      <div className="grid grid-cols-2 gap-3 text-sm">
-                        <div
-                          className={`flex items-center ${
-                            senha.length >= 8 ? "text-green-600" : "text-blue-600"
-                          }`}
-                        >
-                          <span className="mr-2">
-                            {senha.length >= 8 ? "✓" : "ⓘ"}
-                          </span>{" "}
-                          Mínimo 8 caracteres
-                        </div>
-                        <div
-                          className={`flex items-center ${
-                            /[A-Z]/.test(senha) ? "text-green-600" : "text-blue-600"
-                          }`}
-                        >
-                          <span className="mr-2">
-                            {/[A-Z]/.test(senha) ? "✓" : "ⓘ"}
-                          </span>{" "}
-                          Uma letra maiúscula
-                        </div>
-                        <div
-                          className={`flex items-center ${
-                            /[a-z]/.test(senha) ? "text-green-600" : "text-blue-600"
-                          }`}
-                        >
-                          <span className="mr-2">
-                            {/[a-z]/.test(senha) ? "✓" : "ⓘ"}
-                          </span>{" "}
-                          Uma letra minúscula
-                        </div>
-                        <div
-                          className={`flex items-center ${
-                            /\d/.test(senha) ? "text-green-600" : "text-blue-600"
-                          }`}
-                        >
-                          <span className="mr-2">
-                            {/\d/.test(senha) ? "✓" : "ⓘ"}
-                          </span>{" "}
-                          Um número
+                    <div className="relative p-4 rounded-lg mb-6 bg-transparent border border-blue-500">
+                      {/* Borda verde animada que "preenche" da esquerda para direita */}
+                      <div 
+                        className="absolute top-0 left-0 h-full border-l border-t border-b border-green-500 rounded-l-lg transition-all duration-500 ease-out"
+                        style={{
+                          width: (() => {
+                            const requirements = [
+                              senha.length >= 8,
+                              /[A-Z]/.test(senha),
+                              /[a-z]/.test(senha),
+                              /\d/.test(senha)
+                            ];
+                            const fulfilled = requirements.filter(Boolean).length;
+                            return `${(fulfilled / requirements.length) * 100}%`;
+                          })()
+                        }}
+                      />
+                      
+                      {/* Borda verde top e bottom que acompanha */}
+                      <div 
+                        className="absolute top-0 left-0 border-t border-green-500 transition-all duration-500 ease-out"
+                        style={{
+                          width: (() => {
+                            const requirements = [
+                              senha.length >= 8,
+                              /[A-Z]/.test(senha),
+                              /[a-z]/.test(senha),
+                              /\d/.test(senha)
+                            ];
+                            const fulfilled = requirements.filter(Boolean).length;
+                            return `${(fulfilled / requirements.length) * 100}%`;
+                          })()
+                        }}
+                      />
+                      
+                      <div 
+                        className="absolute bottom-0 left-0 border-b border-green-500 transition-all duration-500 ease-out"
+                        style={{
+                          width: (() => {
+                            const requirements = [
+                              senha.length >= 8,
+                              /[A-Z]/.test(senha),
+                              /[a-z]/.test(senha),
+                              /\d/.test(senha)
+                            ];
+                            const fulfilled = requirements.filter(Boolean).length;
+                            return `${(fulfilled / requirements.length) * 100}%`;
+                          })()
+                        }}
+                      />
+                      
+                      {/* Borda verde direita aparece quando 100% */}
+                      <div 
+                        className={`absolute top-0 right-0 h-full border-r border-green-500 rounded-r-lg transition-opacity duration-300 ${
+                          (() => {
+                            const requirements = [
+                              senha.length >= 8,
+                              /[A-Z]/.test(senha),
+                              /[a-z]/.test(senha),
+                              /\d/.test(senha)
+                            ];
+                            const fulfilled = requirements.filter(Boolean).length;
+                            return fulfilled === requirements.length ? 'opacity-100' : 'opacity-0';
+                          })()
+                        }`}
+                      />
+                      
+                      {/* Conteúdo */}
+                      <div className="relative z-10">
+                        <div className="text-sm text-gray-600 mb-3">Sua senha deve conter:</div>
+                        <div className="grid grid-cols-2 gap-3 text-sm">
+                          <div
+                            className={`flex items-center transition-colors duration-300 ${
+                              senha.length >= 8 ? "text-green-600" : "text-blue-600"
+                            }`}
+                          >
+                            <span className="mr-2">
+                              {senha.length >= 8 ? "✓" : "ⓘ"}
+                            </span>{" "}
+                            Mínimo 8 caracteres
+                          </div>
+                          <div
+                            className={`flex items-center transition-colors duration-300 ${
+                              /[A-Z]/.test(senha) ? "text-green-600" : "text-blue-600"
+                            }`}
+                          >
+                            <span className="mr-2">
+                              {/[A-Z]/.test(senha) ? "✓" : "ⓘ"}
+                            </span>{" "}
+                            Uma letra maiúscula
+                          </div>
+                          <div
+                            className={`flex items-center transition-colors duration-300 ${
+                              /[a-z]/.test(senha) ? "text-green-600" : "text-blue-600"
+                            }`}
+                          >
+                            <span className="mr-2">
+                              {/[a-z]/.test(senha) ? "✓" : "ⓘ"}
+                            </span>{" "}
+                            Uma letra minúscula
+                          </div>
+                          <div
+                            className={`flex items-center transition-colors duration-300 ${
+                              /\d/.test(senha) ? "text-green-600" : "text-blue-600"
+                            }`}
+                          >
+                            <span className="mr-2">
+                              {/\d/.test(senha) ? "✓" : "ⓘ"}
+                            </span>{" "}
+                            Um número
+                          </div>
                         </div>
                       </div>
                     </div>
