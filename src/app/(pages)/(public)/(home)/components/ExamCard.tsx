@@ -1,16 +1,16 @@
 import { Button } from "@/components/ui/button";
 
 type ExamCardProps = {
-  id: number;
+  id: string;
   title: string;
   vacancies: number;
-  salary: string;
+  remuneration: number;
   period?: string;
   isOpenForApplications?: boolean;
 };
 
 // eslint-disable-next-line
-const ExamCard = ({ id, title, salary, vacancies,period, isOpenForApplications = false}: ExamCardProps) => {
+const ExamCard = ({ id, title, remuneration, vacancies,period, isOpenForApplications = false}: ExamCardProps) => {
   return (
     <div className={`border border-zinc-200 bg-white rounded-lg w-96 flex flex-col shadow-md`}>
       <div className="p-6 pb-0 flex flex-col gap-4">
@@ -39,7 +39,7 @@ const ExamCard = ({ id, title, salary, vacancies,period, isOpenForApplications =
           </div>
           <div className="flex items-center gap-2 text-zinc-500">
             <span className="font-semibold text-sm">Salário:</span>
-            <span className="text-sm">{salary}</span>
+            <span className="text-sm">{remuneration}</span>
           </div>
         </div>
       </div>

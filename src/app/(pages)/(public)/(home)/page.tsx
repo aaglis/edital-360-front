@@ -1,8 +1,10 @@
 "use client"
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
+import { cadastrarEditalService } from '@/core/services/editalService';
 import ExamCard from './components/ExamCard';
+import type { EditalRequest } from '@/core/types/editais.interface';
 
 export default function Homepage() {
   const [publicExam, setPublicExam] = useState([
@@ -27,6 +29,7 @@ export default function Homepage() {
       active: false
     }
   ])
+  const [editais, setEditais] = useState<EditalRequest[]>([]);
 
   const setPublicExamsFilter = (index: number) => {
     setPublicExam(prevItems =>
@@ -37,34 +40,41 @@ export default function Homepage() {
     );
   }
 
-  const mockExams = [
-    { id: 0, title: 'Concurso Fazenda', vacancies: 10, salary: 'R$ 5.000' },
-    { id: 1, title: 'Concurso Justiça', vacancies: 5, salary: 'R$ 6.000' },
-    { id: 2, title: 'Concurso Controle', vacancies: 8, salary: 'R$ 4.500' },
-    { id: 3, title: 'Concurso Fazenda II', vacancies: 12, salary: 'R$ 5.500' },
-    { id: 4, title: 'Concurso Justiça II', vacancies: 7, salary: 'R$ 6.500' }
+  const mockOpenedExams = [
+    { id: "0", title: 'Concurso Fazenda', vacancies: 10, salary: 5.000, isOpenForApplications: true, period: '10/06 a 13/06' },
+    { id: "1", title: 'Concurso Justiça', vacancies: 5, salary: 6.000, isOpenForApplications: true, period: '15/06 a 20/06' },
+    { id: "2", title: 'Concurso Controle', vacancies: 8, salary: 4.500, isOpenForApplications: true, period: '01/07 a 10/07' },
+    { id: "3", title: 'Concurso Fazenda II', vacancies: 12, salary: 5.500, isOpenForApplications: true, period: '05/08 a 10/08' },
+    { id: "4", title: 'Concurso Justiça II', vacancies: 7, salary: 6.500, isOpenForApplications: true, period: '15/08 a 20/08' }
   ]
 
-  const mockOpenedExams = [
-    { id: 0, title: 'Concurso Fazenda', vacancies: 10, salary: 'R$ 5.000', isOpenForApplications: true, period: '10/06 a 13/06' },
-    { id: 1, title: 'Concurso Justiça', vacancies: 5, salary: 'R$ 6.000', isOpenForApplications: true, period: '15/06 a 20/06' },
-    { id: 2, title: 'Concurso Controle', vacancies: 8, salary: 'R$ 4.500', isOpenForApplications: true, period: '01/07 a 10/07' },
-    { id: 3, title: 'Concurso Fazenda II', vacancies: 12, salary: 'R$ 5.500', isOpenForApplications: true, period: '05/08 a 10/08' },
-    { id: 4, title: 'Concurso Justiça II', vacancies: 7, salary: 'R$ 6.500', isOpenForApplications: true, period: '15/08 a 20/08' }
-  ]
+  const fetchEditais = async () => {
+    try {
+      const response = await cadastrarEditalService.fetchAll();
+      setEditais(response);
+    } catch (error) {
+      console.error('Error fetching editais:', error);
+      return [];
+    }
+  }
+  
+
+  useEffect(() => {
+    fetchEditais();
+  }, []);
 
   return (
-    <div className="max-w-screen-2xl mx-auto px-6">
+    <div className="max-w-screen-2xl mx-auto px-6 w-full">
       <div className="w-full flex flex-col items-center py-11 gap-5">
-        <h1 className="text-4xl font-bold">Oportunidades em Destaque</h1>
-        <p className="text-zinc-500 text-lg">Confira os concursos mais recentes e com inscrições abertas. Prepare-se para o seu futuro!</p>
+        <h1 className="text-4xl font-bold text-center">Oportunidades em Destaque</h1>
+        <p className="text-zinc-500 text-lg text-center">Confira os concursos mais recentes e com inscrições abertas. Prepare-se para o seu futuro!</p>
       </div>
       <div className="flex justify-center">
         {
           publicExam.map((item, index) => (
             <Button
               key={item.value}
-              className={`m-2  ${!item.active ? 'bg-transparent text-slate-500 border border-zinc-200 hover:bg-slate-50' : ''}`}
+              className={`m-2  ${!item.active ? 'bg-transparent border border-zinc-200 hover:bg-slate-50' : 'text-white'}`}
               onClick={() => setPublicExamsFilter(index)}
             >
               {item.label}
@@ -73,28 +83,28 @@ export default function Homepage() {
         }
       </div>
       <div>
-        <div className="flex items-center gap-3">
-          <div className="w-1 h-7 bg-primary-light"></div>
+        <div className="flex items-center gap-3 w-full justify-center py-6 md:justify-items-start">
+          <div className="w-1 h-7 bg-primary"></div>
           <span className="text-2xl font-bold">Novos Concursos</span>
         </div>
-        <div className="flex flex-wrap justify-center gap-6 p-6">
-          {mockExams.map(exam => (
+        <div className="flex flex-wrap justify-center gap-6 p-0 md:px-6">
+          {editais.map(exam => (
             <ExamCard
               key={exam.id}
               id={exam.id}
               title={exam.title}
               vacancies={exam.vacancies}
-              salary={exam.salary}
+              remuneration={exam.remuneration}
             />
           ))}
         </div>
       </div>
       <div>
-        <div className="flex items-center gap-3">
-          <div className="w-1 h-7 bg-secondary-light"></div>
+        <div className="flex items-center gap-3 w-full justify-center py-6 md:justify-items-start">
+          <div className="w-1 h-7 bg-secondary"></div>
           <span className="text-2xl font-bold">Inscrições Abertas</span>
         </div>
-        <div className="flex flex-wrap justify-center gap-6 p-6">
+        <div className="flex flex-wrap justify-center gap-6 p-0 md:px-6">
           {mockOpenedExams.map(exam => (
             <ExamCard
               key={exam.id}
@@ -102,7 +112,7 @@ export default function Homepage() {
               title={exam.title}
               vacancies={exam.vacancies}
               period={exam.period}
-              salary={exam.salary}
+              remuneration={exam.salary}
               isOpenForApplications={true}
             />
           ))}

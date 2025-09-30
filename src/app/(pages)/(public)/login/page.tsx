@@ -70,18 +70,18 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex justify-center mt-20 w-96 mx-auto">
-      <Card className="w-full shadow-lg">
+    <div className="flex justify-center mt-20 max-w-96 md:w-[500px] md:max-w-none mx-auto">
+      <Card className="w-full shadow-lg rounded-3xl mx-2 md:mx-0">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">
-            Entrar na sua conta
+            Login Edital360
           </CardTitle>
           <CardDescription>
-            Acesse sua área do candidato
+            Preencha os campos para fazer login
           </CardDescription>
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="px-5 md:px-10">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
@@ -98,7 +98,7 @@ export default function LoginPage() {
                         render={({ field }) => (
                           <InputMask
                             mask="999.999.999-99"
-                            placeholder="000.000.000-00"
+                            placeholder="Digite seu CPF..."
                             value={field.value}
                             onChange={(e) => {
                               const onlyDigits = e.target.value.replace(/\D/g, "");
@@ -125,12 +125,12 @@ export default function LoginPage() {
                       <div className="relative">
                         <Input
                           type={showPassword ? "text" : "password"}
-                          placeholder="********"
+                          placeholder="Digite sua senha..."
                           {...field}
                         />
                         <button
                           type="button"
-                          className="absolute right-2 top-2.5 text-gray-500"
+                          className="absolute right-2 top-2.5"
                           onClick={() => setShowPassword((prev) => !prev)}
                           tabIndex={-1}
                         >
@@ -147,15 +147,22 @@ export default function LoginPage() {
                 )}
               />
 
+              <div className="w-full flex justify-end">
+                <Link href="/recuperar-senha" className="text-sm text-primary underline">
+                  Esqueci minha senha
+                </Link>
+              </div>
+
               <FormField
                 control={form.control}
                 name="recaptchaResponse"
                 render={() => (
-                  <FormItem>
+                  <FormItem className="w-full flex flex-col items-center justify-center py-4">
                     <FormControl>
                       <ReCAPTCHA
                         sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""}
                         ref={recaptchaRef}
+                        lang="pt-BR"
                         onChange={(token) => {
                           if(token) {
                             form.setValue("recaptchaResponse", token);
@@ -166,6 +173,7 @@ export default function LoginPage() {
                             });
                           }
                         }}
+                        hl="pt-BR"
                       />
                     </FormControl>
                     <FormMessage />
@@ -173,29 +181,35 @@ export default function LoginPage() {
                 )}
               />
 
-              <div className="w-full flex justify-end">
-                <Link href="/recuperar-senha" className="text-sm text-primary hover:underline">
-                  Esqueci minha senha
+
+              <div className="flex flex-col gap-3">
+                <Button 
+                  type="submit" 
+                  className="w-full text-white"
+                  disabled={isLoading}
+                >
+                  {isLoading && <Loader2Icon className="animate-spin w-5 h-5 mr-2" />}
+                  Entrar
+                </Button>
+                <Link href="/">
+                  <Button 
+                    type="button" 
+                    variant={"outline"}
+                    className="w-full"
+                  >
+                    Voltar
+                  </Button>
                 </Link>
               </div>
-
-              <Button 
-                type="submit" 
-                className="w-full"
-                disabled={isLoading}
-              >
-                {isLoading && <Loader2Icon className="animate-spin w-5 h-5 mr-2" />}
-                Entrar
-              </Button>
             </form>
           </Form>
         </CardContent>
 
         <CardFooter className="flex flex-col items-center">
           <p className="text-sm text-zinc-500">
-            Não tem uma conta?{" "}
-            <Link href="/cadastro" className="text-primary hover:underline">
-              Cadastre-se
+            Não possui uma conta? Faça seu{" "}
+            <Link href="/cadastro" className="text-primary underline">
+              Cadastro
             </Link>
           </p>
         </CardFooter>

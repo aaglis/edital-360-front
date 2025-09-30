@@ -11,7 +11,7 @@ const HeaderComponent = () => {
         </Link>
         <div>
           <Link href={"/login"}>
-            <Button>Área do Candidato</Button>
+            <Button className="text-white">Área do Candidato</Button>
           </Link>
         </div>
       </header>
