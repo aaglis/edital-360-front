@@ -130,7 +130,7 @@
   font-size: 14px;
   line-height: 150%;
   letter-spacing: 0.5%;
-  color: rgb(55 65 81); /* text-gray-700 equivalent */
+  color: rgb(55 65 81); 
 }
 
 .form-label-geist .asterisk {
@@ -140,5 +140,42 @@
   font-size: 14px;
   line-height: 150%;
   letter-spacing: 0.5%;
-  color: rgb(239 68 68); /* text-red-500 for required asterisk */
+  color: rgb(239 68 68); 
+}
+
+
+.form-input-custom {
+  background-color: white !important;
+  border: 1px solid #D4D4D4 !important;
+  border-radius: 8px !important; 
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 14px;
+  line-height: 150%;
+  letter-spacing: 0.5%;
+}
+
+.form-input-custom::placeholder {
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 14px;
+  line-height: 150%;
+  letter-spacing: 0.5%;
+  color: #737373 !important;
+}
+
+.form-input-custom:focus {
+  border-color: #737373 !important; 
+  box-shadow: 0px 1px 2px 0px #0000000D !important;
+  outline: none !important;
+}
+
+.form-input-disabled {
+  background-color: #F9FAFB !important;
+  border: 1px solid #D4D4D4 !important;
+  border-radius: 8px !important;
+  color: #6B7280 !important; 
+  cursor: not-allowed !important;
 }

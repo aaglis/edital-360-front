@@ -354,9 +354,10 @@ export default function RegisterComponent() {
                                   placeholder="000.000.000-00"
                                   value={field.value}
                                   onChange={field.onChange}
+                                  disabled={true}
                                 >
                                   {(inputProps: React.InputHTMLAttributes<HTMLInputElement>) => 
-                                    <Input {...inputProps} className="h-9 w-[320px]" />
+                                    <Input {...inputProps} className="form-input-disabled h-9 w-[320px]" />
                                   }
                                 </InputMask>
                               )}
@@ -385,7 +386,7 @@ export default function RegisterComponent() {
                                   onChange={field.onChange}
                                 >
                                   {(inputProps: React.InputHTMLAttributes<HTMLInputElement>) => 
-                                    <Input {...inputProps} className="h-9 w-[320px]" />
+                                    <Input {...inputProps} className="form-input-custom h-9 w-[320px]" />
                                   }
                                 </InputMask>
                               )}
@@ -405,7 +406,7 @@ export default function RegisterComponent() {
                           <FormControl>
                             <Input
                               placeholder="Ex: SP"
-                              className="h-9 w-[320px]"
+                              className="form-input-custom h-9 w-[320px]"
                               {...field}
                               maxLength={2}
                               onChange={(e) => {
@@ -431,7 +432,7 @@ export default function RegisterComponent() {
                           <FormControl>
                             <Input
                               placeholder="Digite seu nome completo"
-                              className="h-9 w-[320px]"
+                              className="form-input-custom h-9 w-[320px]"
                               {...field}
                             />
                           </FormControl>
@@ -448,7 +449,7 @@ export default function RegisterComponent() {
                           <FormLabel className="form-label-geist">Sexo <span className="asterisk">*</span></FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
-                              <SelectTrigger className="h-9 w-[320px]">
+                              <SelectTrigger className="form-input-custom h-9 w-[320px]">
                                 <SelectValue placeholder="Selecione" />
                               </SelectTrigger>
                             </FormControl>
@@ -469,7 +470,7 @@ export default function RegisterComponent() {
                         <FormItem>
                           <FormLabel className="form-label-geist">Data de nascimento <span className="asterisk">*</span></FormLabel>
                           <FormControl>
-                            <Input type="date" className="max-h-8 w-full max-w-[165px]" {...field} />
+                            <Input type="date" className="form-input-custom max-h-8 w-full max-w-[165px]" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -484,7 +485,7 @@ export default function RegisterComponent() {
                           <FormLabel className="form-label-geist">Escolaridade <span className="asterisk">*</span></FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
-                              <SelectTrigger className="h-9 w-[320px]">
+                              <SelectTrigger className="form-input-custom h-9 w-[320px]">
                                 <SelectValue placeholder="Selecione" />
                               </SelectTrigger>
                             </FormControl>
@@ -515,7 +516,7 @@ export default function RegisterComponent() {
                         <FormItem>
                           <FormLabel className="form-label-geist">Nome da mãe <span className="asterisk">*</span></FormLabel>
                           <FormControl>
-                            <Input placeholder="Digite o nome da mãe" className="h-9 w-[320px]" {...field} />
+                            <Input placeholder="Digite o nome da mãe" className="form-input-custom h-9 w-[320px]" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -529,7 +530,7 @@ export default function RegisterComponent() {
                         <FormItem>
                           <FormLabel className="form-label-geist">Nome do pai <span className="asterisk">*</span></FormLabel>
                           <FormControl>
-                            <Input placeholder="Digite o nome do pai" className="h-9 w-[320px]" {...field} />
+                            <Input placeholder="Digite o nome do pai" className="form-input-custom h-9 w-[320px]" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -571,7 +572,7 @@ export default function RegisterComponent() {
                                   onChange={field.onChange}
                                 >
                                   {(inputProps: React.InputHTMLAttributes<HTMLInputElement>) => 
-                                    <Input {...inputProps} className="h-9 w-[320px]" />
+                                    <Input {...inputProps} className="form-input-custom h-9 w-[320px]" />
                                   }
                                 </InputMask>
                               )}
@@ -591,7 +592,7 @@ export default function RegisterComponent() {
                           <FormControl>
                             <Input
                               placeholder="Ex: SP"
-                              className="max-h-9 w-full max-w-[100px]"
+                              className="form-input-custom max-h-9 w-full max-w-[100px]"
                               {...field}
                               maxLength={2}
                               onChange={(e) => {
@@ -612,7 +613,7 @@ export default function RegisterComponent() {
                         <FormItem>
                           <FormLabel className="form-label-geist">Cidade <span className="asterisk">*</span></FormLabel>
                           <FormControl>
-                            <Input placeholder="Digite a cidade" className="h-9 w-[320px]" {...field} />
+                            <Input placeholder="Digite a cidade" className="form-input-custom h-9 w-[320px]" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -626,7 +627,7 @@ export default function RegisterComponent() {
                         <FormItem>
                           <FormLabel className="form-label-geist">Bairro <span className="asterisk">*</span></FormLabel>
                           <FormControl>
-                            <Input placeholder="Digite o bairro" className="h-9 w-[320px]" {...field} />
+                            <Input placeholder="Digite o bairro" className="form-input-custom h-9 w-[320px]" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -643,7 +644,7 @@ export default function RegisterComponent() {
                         <FormItem>
                           <FormLabel className="form-label-geist">Logradouro <span className="asterisk">*</span></FormLabel>
                           <FormControl>
-                            <Input placeholder="Digite o logradouro" className="h-9 w-[320px]" {...field} />
+                            <Input placeholder="Digite o logradouro" className="form-input-custom h-9 w-[320px]" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -657,7 +658,7 @@ export default function RegisterComponent() {
                         <FormItem>
                           <FormLabel className="form-label-geist">Complemento</FormLabel>
                           <FormControl>
-                            <Input placeholder="Apto, bloco..." className="h-9 w-[320px]" {...field} />
+                            <Input placeholder="Apto, bloco..." className="form-input-custom h-9 w-[320px]" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -673,7 +674,7 @@ export default function RegisterComponent() {
                           <FormControl>
                             <Input
                               placeholder="123"
-                              className="h-9 w-[320px]"
+                              className="form-input-custom h-9 w-[320px]"
                               {...field}
                               onChange={(e) => {
                                 const value = e.target.value.replace(/\D/g, "");
@@ -699,7 +700,7 @@ export default function RegisterComponent() {
                             <Input
                               type="email"
                               placeholder="seuemail@exemplo.com"
-                              className="h-9 w-[320px]"
+                              className="form-input-custom h-9 w-[320px]"
                               {...field}
                               onChange={(e) => {
                                 const value = e.target.value.toLowerCase().trim();
@@ -722,7 +723,7 @@ export default function RegisterComponent() {
                             <Input
                               type="email"
                               placeholder="seuemail@exemplo.com"
-                              className="h-9 w-[320px]"
+                              className="form-input-custom h-9 w-[320px]"
                               {...field}
                               onChange={(e) => {
                                 const value = e.target.value.toLowerCase().trim();
@@ -753,7 +754,7 @@ export default function RegisterComponent() {
                                   onChange={field.onChange}
                                 >
                                   {(inputProps: React.InputHTMLAttributes<HTMLInputElement>) => 
-                                    <Input {...inputProps} className="max-h-9 w-full max-w-[100px]" />
+                                    <Input {...inputProps} className="form-input-custom max-h-9 w-full max-w-[100px]" />
                                   }
                                 </InputMask>
                               )}
@@ -782,7 +783,7 @@ export default function RegisterComponent() {
                                   onChange={field.onChange}
                                 >
                                   {(inputProps: React.InputHTMLAttributes<HTMLInputElement>) => 
-                                    <Input {...inputProps} className="h-9 w-[320px]" />
+                                    <Input {...inputProps} className="form-input-custom h-9 w-[320px]" />
                                   }
                                 </InputMask>
                               )}
@@ -814,7 +815,7 @@ export default function RegisterComponent() {
                                   onChange={field.onChange}
                                 >
                                   {(inputProps: React.InputHTMLAttributes<HTMLInputElement>) => 
-                                    <Input {...inputProps} className="max-h-9 w-full max-w-[100px]" />
+                                    <Input {...inputProps} className="form-input-custom max-h-9 w-full max-w-[100px]" />
                                   }
                                 </InputMask>
                               )}
@@ -843,7 +844,7 @@ export default function RegisterComponent() {
                                   onChange={field.onChange}
                                 >
                                   {(inputProps: React.InputHTMLAttributes<HTMLInputElement>) => 
-                                    <Input {...inputProps} className="h-9 w-[320px]" />
+                                    <Input {...inputProps} className="form-input-custom h-9 w-[320px]" />
                                   }
                                 </InputMask>
                               )}
@@ -882,7 +883,7 @@ export default function RegisterComponent() {
                               <Input
                                 type={showPassword ? "text" : "password"}
                                 placeholder="Digite sua senha"
-                                className="h-9 pr-10 w-[320px]"
+                                className="form-input-custom h-9 pr-10 w-[320px]"
                                 {...field}
                               />
                               <button
@@ -915,7 +916,7 @@ export default function RegisterComponent() {
                               <Input
                                 type={showConfirmPassword ? "text" : "password"}
                                 placeholder="Confirme sua senha"
-                                className="h-9 pr-10 w-[320px]"
+                                className="form-input-custom h-9 pr-10 w-[320px]"
                                 {...field}
                               />
                               <button
@@ -1073,28 +1074,43 @@ export default function RegisterComponent() {
                   </div>
                 </div>
 
-                {/* Botão de submit */}
-                <div className="pt-6 border-t border-gray-200">
-                  <Button
-                    type="submit"
-                    className="w-full h-12 text-base font-medium bg-blue-600 hover:bg-blue-700"
-                    disabled={!canSubmit || isSubmitting}
-                    onClick={(e) => {
-                      if (!canSubmit) {
-                        e.preventDefault();
-                        focusFirstError();
-                      }
-                    }}
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        Finalizando cadastro...
-                      </>
-                    ) : (
-                      "Finalizar Cadastro"
-                    )}
-                  </Button>
+                {/* Botões de navegação */}
+                <div className="pt-6 border-t border-white">
+                  <div className="flex justify-between items-center">
+                    {/* Botão Voltar */}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-12 w-full px-8 text-base font-medium text-gray-700 hover:text-gray-700 bg-white hover:bg-gray-50 max-w-[154px] max-h-[40px]"
+                      style={{ borderColor: '#172554' }}
+                      onClick={() => router.back()}
+                    >
+                      Voltar
+                    </Button>
+
+                    {/* Botão Avançar */}
+                    <Button
+                      type="submit"
+                      className="h-12 w-full px-8 text-base font-medium text-white hover:opacity-90 max-w-[154px] max-h-[40px]"
+                      style={{ backgroundColor: '#172554' }}
+                      disabled={!canSubmit || isSubmitting}
+                      onClick={(e) => {
+                        if (!canSubmit) {
+                          e.preventDefault();
+                          focusFirstError();
+                        }
+                      }}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                          Finalizando cadastro...
+                        </>
+                      ) : (
+                        "Avançar"
+                      )}
+                    </Button>
+                  </div>
                   
                   {!passwordsMatch && senha && confirmarSenha && (
                     <p className="text-sm text-red-600 text-center mt-3">
