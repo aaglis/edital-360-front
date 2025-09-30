@@ -344,7 +344,7 @@ export default function RegisterComponent() {
                     Informações pessoais
                   </h2>
                    {/* 1ª fileira: CPF, Documento de identidade, Órgão expedidor */}
-                  <div className="grid grid-cols-3 gap-4 mb-6">
+                  <div className="flex gap-3 mb-6">
                     <FormField
                       control={form.control}
                       name="cpf"
@@ -412,7 +412,7 @@ export default function RegisterComponent() {
                           <FormControl>
                             <Input
                               placeholder="Ex: SP"
-                              className="h-9 w-[69px]"
+                              className="h-9 w-[320px]"
                               {...field}
                               maxLength={2}
                               onChange={(e) => {
@@ -428,7 +428,7 @@ export default function RegisterComponent() {
                   </div>
 
                   {/* 2ª fileira: Nome, Sexo, Data nascimento, Escolaridade */}
-                  <div className="grid grid-cols-4 gap-4 mb-6">
+                  <div className="flex gap-3 mb-6">
                     <FormField
                       control={form.control}
                       name="nome"
@@ -438,7 +438,7 @@ export default function RegisterComponent() {
                           <FormControl>
                             <Input
                               placeholder="Digite seu nome completo"
-                              className="max-h-9 w-full max-w-[320px]"
+                              className="h-9 w-[320px]"
                               {...field}
                             />
                           </FormControl>
@@ -455,7 +455,7 @@ export default function RegisterComponent() {
                           <FormLabel className="text-sm font-medium text-gray-700">Sexo *</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
-                              <SelectTrigger className="max-h-9 w-full max-w-[165px]">
+                              <SelectTrigger className="h-9 w-[320px]">
                                 <SelectValue placeholder="Selecione" />
                               </SelectTrigger>
                             </FormControl>
@@ -491,7 +491,7 @@ export default function RegisterComponent() {
                           <FormLabel className="text-sm font-medium text-gray-700">Escolaridade *</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
-                              <SelectTrigger className="max-h-9 w-full max-w-[320px]">
+                              <SelectTrigger className="h-9 w-[320px]">
                                 <SelectValue placeholder="Selecione" />
                               </SelectTrigger>
                             </FormControl>
@@ -514,7 +514,7 @@ export default function RegisterComponent() {
                   </div>
 
                   {/* 3ª fileira: Nome da mãe, Nome do pai */}
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="flex gap-3 mb-6">
                     <FormField
                       control={form.control}
                       name="nomeMae"
@@ -522,7 +522,7 @@ export default function RegisterComponent() {
                         <FormItem>
                           <FormLabel className="text-sm font-medium text-gray-700">Nome da mãe *</FormLabel>
                           <FormControl>
-                            <Input placeholder="Digite o nome da mãe" className="max-h-9 w-full max-w-[320px]" {...field} />
+                            <Input placeholder="Digite o nome da mãe" className="h-9 w-[320px]" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -536,7 +536,7 @@ export default function RegisterComponent() {
                         <FormItem>
                           <FormLabel className="text-sm font-medium text-gray-700">Nome do pai *</FormLabel>
                           <FormControl>
-                            <Input placeholder="Digite o nome do pai" className="max-h-9 w-full max-w-[320px]" {...field} />
+                            <Input placeholder="Digite o nome do pai" className="h-9 w-[320px]" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -552,7 +552,7 @@ export default function RegisterComponent() {
                   </h2>
                   
                   {/* 1ª fileira: CEP, UF, Cidade, Bairro */}
-                  <div className="grid grid-cols-4 gap-4 mb-6">
+                  <div className="flex gap-3 mb-6">
                     <FormField
                       control={form.control}
                       name="cep"
@@ -571,7 +571,7 @@ export default function RegisterComponent() {
                                   onChange={field.onChange}
                                 >
                                   {(inputProps: React.InputHTMLAttributes<HTMLInputElement>) => 
-                                    <Input {...inputProps} className="max-h-9 w-full max-w-[165px]" />
+                                    <Input {...inputProps} className="h-9 w-[320px]" />
                                   }
                                 </InputMask>
                               )}
@@ -612,7 +612,7 @@ export default function RegisterComponent() {
                         <FormItem>
                           <FormLabel className="text-sm font-medium text-gray-700">Cidade *</FormLabel>
                           <FormControl>
-                            <Input placeholder="Digite a cidade" className="max-h-9 w-full max-w-[320px]" {...field} />
+                            <Input placeholder="Digite a cidade" className="h-9 w-[320px]" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -626,7 +626,7 @@ export default function RegisterComponent() {
                         <FormItem>
                           <FormLabel className="text-sm font-medium text-gray-700">Bairro *</FormLabel>
                           <FormControl>
-                            <Input placeholder="Digite o bairro" className="max-h-9 w-full max-w-[320px]" {...field} />
+                            <Input placeholder="Digite o bairro" className="h-9 w-[320px]" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -635,7 +635,7 @@ export default function RegisterComponent() {
                   </div>
 
                   {/* 2ª fileira: Logradouro, Complemento, Número */}
-                  <div className="grid grid-cols-3 gap-4 mb-6">
+                  <div className="flex gap-3 mb-6">
                     <FormField
                       control={form.control}
                       name="logradouro"
@@ -643,7 +643,7 @@ export default function RegisterComponent() {
                         <FormItem>
                           <FormLabel className="text-sm font-medium text-gray-700">Logradouro *</FormLabel>
                           <FormControl>
-                            <Input placeholder="Digite o logradouro" className="max-h-9 w-full max-w-[320px]" {...field} />
+                            <Input placeholder="Digite o logradouro" className="h-9 w-[320px]" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -657,7 +657,7 @@ export default function RegisterComponent() {
                         <FormItem>
                           <FormLabel className="text-sm font-medium text-gray-700">Complemento</FormLabel>
                           <FormControl>
-                            <Input placeholder="Apto, bloco..." className="max-h-9 w-full max-w-[320px]" {...field} />
+                            <Input placeholder="Apto, bloco..." className="h-9 w-[320px]" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -673,7 +673,7 @@ export default function RegisterComponent() {
                           <FormControl>
                             <Input
                               placeholder="123"
-                              className="max-h-9 w-full max-w-[165px]"
+                              className="h-9 w-[320px]"
                               {...field}
                               onChange={(e) => {
                                 const value = e.target.value.replace(/\D/g, "");
@@ -688,7 +688,7 @@ export default function RegisterComponent() {
                   </div>
 
                   {/* 3ª fileira: Email, Confirmar email, DDD, Celular */}
-                  <div className="grid grid-cols-4 gap-4 mb-6">
+                  <div className="flex gap-3 mb-6">
                     <FormField
                       control={form.control}
                       name="email"
@@ -699,7 +699,7 @@ export default function RegisterComponent() {
                             <Input
                               type="email"
                               placeholder="seuemail@exemplo.com"
-                              className="max-h-9 w-full max-w-[320px]"
+                              className="h-9 w-[320px]"
                               {...field}
                               onChange={(e) => {
                                 const value = e.target.value.toLowerCase().trim();
@@ -722,7 +722,7 @@ export default function RegisterComponent() {
                             <Input
                               type="email"
                               placeholder="seuemail@exemplo.com"
-                              className="max-h-9 w-full max-w-[320px]"
+                              className="h-9 w-[320px]"
                               {...field}
                               onChange={(e) => {
                                 const value = e.target.value.toLowerCase().trim();
@@ -782,7 +782,7 @@ export default function RegisterComponent() {
                                   onChange={field.onChange}
                                 >
                                   {(inputProps: React.InputHTMLAttributes<HTMLInputElement>) => 
-                                    <Input {...inputProps} className="max-h-9 w-full max-w-[165px]" />
+                                    <Input {...inputProps} className="h-9 w-[320px]" />
                                   }
                                 </InputMask>
                               )}
@@ -795,7 +795,7 @@ export default function RegisterComponent() {
                   </div>
 
                   {/* 4ª fileira: DDD, Telefone */}
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="flex gap-3 mb-6">
                     <FormField
                       control={form.control}
                       name="dddTelefone"
@@ -843,7 +843,7 @@ export default function RegisterComponent() {
                                   onChange={field.onChange}
                                 >
                                   {(inputProps: React.InputHTMLAttributes<HTMLInputElement>) => 
-                                    <Input {...inputProps} className="max-h-9 w-full max-w-[165px]" />
+                                    <Input {...inputProps} className="h-9 w-[320px]" />
                                   }
                                 </InputMask>
                               )}
@@ -863,7 +863,7 @@ export default function RegisterComponent() {
                   </h2>
                   
                   {/* 1ª fileira: Senha e confirmar senha */}
-                  <div className="grid grid-cols-2 gap-4 mb-6">
+                  <div className="flex gap-3 mb-6">
                     <FormField
                       control={form.control}
                       name="senha"
