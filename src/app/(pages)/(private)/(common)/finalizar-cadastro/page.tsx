@@ -932,7 +932,7 @@ export default function RegisterComponent() {
                       name="confirmarSenha"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium text-gray-700">Confirmars senha *</FormLabel>
+                          <FormLabel className="text-sm font-medium text-gray-700">Confirmar senha *</FormLabel>
                           <FormControl>
                             <div className="relative p-0 max-w-[320px]">
                               <Input
@@ -940,12 +940,13 @@ export default function RegisterComponent() {
                                 placeholder="Confirme sua senha"
                                 className="h-9 pr-10 w-[320px]"
                                 {...field}
-                              />                                <button
-                                  type="button"
-                                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                  tabIndex={-1}
-                                >
+                              />
+                              <button
+                                type="button"
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                tabIndex={-1}
+                              >
                                 {showConfirmPassword ? (
                                   <EyeOffIcon className="w-4 h-4" />
                                 ) : (
@@ -956,12 +957,26 @@ export default function RegisterComponent() {
                           </FormControl>
 
                           {field.value && senha && (
-                            <div
-                              className={`text-xs mt-1 flex items-center ${
-                                passwordsMatch ? "text-green-600" : "text-red-600"
-                              }`}
-                            >
-                              {passwordsMatch ? "✓ As senhas coincidem" : "✗ As senhas não coincidem"}
+                            <div className="mt-2">
+                              <div className="flex justify-between items-center">
+                                <span className="text-xs text-gray-600">
+                                  Confirmação:
+                                </span>
+                                <span
+                                  className={`text-xs font-medium ${
+                                    passwordsMatch ? "text-green-600" : "text-red-600"
+                                  }`}
+                                >
+                                  {passwordsMatch ? "✓ Senhas coincidem" : "✗ Senhas não coincidem"}
+                                </span>
+                              </div>
+                              <div className={`h-1.5 w-full rounded-full mt-1 ${
+                                passwordsMatch ? "bg-green-200" : "bg-red-200"
+                              }`}>
+                                <div className={`h-full rounded-full transition-all duration-300 ${
+                                  passwordsMatch ? "bg-green-500 w-full" : "bg-red-500 w-0"
+                                }`}></div>
+                              </div>
                             </div>
                           )}
                           <FormMessage />
@@ -972,46 +987,51 @@ export default function RegisterComponent() {
 
                   {/* Requisitos da senha */}
                   {senha && (
-                    <div className="p-4 bg-gray-50 rounded-lg mb-6">
+                    <div className={`p-4 rounded-lg mb-6 border transition-all duration-300 ${
+                      // Verifica se todos os requisitos estão sendo atendidos
+                      senha.length >= 8 && /[A-Z]/.test(senha) && /[a-z]/.test(senha) && /\d/.test(senha)
+                        ? "bg-green-50 border-green-500" 
+                        : "bg-blue-50 border-blue-500"
+                    }`}>
                       <div className="text-sm text-gray-600 mb-3">Sua senha deve conter:</div>
                       <div className="grid grid-cols-2 gap-3 text-sm">
                         <div
                           className={`flex items-center ${
-                            senha.length >= 8 ? "text-green-600" : "text-gray-400"
+                            senha.length >= 8 ? "text-green-600" : "text-blue-600"
                           }`}
                         >
                           <span className="mr-2">
-                            {senha.length >= 8 ? "✓" : "○"}
+                            {senha.length >= 8 ? "✓" : "ⓘ"}
                           </span>{" "}
                           Mínimo 8 caracteres
                         </div>
                         <div
                           className={`flex items-center ${
-                            /[A-Z]/.test(senha) ? "text-green-600" : "text-gray-400"
+                            /[A-Z]/.test(senha) ? "text-green-600" : "text-blue-600"
                           }`}
                         >
                           <span className="mr-2">
-                            {/[A-Z]/.test(senha) ? "✓" : "○"}
+                            {/[A-Z]/.test(senha) ? "✓" : "ⓘ"}
                           </span>{" "}
                           Uma letra maiúscula
                         </div>
                         <div
                           className={`flex items-center ${
-                            /[a-z]/.test(senha) ? "text-green-600" : "text-gray-400"
+                            /[a-z]/.test(senha) ? "text-green-600" : "text-blue-600"
                           }`}
                         >
                           <span className="mr-2">
-                            {/[a-z]/.test(senha) ? "✓" : "○"}
+                            {/[a-z]/.test(senha) ? "✓" : "ⓘ"}
                           </span>{" "}
                           Uma letra minúscula
                         </div>
                         <div
                           className={`flex items-center ${
-                            /\d/.test(senha) ? "text-green-600" : "text-gray-400"
+                            /\d/.test(senha) ? "text-green-600" : "text-blue-600"
                           }`}
                         >
                           <span className="mr-2">
-                            {/\d/.test(senha) ? "✓" : "○"}
+                            {/\d/.test(senha) ? "✓" : "ⓘ"}
                           </span>{" "}
                           Um número
                         </div>
