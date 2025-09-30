@@ -36,6 +36,7 @@ export default function RegisterComponent() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   const fieldOrder = [
     "nome",
@@ -294,7 +295,8 @@ export default function RegisterComponent() {
             className="space-y-8"
           >
             <div className="bg-white rounded-3xl shadow-sm border p-8">
-              <div className="space-y-8">
+              {!showConfirmation ? (
+                <div className="space-y-8">
                 
                 {/* Título principal */}
                 <div className="text-left mb-12">
@@ -1090,14 +1092,16 @@ export default function RegisterComponent() {
 
                     {/* Botão Avançar */}
                     <Button
-                      type="submit"
+                      type="button"
                       className="h-12 w-full px-8 text-base font-medium text-white hover:opacity-90 max-w-[154px] max-h-[40px]"
                       style={{ backgroundColor: '#172554' }}
                       disabled={!canSubmit || isSubmitting}
                       onClick={(e) => {
+                        e.preventDefault();
                         if (!canSubmit) {
-                          e.preventDefault();
                           focusFirstError();
+                        } else {
+                          setShowConfirmation(true);
                         }
                       }}
                     >
@@ -1127,6 +1131,180 @@ export default function RegisterComponent() {
                   )}
                 </div>
               </div>
+              ) : (
+                <div className="space-y-8">
+                  {/* Título principal */}
+                  <div className="text-left mb-12">
+                    <h1 className="mb-2" style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontWeight: 600,
+                      fontSize: '48px',
+                      lineHeight: '100%',
+                      letterSpacing: '-0.5%',
+                      textAlign: 'left',
+                      verticalAlign: 'middle',
+                      color: 'black'
+                    }}>
+                      Cadastro
+                    </h1>
+                    <p style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontWeight: 600,
+                      fontSize: '20px',
+                      lineHeight: '120%',
+                      letterSpacing: '-0.5%',
+                      textAlign: 'left',
+                      verticalAlign: 'middle',
+                      color: 'black'
+                    }}>
+                      Para finalizar seu cadastro, confira as informações com atenção
+                    </p>
+                  </div>
+
+                  {/* Informações Pessoais */}
+                  <div>
+                    <h3 className="text-black mb-4" style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontWeight: 600,
+                      fontSize: '24px',
+                      lineHeight: '100%',
+                      letterSpacing: '-0.5%',
+                    }}>
+                      Informações pessoais
+                    </h3>
+                    <div className="space-y-3 text-sm">
+                      <div>
+                        <span className="font-medium text-gray-700">CPF:</span>
+                        <span className="ml-2 text-gray-900">{form.getValues('cpf')}</span>
+                      </div>
+                      <div>
+                        <span className="font-medium text-gray-700">Identidade:</span>
+                        <span className="ml-2 text-gray-900">{form.getValues('documentoIdentidade')}</span>
+                      </div>
+                      <div>
+                        <span className="font-medium text-gray-700">Nome:</span>
+                        <span className="ml-2 text-gray-900">{form.getValues('nome')}</span>
+                      </div>
+                      <div>
+                        <span className="font-medium text-gray-700">Sexo:</span>
+                        <span className="ml-2 text-gray-900">{form.getValues('sexo')}</span>
+                      </div>
+                      <div>
+                        <span className="font-medium text-gray-700">Data de Nascimento:</span>
+                        <span className="ml-2 text-gray-900">{form.getValues('dataNascimento')}</span>
+                      </div>
+                      <div>
+                        <span className="font-medium text-gray-700">Escolaridade:</span>
+                        <span className="ml-2 text-gray-900">{form.getValues('escolaridade')}</span>
+                      </div>
+                      <div>
+                        <span className="font-medium text-gray-700">Nome da Mãe:</span>
+                        <span className="ml-2 text-gray-900">{form.getValues('nomeMae')}</span>
+                      </div>
+                      <div>
+                        <span className="font-medium text-gray-700">Nome do Pai:</span>
+                        <span className="ml-2 text-gray-900">{form.getValues('nomePai')}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Endereço e Contato */}
+                  <div>
+                    <h3 className="text-black mb-4" style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontWeight: 600,
+                      fontSize: '24px',
+                      lineHeight: '100%',
+                      letterSpacing: '-0.5%',
+                    }}>
+                      Endereço e contato
+                    </h3>
+                    <div className="space-y-3 text-sm">
+                      <div>
+                        <span className="font-medium text-gray-700">CEP:</span>
+                        <span className="ml-2 text-gray-900">{form.getValues('cep')}</span>
+                      </div>
+                      <div>
+                        <span className="font-medium text-gray-700">Bairro:</span>
+                        <span className="ml-2 text-gray-900">{form.getValues('bairro')}</span>
+                      </div>
+                      <div>
+                        <span className="font-medium text-gray-700">Logradouro:</span>
+                        <span className="ml-2 text-gray-900">{form.getValues('logradouro')}</span>
+                      </div>
+                      <div>
+                        <span className="font-medium text-gray-700">Complemento:</span>
+                        <span className="ml-2 text-gray-900">{form.getValues('complemento') || 'Não informado'}</span>
+                      </div>
+                      <div>
+                        <span className="font-medium text-gray-700">Número:</span>
+                        <span className="ml-2 text-gray-900">{form.getValues('numero')}</span>
+                      </div>
+                      <div>
+                        <span className="font-medium text-gray-700">Email:</span>
+                        <span className="ml-2 text-gray-900">{form.getValues('email')}</span>
+                      </div>
+                      <div>
+                        <span className="font-medium text-gray-700">Celular:</span>
+                        <span className="ml-2 text-gray-900">({form.getValues('dddCelular')}) {form.getValues('celular')}</span>
+                      </div>
+                      {form.getValues('telefone') && (
+                        <div>
+                          <span className="font-medium text-gray-700">Telefone:</span>
+                          <span className="ml-2 text-gray-900">({form.getValues('dddTelefone')}) {form.getValues('telefone')}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Informação sobre a senha */}
+                  <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <div className="flex items-center text-blue-700">
+                      <span className="mr-2">ⓘ</span>
+                      <span className="text-sm">
+                        Os dados só poderão ser alterados durante períodos de inscrição e novos dados não servem para inscrições anteriores. Deseja confirmar suas informações, declarando-as como verdadeiras?
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Botões de navegação */}
+                  <div className="pt-6 border-t border-white">
+                    <div className="flex justify-between items-center">
+                      {/* Botão Voltar */}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="h-12 w-full px-8 text-base font-medium text-gray-700 hover:text-gray-700 bg-white hover:bg-gray-50 max-w-[154px] max-h-[40px]"
+                        style={{ borderColor: '#172554' }}
+                        onClick={() => setShowConfirmation(false)}
+                      >
+                        Voltar
+                      </Button>
+
+                      {/* Botão Finalizar */}
+                      <Button
+                        type="button"
+                        className="h-12 w-full px-8 text-base font-medium text-white hover:opacity-90 max-w-[154px] max-h-[40px]"
+                        style={{ backgroundColor: '#172554' }}
+                        disabled={isSubmitting}
+                        onClick={() => {
+                          const formData = form.getValues();
+                          onSubmit(formData);
+                        }}
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                            Finalizando...
+                          </>
+                        ) : (
+                          'Finalizar'
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </form>
         </Form>
