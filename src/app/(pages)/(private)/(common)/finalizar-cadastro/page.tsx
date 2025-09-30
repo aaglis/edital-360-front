@@ -286,24 +286,43 @@ export default function RegisterComponent() {
   }, [passwordsMatch, form.formState.isValid]);
 
   return (
-    <div className="flex flex-col items-center py-8 px-4 min-h-screen bg-gray-50">
+    <div className="flex flex-col items-center py-8 px-4 min-h-screen" style={{ backgroundColor: '#E5E5E5' }}>
       <div className="w-full" style={{ maxWidth: '1289px' }}>
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">
-            Cadastro
-          </h1>
-          <p className="text-gray-600">
-            Para prosseguir com seu cadastro, preencha os campos corretamente
-          </p>
-        </div>
-        
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-8"
           >
-            <div className="bg-white rounded-lg shadow-sm border p-8">
+            <div className="bg-white rounded-3xl shadow-sm border p-8">
               <div className="space-y-8">
+                
+                {/* Título principal */}
+                <div className="text-left mb-12">
+                  <h1 className="mb-2" style={{
+                    fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                    fontWeight: 600,
+                    fontSize: '48px',
+                    lineHeight: '100%',
+                    letterSpacing: '-1%',
+                    textAlign: 'left',
+                    verticalAlign: 'middle',
+                    color: 'black'
+                  }}>
+                    Cadastro
+                  </h1>
+                  <p style={{
+                    fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                    fontWeight: 600,
+                    fontSize: '20px',
+                    lineHeight: '120%',
+                    letterSpacing: '-2%',
+                    textAlign: 'left',
+                    verticalAlign: 'middle',
+                    color: 'black'
+                  }}>
+                    Para prosseguir com seu cadastro, preencha os campos corretamente
+                  </p>
+                </div>
                 
                 {/* Informações pessoais */}
                 <div>
@@ -324,7 +343,7 @@ export default function RegisterComponent() {
                       name="cpf"
                       render={() => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium text-gray-700">CPF *</FormLabel>
+                          <FormLabel className="form-label-geist">CPF <span className="asterisk">*</span></FormLabel>
                           <FormControl>
                             <Controller
                               name="cpf"
@@ -353,7 +372,7 @@ export default function RegisterComponent() {
                       name="documentoIdentidade"
                       render={() => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium text-gray-700">Documento de identidade *</FormLabel>
+                          <FormLabel className="form-label-geist">Documento de identidade <span className="asterisk">*</span></FormLabel>
                           <FormControl>
                             <Controller
                               name="documentoIdentidade"
@@ -382,7 +401,7 @@ export default function RegisterComponent() {
                       name="ufIdentidade"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium text-gray-700">Órgão expedidor de documentos *</FormLabel>
+                          <FormLabel className="form-label-geist">Órgão expedidor de documentos <span className="asterisk">*</span></FormLabel>
                           <FormControl>
                             <Input
                               placeholder="Ex: SP"
@@ -408,7 +427,7 @@ export default function RegisterComponent() {
                       name="nome"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium text-gray-700">Nome *</FormLabel>
+                          <FormLabel className="form-label-geist">Nome <span className="asterisk">*</span></FormLabel>
                           <FormControl>
                             <Input
                               placeholder="Digite seu nome completo"
@@ -426,7 +445,7 @@ export default function RegisterComponent() {
                       name="sexo"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium text-gray-700">Sexo *</FormLabel>
+                          <FormLabel className="form-label-geist">Sexo <span className="asterisk">*</span></FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger className="h-9 w-[320px]">
@@ -448,7 +467,7 @@ export default function RegisterComponent() {
                       name="dataNascimento"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium text-gray-700">Data de nascimento *</FormLabel>
+                          <FormLabel className="form-label-geist">Data de nascimento <span className="asterisk">*</span></FormLabel>
                           <FormControl>
                             <Input type="date" className="max-h-8 w-full max-w-[165px]" {...field} />
                           </FormControl>
@@ -462,7 +481,7 @@ export default function RegisterComponent() {
                       name="escolaridade"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium text-gray-700">Escolaridade *</FormLabel>
+                          <FormLabel className="form-label-geist">Escolaridade <span className="asterisk">*</span></FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger className="h-9 w-[320px]">
@@ -494,7 +513,7 @@ export default function RegisterComponent() {
                       name="nomeMae"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium text-gray-700">Nome da mãe *</FormLabel>
+                          <FormLabel className="form-label-geist">Nome da mãe <span className="asterisk">*</span></FormLabel>
                           <FormControl>
                             <Input placeholder="Digite o nome da mãe" className="h-9 w-[320px]" {...field} />
                           </FormControl>
@@ -508,7 +527,7 @@ export default function RegisterComponent() {
                       name="nomePai"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium text-gray-700">Nome do pai *</FormLabel>
+                          <FormLabel className="form-label-geist">Nome do pai <span className="asterisk">*</span></FormLabel>
                           <FormControl>
                             <Input placeholder="Digite o nome do pai" className="h-9 w-[320px]" {...field} />
                           </FormControl>
@@ -521,7 +540,7 @@ export default function RegisterComponent() {
 
                 {/* Endereço e contato */}
                 <div>
-                  <h2 className="text-black mb-6" style={{
+                  <h2 className="text-black mb-6 mt-16" style={{
                     fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
                     fontWeight: 600,
                     fontSize: '30px',
@@ -539,7 +558,7 @@ export default function RegisterComponent() {
                       name="cep"
                       render={() => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium text-gray-700">CEP *</FormLabel>
+                          <FormLabel className="form-label-geist">CEP <span className="asterisk">*</span></FormLabel>
                           <FormControl>
                             <Controller
                               name="cep"
@@ -568,7 +587,7 @@ export default function RegisterComponent() {
                       name="uf"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium text-gray-700">UF *</FormLabel>
+                          <FormLabel className="form-label-geist">UF <span className="asterisk">*</span></FormLabel>
                           <FormControl>
                             <Input
                               placeholder="Ex: SP"
@@ -591,7 +610,7 @@ export default function RegisterComponent() {
                       name="cidade"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium text-gray-700">Cidade *</FormLabel>
+                          <FormLabel className="form-label-geist">Cidade <span className="asterisk">*</span></FormLabel>
                           <FormControl>
                             <Input placeholder="Digite a cidade" className="h-9 w-[320px]" {...field} />
                           </FormControl>
@@ -605,7 +624,7 @@ export default function RegisterComponent() {
                       name="bairro"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium text-gray-700">Bairro *</FormLabel>
+                          <FormLabel className="form-label-geist">Bairro <span className="asterisk">*</span></FormLabel>
                           <FormControl>
                             <Input placeholder="Digite o bairro" className="h-9 w-[320px]" {...field} />
                           </FormControl>
@@ -622,7 +641,7 @@ export default function RegisterComponent() {
                       name="logradouro"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium text-gray-700">Logradouro *</FormLabel>
+                          <FormLabel className="form-label-geist">Logradouro <span className="asterisk">*</span></FormLabel>
                           <FormControl>
                             <Input placeholder="Digite o logradouro" className="h-9 w-[320px]" {...field} />
                           </FormControl>
@@ -636,7 +655,7 @@ export default function RegisterComponent() {
                       name="complemento"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium text-gray-700">Complemento</FormLabel>
+                          <FormLabel className="form-label-geist">Complemento</FormLabel>
                           <FormControl>
                             <Input placeholder="Apto, bloco..." className="h-9 w-[320px]" {...field} />
                           </FormControl>
@@ -650,7 +669,7 @@ export default function RegisterComponent() {
                       name="numero"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium text-gray-700">Número *</FormLabel>
+                          <FormLabel className="form-label-geist">Número <span className="asterisk">*</span></FormLabel>
                           <FormControl>
                             <Input
                               placeholder="123"
@@ -675,7 +694,7 @@ export default function RegisterComponent() {
                       name="email"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium text-gray-700">E-mail *</FormLabel>
+                          <FormLabel className="form-label-geist">E-mail <span className="asterisk">*</span></FormLabel>
                           <FormControl>
                             <Input
                               type="email"
@@ -698,7 +717,7 @@ export default function RegisterComponent() {
                       name="confirmarEmail"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium text-gray-700">Confirmar e-mail *</FormLabel>
+                          <FormLabel className="form-label-geist">Confirmar e-mail <span className="asterisk">*</span></FormLabel>
                           <FormControl>
                             <Input
                               type="email"
@@ -721,7 +740,7 @@ export default function RegisterComponent() {
                       name="dddCelular"
                       render={() => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium text-gray-700">DDD *</FormLabel>
+                          <FormLabel className="form-label-geist">DDD <span className="asterisk">*</span></FormLabel>
                           <FormControl>
                             <Controller
                               name="dddCelular"
@@ -750,7 +769,7 @@ export default function RegisterComponent() {
                       name="celular"
                       render={() => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium text-gray-700">Celular *</FormLabel>
+                          <FormLabel className="form-label-geist">Celular <span className="asterisk">*</span></FormLabel>
                           <FormControl>
                             <Controller
                               name="celular"
@@ -782,7 +801,7 @@ export default function RegisterComponent() {
                       name="dddTelefone"
                       render={() => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium text-gray-700">DDD Telefone</FormLabel>
+                          <FormLabel className="form-label-geist">DDD Telefone</FormLabel>
                           <FormControl>
                             <Controller
                               name="dddTelefone"
@@ -811,7 +830,7 @@ export default function RegisterComponent() {
                       name="telefone"
                       render={() => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium text-gray-700">Telefone</FormLabel>
+                          <FormLabel className="form-label-geist">Telefone</FormLabel>
                           <FormControl>
                             <Controller
                               name="telefone"
@@ -839,7 +858,7 @@ export default function RegisterComponent() {
 
                 {/* Dados de acesso */}
                 <div>
-                  <h2 className="text-black mb-6" style={{
+                  <h2 className="text-black mb-6 mt-16" style={{
                     fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
                     fontWeight: 600,
                     fontSize: '30px',
@@ -857,7 +876,7 @@ export default function RegisterComponent() {
                       name="senha"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium text-gray-700">Senha *</FormLabel>
+                          <FormLabel className="form-label-geist">Senha <span className="asterisk">*</span></FormLabel>
                           <FormControl>
                             <div className="relative p-0 max-w-[320px]">
                               <Input
@@ -890,7 +909,7 @@ export default function RegisterComponent() {
                       name="confirmarSenha"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium text-gray-700">Confirmar senha *</FormLabel>
+                          <FormLabel className="form-label-geist">Confirmar senha <span className="asterisk">*</span></FormLabel>
                           <FormControl>
                             <div className="relative p-0 max-w-[320px]">
                               <Input
