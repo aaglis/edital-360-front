@@ -307,7 +307,14 @@ export default function RegisterComponent() {
                 
                 {/* Informações pessoais */}
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-800 mb-6">
+                  <h2 className="text-black mb-6" style={{
+                    fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                    fontWeight: 600,
+                    fontSize: '30px',
+                    lineHeight: '100%',
+                    letterSpacing: '-1%',
+                    verticalAlign: 'middle'
+                  }}>
                     Informações pessoais
                   </h2>
                    {/* 1ª fileira: CPF, Documento de identidade, Órgão expedidor */}
@@ -514,7 +521,14 @@ export default function RegisterComponent() {
 
                 {/* Endereço e contato */}
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-800 mb-6">
+                  <h2 className="text-black mb-6" style={{
+                    fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                    fontWeight: 600,
+                    fontSize: '30px',
+                    lineHeight: '100%',
+                    letterSpacing: '-1%',
+                    verticalAlign: 'middle'
+                  }}>
                     Endereço e contato
                   </h2>
                   
@@ -825,7 +839,14 @@ export default function RegisterComponent() {
 
                 {/* Dados de acesso */}
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-800 mb-6">
+                  <h2 className="text-black mb-6" style={{
+                    fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                    fontWeight: 600,
+                    fontSize: '30px',
+                    lineHeight: '100%',
+                    letterSpacing: '-1%',
+                    verticalAlign: 'middle'
+                  }}>
                     Dados de acesso
                   </h2>
                   
