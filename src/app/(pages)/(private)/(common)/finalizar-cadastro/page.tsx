@@ -423,19 +423,21 @@ export default function RegisterComponent() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="fundamental">Fundamental</SelectItem>
-                        <SelectItem value="medio">Médio</SelectItem>
-                        <SelectItem value="superior-incompleto">
+                        <SelectItem value="FUNDAMENTAL_INCOMPLETO">Fundamental Incompleto</SelectItem>
+                        <SelectItem value="FUNDAMENTAL_COMPLETO">Fundamental Completo</SelectItem>
+                        <SelectItem value="MEDIO_INCOMPLETO">Médio Incompleto</SelectItem>
+                        <SelectItem value="MEDIO_COMPLETO">Médio Completo</SelectItem>
+                        <SelectItem value="SUPERIOR_INCOMPLETO">
                           Superior Incompleto
                         </SelectItem>
-                        <SelectItem value="superior-completo">
+                        <SelectItem value="SUPERIOR_COMPLETO">
                           Superior Completo
                         </SelectItem>
-                        <SelectItem value="pos-graduacao">
+                        <SelectItem value="POS_GRADUACAO">
                           Pós-graduação
                         </SelectItem>
-                        <SelectItem value="mestrado">Mestrado</SelectItem>
-                        <SelectItem value="doutorado">Doutorado</SelectItem>
+                        <SelectItem value="MESTRADO">Mestrado</SelectItem>
+                        <SelectItem value="DOUTORADO">Doutorado</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />

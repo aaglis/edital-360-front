@@ -42,13 +42,15 @@ export const cadastroCompletoSchema = z
 
     escolaridade: z.enum(
       [
-        "fundamental",
-        "medio",
-        "superior-incompleto",
-        "superior-completo",
-        "pos-graduacao",
-        "mestrado",
-        "doutorado",
+        "FUNDAMENTAL_INCOMPLETO",
+        "FUNDAMENTAL_COMPLETO", 
+        "MEDIO_INCOMPLETO",
+        "MEDIO_COMPLETO",
+        "SUPERIOR_INCOMPLETO",
+        "SUPERIOR_COMPLETO",
+        "POS_GRADUACAO",
+        "MESTRADO",
+        "DOUTORADO",
       ],
       {
         message: "Selecione a escolaridade",
