@@ -13,7 +13,6 @@ import { userService, type CadastroUsuarioData } from "@/core/services/userServi
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
@@ -275,43 +274,11 @@ export default function RegisterComponent() {
     }
   };
 
-  const calculatePasswordStrength = (
-    password: string
-  ): { score: number; percentage: number; color: string; text: string } => {
-    let score = 0;
-
-    if (password.length >= 8) score += 20;
-    if (password.length >= 12) score += 10;
-    if (/[a-z]/.test(password)) score += 20;
-    if (/[A-Z]/.test(password)) score += 20;
-    if (/\d/.test(password)) score += 20;
-    if (/[^a-zA-Z0-9]/.test(password)) score += 10;
-
-    let color = "bg-red-500";
-    let text = "Muito fraca";
-
-    if (score >= 80) {
-      color = "bg-green-500";
-      text = "Muito forte";
-    } else if (score >= 60) {
-      color = "bg-yellow-500";
-      text = "Forte";
-    } else if (score >= 40) {
-      color = "bg-orange-500";
-      text = "Moderada";
-    } else if (score >= 20) {
-      color = "bg-red-400";
-      text = "Fraca";
-    }
-
-    return { score, percentage: score, color, text };
-  };
-
   const senha = form.watch("senha");
   const confirmarSenha = form.watch("confirmarSenha");
 
   const passwordsMatch = useMemo(() => {
-    return senha && confirmarSenha && senha === confirmarSenha;
+    return senha && confirmarSenha && senha.length > 0 && confirmarSenha.length > 0 && senha === confirmarSenha;
   }, [senha, confirmarSenha]);
 
   const canSubmit = useMemo(() => {
@@ -867,64 +834,34 @@ export default function RegisterComponent() {
                     <FormField
                       control={form.control}
                       name="senha"
-                      render={({ field }) => {
-                        const strength = calculatePasswordStrength(field.value || "");
-                        const getStrengthColor = (percentage: number) => {
-                          if (percentage >= 80) return "text-green-600";
-                          if (percentage >= 60) return "text-yellow-600";
-                          return "text-red-600";
-                        };
-
-                        return (
-                          <FormItem>
-                            <FormLabel className="text-sm font-medium text-gray-700">Senha *</FormLabel>
-                            <FormControl>
-                              <div className="relative p-0 max-w-[320px] ">
-                                <Input
-                                  type={showPassword ? "text" : "password"}
-                                  placeholder="Digite sua senha"
-                                  className="h-9 pr-10 w-[320px]"
-                                  {...field}
-                                />
-                                <button
-                                  type="button"
-                                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                                  onClick={() => setShowPassword(!showPassword)}
-                                  tabIndex={-1}
-                                >
-                                  {showPassword ? (
-                                    <EyeOffIcon className="w-4 h-4" />
-                                  ) : (
-                                    <EyeIcon className="w-4 h-4" />
-                                  )}
-                                </button>
-                              </div>
-                            </FormControl>
-
-                            {field.value && (
-                              <div className="mt-2 ">
-                                <div className="flex justify-between items-center">
-                                  <span className="text-xs text-gray-600">
-                                    Força da senha:
-                                  </span>
-                                  <span
-                                    className={`text-xs font-medium ${getStrengthColor(
-                                      strength.percentage
-                                    )}`}
-                                  >
-                                    {strength.text}
-                                  </span>
-                                </div>
-                                <Progress
-                                  value={strength.percentage}
-                                  className="h-1.5"
-                                />
-                              </div>
-                            )}
-                            <FormMessage />
-                          </FormItem>
-                        );
-                      }}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-sm font-medium text-gray-700">Senha *</FormLabel>
+                          <FormControl>
+                            <div className="relative p-0 max-w-[320px]">
+                              <Input
+                                type={showPassword ? "text" : "password"}
+                                placeholder="Digite sua senha"
+                                className="h-9 pr-10 w-[320px]"
+                                {...field}
+                              />
+                              <button
+                                type="button"
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                                onClick={() => setShowPassword(!showPassword)}
+                                tabIndex={-1}
+                              >
+                                {showPassword ? (
+                                  <EyeOffIcon className="w-4 h-4" />
+                                ) : (
+                                  <EyeIcon className="w-4 h-4" />
+                                )}
+                              </button>
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
 
                     <FormField
@@ -955,30 +892,6 @@ export default function RegisterComponent() {
                               </button>
                             </div>
                           </FormControl>
-
-                          {field.value && senha && (
-                            <div className="mt-2">
-                              <div className="flex justify-between items-center">
-                                <span className="text-xs text-gray-600">
-                                  Confirmação:
-                                </span>
-                                <span
-                                  className={`text-xs font-medium ${
-                                    passwordsMatch ? "text-green-600" : "text-red-600"
-                                  }`}
-                                >
-                                  {passwordsMatch ? "✓ Senhas coincidem" : "✗ Senhas não coincidem"}
-                                </span>
-                              </div>
-                              <div className={`h-1.5 w-full rounded-full mt-1 ${
-                                passwordsMatch ? "bg-green-200" : "bg-red-200"
-                              }`}>
-                                <div className={`h-full rounded-full transition-all duration-300 ${
-                                  passwordsMatch ? "bg-green-500 w-full" : "bg-red-500 w-0"
-                                }`}></div>
-                              </div>
-                            </div>
-                          )}
                           <FormMessage />
                         </FormItem>
                       )}
@@ -986,122 +899,138 @@ export default function RegisterComponent() {
                   </div>
 
                   {/* Requisitos da senha */}
-                  {senha && (
-                    <div className="relative p-4 rounded-lg mb-6 bg-transparent border border-blue-500">
-                      {/* Borda verde animada que "preenche" da esquerda para direita */}
-                      <div 
-                        className="absolute top-0 left-0 h-full border-l border-t border-b border-green-500 rounded-l-lg transition-all duration-500 ease-out"
-                        style={{
-                          width: (() => {
-                            const requirements = [
-                              senha.length >= 8,
-                              /[A-Z]/.test(senha),
-                              /[a-z]/.test(senha),
-                              /\d/.test(senha)
-                            ];
-                            const fulfilled = requirements.filter(Boolean).length;
-                            return `${(fulfilled / requirements.length) * 100}%`;
-                          })()
-                        }}
-                      />
-                      
-                      {/* Borda verde top e bottom que acompanha */}
-                      <div 
-                        className="absolute top-0 left-0 border-t border-green-500 transition-all duration-500 ease-out"
-                        style={{
-                          width: (() => {
-                            const requirements = [
-                              senha.length >= 8,
-                              /[A-Z]/.test(senha),
-                              /[a-z]/.test(senha),
-                              /\d/.test(senha)
-                            ];
-                            const fulfilled = requirements.filter(Boolean).length;
-                            return `${(fulfilled / requirements.length) * 100}%`;
-                          })()
-                        }}
-                      />
-                      
-                      <div 
-                        className="absolute bottom-0 left-0 border-b border-green-500 transition-all duration-500 ease-out"
-                        style={{
-                          width: (() => {
-                            const requirements = [
-                              senha.length >= 8,
-                              /[A-Z]/.test(senha),
-                              /[a-z]/.test(senha),
-                              /\d/.test(senha)
-                            ];
-                            const fulfilled = requirements.filter(Boolean).length;
-                            return `${(fulfilled / requirements.length) * 100}%`;
-                          })()
-                        }}
-                      />
-                      
-                      {/* Borda verde direita aparece quando 100% */}
-                      <div 
-                        className={`absolute top-0 right-0 h-full border-r border-green-500 rounded-r-lg transition-opacity duration-300 ${
-                          (() => {
-                            const requirements = [
-                              senha.length >= 8,
-                              /[A-Z]/.test(senha),
-                              /[a-z]/.test(senha),
-                              /\d/.test(senha)
-                            ];
-                            const fulfilled = requirements.filter(Boolean).length;
-                            return fulfilled === requirements.length ? 'opacity-100' : 'opacity-0';
-                          })()
-                        }`}
-                      />
-                      
-                      {/* Conteúdo */}
-                      <div className="relative z-10">
-                        <div className="text-sm text-gray-600 mb-3">Sua senha deve conter:</div>
-                        <div className="grid grid-cols-2 gap-3 text-sm">
-                          <div
-                            className={`flex items-center transition-colors duration-300 ${
-                              senha.length >= 8 ? "text-green-600" : "text-blue-600"
-                            }`}
-                          >
-                            <span className="mr-2">
-                              {senha.length >= 8 ? "✓" : "ⓘ"}
-                            </span>{" "}
-                            Mínimo 8 caracteres
-                          </div>
-                          <div
-                            className={`flex items-center transition-colors duration-300 ${
-                              /[A-Z]/.test(senha) ? "text-green-600" : "text-blue-600"
-                            }`}
-                          >
-                            <span className="mr-2">
-                              {/[A-Z]/.test(senha) ? "✓" : "ⓘ"}
-                            </span>{" "}
-                            Uma letra maiúscula
-                          </div>
-                          <div
-                            className={`flex items-center transition-colors duration-300 ${
-                              /[a-z]/.test(senha) ? "text-green-600" : "text-blue-600"
-                            }`}
-                          >
-                            <span className="mr-2">
-                              {/[a-z]/.test(senha) ? "✓" : "ⓘ"}
-                            </span>{" "}
-                            Uma letra minúscula
-                          </div>
-                          <div
-                            className={`flex items-center transition-colors duration-300 ${
-                              /\d/.test(senha) ? "text-green-600" : "text-blue-600"
-                            }`}
-                          >
-                            <span className="mr-2">
-                              {/\d/.test(senha) ? "✓" : "ⓘ"}
-                            </span>{" "}
-                            Um número
-                          </div>
+                  <div className="relative p-4 rounded-lg mb-6 bg-transparent border border-blue-500 max-w-[650px]">
+                    {/* Borda verde animada que "preenche" da esquerda para direita */}
+                    <div 
+                      className="absolute top-0 left-0 h-full border-l border-t border-b border-green-500 rounded-l-lg transition-all duration-500 ease-out"
+                      style={{
+                        width: (() => {
+                          if (!senha || senha.length === 0) return '0%';
+                          const requirements = [
+                            senha.length >= 8,
+                            /[A-Z]/.test(senha),
+                            /[a-z]/.test(senha),
+                            /\d/.test(senha),
+                            senha && confirmarSenha && senha.length > 0 && confirmarSenha.length > 0 && senha === confirmarSenha
+                          ];
+                          const fulfilled = requirements.filter(Boolean).length;
+                          return `${(fulfilled / requirements.length) * 100}%`;
+                        })()
+                      }}
+                    />
+                    
+                    {/* Borda verde top e bottom que acompanha */}
+                    <div 
+                      className="absolute top-0 left-0 border-t border-green-500 transition-all duration-500 ease-out"
+                      style={{
+                        width: (() => {
+                          if (!senha || senha.length === 0) return '0%';
+                          const requirements = [
+                            senha.length >= 8,
+                            /[A-Z]/.test(senha),
+                            /[a-z]/.test(senha),
+                            /\d/.test(senha),
+                            senha && confirmarSenha && senha.length > 0 && confirmarSenha.length > 0 && senha === confirmarSenha
+                          ];
+                          const fulfilled = requirements.filter(Boolean).length;
+                          return `${(fulfilled / requirements.length) * 100}%`;
+                        })()
+                      }}
+                    />
+                    
+                    <div 
+                      className="absolute bottom-0 left-0 border-b border-green-500 transition-all duration-500 ease-out"
+                      style={{
+                        width: (() => {
+                          if (!senha || senha.length === 0) return '0%';
+                          const requirements = [
+                            senha.length >= 8,
+                            /[A-Z]/.test(senha),
+                            /[a-z]/.test(senha),
+                            /\d/.test(senha),
+                            senha && confirmarSenha && senha.length > 0 && confirmarSenha.length > 0 && senha === confirmarSenha
+                          ];
+                          const fulfilled = requirements.filter(Boolean).length;
+                          return `${(fulfilled / requirements.length) * 100}%`;
+                        })()
+                      }}
+                    />
+                    
+                    {/* Borda verde direita aparece quando 100% */}
+                    <div 
+                      className={`absolute top-0 right-0 h-full border-r border-green-500 rounded-r-lg transition-opacity duration-300 ${
+                        (() => {
+                          if (!senha || senha.length === 0) return 'opacity-0';
+                          const requirements = [
+                            senha.length >= 8,
+                            /[A-Z]/.test(senha),
+                            /[a-z]/.test(senha),
+                            /\d/.test(senha),
+                            senha && confirmarSenha && senha.length > 0 && confirmarSenha.length > 0 && senha === confirmarSenha
+                          ];
+                          const fulfilled = requirements.filter(Boolean).length;
+                          return fulfilled === requirements.length ? 'opacity-100' : 'opacity-0';
+                        })()
+                      }`}
+                    />
+                    
+                    {/* Conteúdo */}
+                    <div className="relative z-10">
+                      <div className="text-sm text-gray-600 mb-3">Sua senha deve conter:</div>
+                      <div className="grid grid-cols-2 gap-3 text-sm">
+                        <div
+                          className={`flex items-center transition-colors duration-300 ${
+                            senha && senha.length >= 8 ? "text-green-600" : "text-blue-600"
+                          }`}
+                        >
+                          <span className="mr-2">
+                            {senha && senha.length >= 8 ? "✓" : "ⓘ"}
+                          </span>{" "}
+                          Mínimo 8 caracteres
+                        </div>
+                        <div
+                          className={`flex items-center transition-colors duration-300 ${
+                            senha && /[A-Z]/.test(senha) ? "text-green-600" : "text-blue-600"
+                          }`}
+                        >
+                          <span className="mr-2">
+                            {senha && /[A-Z]/.test(senha) ? "✓" : "ⓘ"}
+                          </span>{" "}
+                          Uma letra maiúscula
+                        </div>
+                        <div
+                          className={`flex items-center transition-colors duration-300 ${
+                            senha && /[a-z]/.test(senha) ? "text-green-600" : "text-blue-600"
+                          }`}
+                        >
+                          <span className="mr-2">
+                            {senha && /[a-z]/.test(senha) ? "✓" : "ⓘ"}
+                          </span>{" "}
+                          Uma letra minúscula
+                        </div>
+                        <div
+                          className={`flex items-center transition-colors duration-300 ${
+                            senha && /\d/.test(senha) ? "text-green-600" : "text-blue-600"
+                          }`}
+                        >
+                          <span className="mr-2">
+                            {senha && /\d/.test(senha) ? "✓" : "ⓘ"}
+                          </span>{" "}
+                          Um número
+                        </div>
+                        <div
+                          className={`flex items-center transition-colors duration-300 col-span-2 ${
+                            passwordsMatch ? "text-green-600" : "text-blue-600"
+                          }`}
+                        >
+                          <span className="mr-2">
+                            {passwordsMatch ? "✓" : "ⓘ"}
+                          </span>{" "}
+                          A senha e a confirmação de senha devem ser iguais
                         </div>
                       </div>
                     </div>
-                  )}
+                  </div>
                 </div>
 
                 {/* Botão de submit */}
