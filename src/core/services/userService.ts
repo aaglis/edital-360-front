@@ -80,6 +80,10 @@ export const userService = {
       }
     }
   },
+  isLoggedIn() {
+    const token = sessionStorage.getItem("auth_token") || Cookies.get("token");
+    return !!token;
+  },
   logout() {
     sessionStorage.removeItem("auth_token");
     Cookies.remove("token");

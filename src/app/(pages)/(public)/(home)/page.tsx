@@ -74,7 +74,8 @@ export default function Homepage() {
           publicExam.map((item, index) => (
             <Button
               key={item.value}
-              className={`m-2  ${!item.active ? 'bg-transparent border border-zinc-200 hover:bg-slate-50' : 'text-white'}`}
+              className="ml-2"
+              variant={item.active ? 'default' : 'outline'}
               onClick={() => setPublicExamsFilter(index)}
             >
               {item.label}

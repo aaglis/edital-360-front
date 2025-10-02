@@ -17,6 +17,7 @@ const config: Config = {
         'text-list': 'hsl(var(--text-list))',
 
         primary: 'hsl(var(--primary))',
+        "primary-hover": 'hsl(var(--primary-hover))',
         secondary: 'hsl(var(--secondary))',
 
         success: 'hsl(var(--success))',

@@ -70,7 +70,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex justify-center mt-20 max-w-96 md:w-[500px] md:max-w-none mx-auto">
+    <div className="flex justify-center max-w-96 md:w-[500px] md:max-w-none mx-auto">
       <Card className="w-full shadow-lg rounded-3xl mx-2 md:mx-0">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">
