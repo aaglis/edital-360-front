@@ -81,6 +81,9 @@ export const userService = {
     }
   },
   isLoggedIn() {
+    if (typeof window === "undefined") {
+      return false; // SSR sempre retorna false
+    }
     const token = sessionStorage.getItem("auth_token") || Cookies.get("token");
     return !!token;
   },

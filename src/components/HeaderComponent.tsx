@@ -4,12 +4,14 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Logo from "./Logo";
 import userService from "@/core/services/userService";
+import { useEffect, useState } from "react";
 
 const HeaderComponent = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const isLoggedIn = userService.isLoggedIn();
-
-  console.log(isLoggedIn);
+  useEffect(() => {
+    setIsLoggedIn(userService.isLoggedIn());
+  }, []);
 
   return (
     <div className="bg-white shadow-lg">
