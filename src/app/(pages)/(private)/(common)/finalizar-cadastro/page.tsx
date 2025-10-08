@@ -28,14 +28,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 
 export default function RegisterComponent() {
   const { toast } = useToast();
@@ -44,7 +36,7 @@ export default function RegisterComponent() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showModal, setShowModal] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   const fieldOrder = [
     "nome",
@@ -297,12 +289,14 @@ export default function RegisterComponent() {
   return (
     <div className="flex flex-col items-center py-8 px-4 min-h-screen" style={{ backgroundColor: '#E5E5E5' }}>
       <div className="w-full" style={{ maxWidth: '1289px' }}>
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-8"
-          >
-            <div className="bg-white rounded-3xl shadow-sm border p-8">
+        {!showConfirmation ? (
+          // Tela de Cadastro
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-8"
+            >
+              <div className="bg-white rounded-3xl shadow-sm border p-8">
               <div className="space-y-8">
                 
                 {/* Título principal */}
@@ -1106,7 +1100,7 @@ export default function RegisterComponent() {
                         if (!canSubmit) {
                           focusFirstError();
                         } else {
-                          setShowModal(true);
+                          setShowConfirmation(true);
                         }
                       }}
                     >
@@ -1133,175 +1127,332 @@ export default function RegisterComponent() {
             </div>
           </form>
         </Form>
-      </div>
-
-      {/* Modal de Confirmação */}
-      <Dialog open={showModal} onOpenChange={setShowModal}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white">
-          <DialogHeader>
-            <DialogTitle style={{
-              fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
-              fontWeight: 600,
-              fontSize: '48px',
-              lineHeight: '100%',
-              letterSpacing: '-0.5%',
-              color: 'black'
-            }}>
-              Cadastro
-            </DialogTitle>
-            <DialogDescription style={{
-              fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
-              fontWeight: 600,
-              fontSize: '20px',
-              lineHeight: '120%',
-              letterSpacing: '-0.5%',
-              color: 'black',
-              marginTop: '8px'
-            }}>
-              Para finalizar seu cadastro, confira as informações com atenção
-            </DialogDescription>
-          </DialogHeader>
-          
-          {/* Conteúdo do Modal */}
-          <div className="space-y-8 py-4">
-            {/* Informações Pessoais */}
-            <div>
-              <h3 className="text-black mb-4" style={{
-                fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
-                fontWeight: 600,
-                fontSize: '24px',
-                lineHeight: '100%',
-                letterSpacing: '-0.5%',
-              }}>
-                Informações pessoais
-              </h3>
-              <div className="space-y-3 text-sm">
-                <div>
-                  <span className="font-medium text-gray-700">CPF:</span>
-                  <span className="ml-2 text-gray-900">{form.getValues('cpf')}</span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">Identidade:</span>
-                  <span className="ml-2 text-gray-900">{form.getValues('documentoIdentidade')}</span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">Nome:</span>
-                  <span className="ml-2 text-gray-900">{form.getValues('nome')}</span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">Sexo:</span>
-                  <span className="ml-2 text-gray-900">{form.getValues('sexo')}</span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">Data de Nascimento:</span>
-                  <span className="ml-2 text-gray-900">{form.getValues('dataNascimento')}</span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">Escolaridade:</span>
-                  <span className="ml-2 text-gray-900">{form.getValues('escolaridade')}</span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">Nome da Mãe:</span>
-                  <span className="ml-2 text-gray-900">{form.getValues('nomeMae')}</span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">Nome do Pai:</span>
-                  <span className="ml-2 text-gray-900">{form.getValues('nomePai')}</span>
-                </div>
+        ) : (
+          // Tela de Confirmação
+          <div className="bg-white rounded-3xl shadow-sm border p-8">
+            <div className="space-y-8">
+              {/* Título da confirmação */}
+              <div className="text-left mb-12">
+                <h1 className="mb-2" style={{
+                  fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                  fontWeight: 600,
+                  fontSize: '48px',
+                  lineHeight: '100%',
+                  letterSpacing: '-1%',
+                  textAlign: 'left',
+                  verticalAlign: 'middle',
+                  color: 'black'
+                }}>
+                  Cadastro
+                </h1>
+                <p style={{
+                  fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                  fontWeight: 600,
+                  fontSize: '20px',
+                  lineHeight: '120%',
+                  letterSpacing: '-2%',
+                  textAlign: 'left',
+                  verticalAlign: 'middle',
+                  color: 'black'
+                }}>
+                  Para finalizar seu cadastro, confira as informações com atenção
+                </p>
               </div>
-            </div>
 
-            {/* Endereço e Contato */}
-            <div>
-              <h3 className="text-black mb-4" style={{
-                fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
-                fontWeight: 600,
-                fontSize: '24px',
-                lineHeight: '100%',
-                letterSpacing: '-0.5%',
-              }}>
-                Endereço e contato
-              </h3>
-              <div className="space-y-3 text-sm">
+              {/* Conteúdo da Confirmação */}
+              <div className="space-y-8">
+                {/* Informações Pessoais */}
                 <div>
-                  <span className="font-medium text-gray-700">CEP:</span>
-                  <span className="ml-2 text-gray-900">{form.getValues('cep')}</span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">Bairro:</span>
-                  <span className="ml-2 text-gray-900">{form.getValues('bairro')}</span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">Logradouro:</span>
-                  <span className="ml-2 text-gray-900">{form.getValues('logradouro')}</span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">Complemento:</span>
-                  <span className="ml-2 text-gray-900">{form.getValues('complemento') || 'Não informado'}</span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">Número:</span>
-                  <span className="ml-2 text-gray-900">{form.getValues('numero')}</span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">Email:</span>
-                  <span className="ml-2 text-gray-900">{form.getValues('email')}</span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">Celular:</span>
-                  <span className="ml-2 text-gray-900">({form.getValues('dddCelular')}) {form.getValues('celular')}</span>
-                </div>
-                {form.getValues('telefone') && (
-                  <div>
-                    <span className="font-medium text-gray-700">Telefone:</span>
-                    <span className="ml-2 text-gray-900">({form.getValues('dddTelefone')}) {form.getValues('telefone')}</span>
+                  <h3 className="text-black mb-6" style={{
+                    fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                    fontWeight: 600,
+                    fontSize: '30px',
+                    lineHeight: '100%',
+                    letterSpacing: '-1%',
+                    verticalAlign: 'middle'
+                  }}>
+                    Informações pessoais
+                  </h3>
+                  <div className="space-y-4">
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>CPF:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>{form.getValues('cpf')}</span>
+                    </div>
+                    
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>Identidade:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>{form.getValues('documentoIdentidade')}</span>
+                    </div>
+                    
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>UF do Documento:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>{form.getValues('ufIdentidade')}</span>
+                    </div>
+                    
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>Nome:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>{form.getValues('nome')}</span>
+                    </div>
+                    
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>Sexo:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>{form.getValues('sexo')}</span>
+                    </div>
+                    
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>Data de Nascimento:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>{form.getValues('dataNascimento')}</span>
+                    </div>
+                    
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>Escolaridade:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>{form.getValues('escolaridade')}</span>
+                    </div>
+                    
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>Nome da Mãe:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>{form.getValues('nomeMae')}</span>
+                    </div>
+                    
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>Nome do Pai:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>{form.getValues('nomePai')}</span>
+                    </div>
                   </div>
-                )}
-              </div>
-            </div>
+                </div>
 
-            {/* Informação sobre a senha */}
-            <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <div className="flex items-center text-blue-700">
-                <span className="mr-2">ⓘ</span>
-                <span className="text-sm">
-                  Os dados só poderão ser alterados durante períodos de inscrição e novos dados não servem para inscrições anteriores. Deseja confirmar suas informações, declarando-as como verdadeiras?
-                </span>
+                {/* Endereço e Contato */}
+                <div>
+                  <h3 className="text-black mb-6" style={{
+                    fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                    fontWeight: 600,
+                    fontSize: '30px',
+                    lineHeight: '100%',
+                    letterSpacing: '-1%',
+                    verticalAlign: 'middle'
+                  }}>
+                    Endereço e contato
+                  </h3>
+                  <div className="space-y-4">
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>CEP:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>{form.getValues('cep')}</span>
+                    </div>
+                    
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>UF:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>{form.getValues('uf')}</span>
+                    </div>
+                    
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>Cidade:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>{form.getValues('cidade')}</span>
+                    </div>
+                    
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>Bairro:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>{form.getValues('bairro')}</span>
+                    </div>
+                    
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>Logradouro:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>{form.getValues('logradouro')}</span>
+                    </div>
+                    
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>Número:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>{form.getValues('numero')}</span>
+                    </div>
+                    
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>Complemento:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>{form.getValues('complemento') || 'Não informado'}</span>
+                    </div>
+                    
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>Email:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>{form.getValues('email')}</span>
+                    </div>
+                    
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>Celular:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>({form.getValues('dddCelular')}) {form.getValues('celular')}</span>
+                    </div>
+                    
+                    {form.getValues('telefone') && (
+                      <div style={{
+                        fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                        fontSize: '16px',
+                        lineHeight: '150%',
+                        letterSpacing: '0%',
+                        color: 'black'
+                      }}>
+                        <span style={{ fontWeight: 500 }}>Telefone:</span>
+                        <span style={{ fontWeight: 400, marginLeft: '8px' }}>({form.getValues('dddTelefone')}) {form.getValues('telefone')}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Informação sobre a confirmação */}
+                <div className="p-6 bg-blue-50 rounded-lg border border-blue-200 mt-8">
+                  <div className="flex items-start text-blue-700">
+                    <span className="mr-3 mt-1 text-lg">ⓘ</span>
+                    <span className="text-base leading-relaxed">
+                      Os dados só poderão ser alterados durante períodos de inscrição e novos dados não servem para inscrições anteriores. Deseja confirmar suas informações, declarando-as como verdadeiras?
+                    </span>
+                  </div>
+                </div>
+
+                {/* Botões de navegação */}
+                <div className="pt-6 border-t border-gray-200">
+                  <div className="flex justify-between items-center">
+                    {/* Botão Voltar */}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-12 w-full px-8 text-base font-medium text-gray-700 hover:text-gray-700 bg-white hover:bg-gray-50 max-w-[154px] max-h-[40px]"
+                      style={{ borderColor: '#172554' }}
+                      onClick={() => setShowConfirmation(false)}
+                    >
+                      Voltar
+                    </Button>
+
+                    {/* Botão Finalizar */}
+                    <Button
+                      type="button"
+                      className="h-12 w-full px-8 text-base font-medium text-white hover:opacity-90 max-w-[154px] max-h-[40px]"
+                      style={{ backgroundColor: '#172554' }}
+                      disabled={isSubmitting}
+                      onClick={() => {
+                        const formData = form.getValues();
+                        onSubmit(formData);
+                      }}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                          Finalizando...
+                        </>
+                      ) : (
+                        'Finalizar'
+                      )}
+                    </Button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-
-          <DialogFooter className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-            <Button
-              variant="outline"
-              onClick={() => setShowModal(false)}
-              className="bg-white text-gray-700 hover:bg-gray-50"
-              style={{ borderColor: '#172554' }}
-            >
-              Voltar
-            </Button>
-            <Button
-              onClick={() => {
-                setShowModal(false);
-                const formData = form.getValues();
-                onSubmit(formData);
-              }}
-              className="text-white hover:opacity-90"
-              style={{ backgroundColor: '#172554' }}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  Finalizando...
-                </>
-              ) : (
-                'Finalizar'
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        )}
+      </div>
     </div>
   );
 }
