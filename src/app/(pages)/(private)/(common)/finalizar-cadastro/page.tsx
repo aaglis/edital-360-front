@@ -11,9 +11,9 @@ import InputMask from "react-input-mask";
 import { EyeIcon, EyeOffIcon, Loader2 } from "lucide-react";
 import { userService, type CadastroUsuarioData } from "@/core/services/userService";
 import { useToast } from "@/hooks/use-toast";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
@@ -37,6 +37,7 @@ export default function RegisterComponent() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   const fieldOrder = [
     "nome",
@@ -275,43 +276,11 @@ export default function RegisterComponent() {
     }
   };
 
-  const calculatePasswordStrength = (
-    password: string
-  ): { score: number; percentage: number; color: string; text: string } => {
-    let score = 0;
-
-    if (password.length >= 8) score += 20;
-    if (password.length >= 12) score += 10;
-    if (/[a-z]/.test(password)) score += 20;
-    if (/[A-Z]/.test(password)) score += 20;
-    if (/\d/.test(password)) score += 20;
-    if (/[^a-zA-Z0-9]/.test(password)) score += 10;
-
-    let color = "bg-red-500";
-    let text = "Muito fraca";
-
-    if (score >= 80) {
-      color = "bg-green-500";
-      text = "Muito forte";
-    } else if (score >= 60) {
-      color = "bg-yellow-500";
-      text = "Forte";
-    } else if (score >= 40) {
-      color = "bg-orange-500";
-      text = "Moderada";
-    } else if (score >= 20) {
-      color = "bg-red-400";
-      text = "Fraca";
-    }
-
-    return { score, percentage: score, color, text };
-  };
-
   const senha = form.watch("senha");
   const confirmarSenha = form.watch("confirmarSenha");
 
   const passwordsMatch = useMemo(() => {
-    return senha && confirmarSenha && senha === confirmarSenha;
+    return senha && confirmarSenha && senha.length > 0 && confirmarSenha.length > 0 && senha === confirmarSenha;
   }, [senha, confirmarSenha]);
 
   const canSubmit = useMemo(() => {
@@ -319,725 +288,1201 @@ export default function RegisterComponent() {
   }, [passwordsMatch, form.formState.isValid]);
 
   return (
-    <div className="flex flex-col items-center mt-20 mx-8 min-h-screen">
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="w-full flex flex-col items-center"
-        >
-          <div className="w-full max-w-[843px] bg-white shadow-md rounded-lg p-6 border border-gray-300">
-            <h1 className="text-xl font-bold border-l-4 border-blue-500 pl-2 mb-6">
-              Dados pessoais
-            </h1>
-
-            <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
-              <FormField
-                control={form.control}
-                name="nome"
-                render={({ field }) => (
-                  <FormItem className="col-span-2 ">
-                    <FormLabel>Nome</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Digite seu nome completo"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="dataNascimento"
-                render={({ field }) => (
-                  <FormItem className="col-span-2 md:col-span-1">
-                    <FormLabel>Data de Nascimento</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="sexo"
-                render={({ field }) => (
-                  <FormItem className="col-span-2 md:col-span-1">
-                    <FormLabel>Sexo</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione o sexo" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="MASCULINO">Masculino</SelectItem>
-                        <SelectItem value="FEMININO">Feminino</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="nomePai"
-                render={({ field }) => (
-                  <FormItem className="col-span-2 md:col-span-1">
-                    <FormLabel>Nome do Pai</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Digite o nome do pai" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="nomeMae"
-                render={({ field }) => (
-                  <FormItem className="col-span-2 md:col-span-1">
-                    <FormLabel>Nome do Mãe</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Digite o nome do Mãe" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="escolaridade"
-                render={({ field }) => (
-                  <FormItem className="col-span-2">
-                    <FormLabel>Escolaridade</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione a escolaridade" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="FUNDAMENTAL_INCOMPLETO">Fundamental Incompleto</SelectItem>
-                        <SelectItem value="FUNDAMENTAL_COMPLETO">Fundamental Completo</SelectItem>
-                        <SelectItem value="MEDIO_INCOMPLETO">Médio Incompleto</SelectItem>
-                        <SelectItem value="MEDIO_COMPLETO">Médio Completo</SelectItem>
-                        <SelectItem value="SUPERIOR_INCOMPLETO">
-                          Superior Incompleto
-                        </SelectItem>
-                        <SelectItem value="SUPERIOR_COMPLETO">
-                          Superior Completo
-                        </SelectItem>
-                        <SelectItem value="POS_GRADUACAO">
-                          Pós-graduação
-                        </SelectItem>
-                        <SelectItem value="MESTRADO">Mestrado</SelectItem>
-                        <SelectItem value="DOUTORADO">Doutorado</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          </div>
-
-          <div className="w-full max-w-[843px] bg-white shadow-md rounded-lg p-6 border border-gray-300 mt-8">
-            <h1 className="text-xl font-bold border-l-4 border-blue-500 pl-2 mb-6">
-              Documentos
-            </h1>
-
-            <div className="grid gap-6 grid-cols-1 md:grid-cols-3">
-              <FormField
-                control={form.control}
-                name="cpf"
-                render={() => (
-                  <FormItem className="col-span-2 md:col-span-1">
-                    <FormLabel>CPF</FormLabel>
-                    <FormControl>
-                      <Controller
-                        name="cpf"
-                        control={form.control}
-                        render={({ field }) => (
-                          <InputMask
-                            mask="999.999.999-99"
-                            placeholder="000.000.000-00"
-                            value={field.value}
-                            onChange={field.onChange}
-                          >
-                            {(
-                              inputProps: React.InputHTMLAttributes<HTMLInputElement>
-                            ) => <Input {...inputProps} />}
-                          </InputMask>
-                        )}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="documentoIdentidade"
-                render={() => (
-                  <FormItem className="col-span-2 md:col-span-1">
-                    <FormLabel>Documento de Identidade</FormLabel>
-                    <FormControl>
-                      <Controller
-                        name="documentoIdentidade"
-                        control={form.control}
-                        render={({ field }) => (
-                          <InputMask
-                            mask="99.999.999-*"
-                            placeholder="00.000.000-0"
-                            value={field.value}
-                            onChange={field.onChange}
-                          >
-                            {(
-                              inputProps: React.InputHTMLAttributes<HTMLInputElement>
-                            ) => <Input {...inputProps} />}
-                          </InputMask>
-                        )}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="ufIdentidade"
-                render={({ field }) => (
-                  <FormItem className="col-span-2 md:col-span-1">
-                    <FormLabel>UF do Documento</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Ex: SP"
-                        {...field}
-                        maxLength={2}
-                        onChange={(e) => {
-                          const value = e.target.value
-                            .toUpperCase()
-                            .replace(/[^A-Z]/g, "");
-                          field.onChange(value);
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          </div>
-
-          <div className="w-full max-w-[843px] bg-white shadow-md rounded-lg p-6 border border-gray-300 mt-8">
-            <h1 className="text-xl font-bold border-l-4 border-blue-500 pl-2 mb-6">
-              Endereços
-            </h1>
-
-            <div className="grid gap-6 grid-cols-1 md:grid-cols-4">
-              <FormField
-                control={form.control}
-                name="cep"
-                render={() => (
-                  <FormItem className="col-span-2 md:col-span-1">
-                    <FormLabel>CEP</FormLabel>
-                    <FormControl>
-                      <Controller
-                        name="cep"
-                        control={form.control}
-                        render={({ field }) => (
-                          <InputMask
-                            mask="99999-999"
-                            placeholder="00000-000"
-                            value={field.value}
-                            onChange={field.onChange}
-                          >
-                            {(
-                              inputProps: React.InputHTMLAttributes<HTMLInputElement>
-                            ) => <Input {...inputProps} />}
-                          </InputMask>
-                        )}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="uf"
-                render={({ field }) => (
-                  <FormItem className="col-span-2 md:col-span-1">
-                    <FormLabel>UF</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Ex: SP"
-                        {...field}
-                        maxLength={2}
-                        onChange={(e) => {
-                          const value = e.target.value
-                            .toUpperCase()
-                            .replace(/[^A-Z]/g, "");
-                          field.onChange(value);
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="cidade"
-                render={({ field }) => (
-                  <FormItem className="col-span-2 md:col-span-1">
-                    <FormLabel>Cidade</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Digite a cidade" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="bairro"
-                render={({ field }) => (
-                  <FormItem className="col-span-2 md:col-span-1">
-                    <FormLabel>Bairro</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Digite o bairro" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="logradouro"
-                render={({ field }) => (
-                  <FormItem className="col-span-2 md:col-span-2">
-                    <FormLabel>Logradouro</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Digite o logradouro" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="complemento"
-                render={({ field }) => (
-                  <FormItem className="col-span-2 md:col-span-1">
-                    <FormLabel>Complemento</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Digite o complemento" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="numero"
-                render={({ field }) => (
-                  <FormItem className="col-span-2 md:col-span-1">
-                    <FormLabel>Número</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Digite o número"
-                        {...field}
-                        onChange={(e) => {
-                          const value = e.target.value.replace(/\D/g, "");
-                          field.onChange(value);
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          </div>
-
-          <div className="w-full max-w-[843px] bg-white shadow-md rounded-lg p-6 border border-gray-300 mt-8">
-            <h1 className="text-xl font-bold border-l-4 border-blue-500 pl-2 mb-6">
-              Contatos
-            </h1>
-
-            <div className="grid gap-6 grid-cols-1 md:grid-cols-4">
-              <FormField
-                control={form.control}
-                name="dddTelefone"
-                render={() => (
-                  <FormItem className="col-span-4 md:col-span-1">
-                    <FormLabel>DDD Telefone</FormLabel>
-                    <FormControl>
-                      <Controller
-                        name="dddTelefone"
-                        control={form.control}
-                        render={({ field }) => (
-                          <InputMask
-                            mask="99"
-                            placeholder="11"
-                            value={field.value}
-                            onChange={field.onChange}
-                          >
-                            {(
-                              inputProps: React.InputHTMLAttributes<HTMLInputElement>
-                            ) => <Input {...inputProps} />}
-                          </InputMask>
-                        )}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="telefone"
-                render={() => (
-                  <FormItem className="col-span-4 md:col-span-1">
-                    <FormLabel>Telefone</FormLabel>
-                    <FormControl>
-                      <Controller
-                        name="telefone"
-                        control={form.control}
-                        render={({ field }) => (
-                          <InputMask
-                            mask="9999-9999"
-                            placeholder="0000-0000"
-                            value={field.value}
-                            onChange={field.onChange}
-                          >
-                            {(
-                              inputProps: React.InputHTMLAttributes<HTMLInputElement>
-                            ) => <Input {...inputProps} />}
-                          </InputMask>
-                        )}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="dddCelular"
-                render={() => (
-                  <FormItem className="col-span-4 md:col-span-1">
-                    <FormLabel>DDD Celular</FormLabel>
-                    <FormControl>
-                      <Controller
-                        name="dddCelular"
-                        control={form.control}
-                        render={({ field }) => (
-                          <InputMask
-                            mask="99"
-                            placeholder="11"
-                            value={field.value}
-                            onChange={field.onChange}
-                          >
-                            {(
-                              inputProps: React.InputHTMLAttributes<HTMLInputElement>
-                            ) => <Input {...inputProps} />}
-                          </InputMask>
-                        )}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="celular"
-                render={() => (
-                  <FormItem className="col-span-4 md:col-span-1">
-                    <FormLabel>Celular</FormLabel>
-                    <FormControl>
-                      <Controller
-                        name="celular"
-                        control={form.control}
-                        render={({ field }) => (
-                          <InputMask
-                            mask="99999-9999"
-                            placeholder="00000-0000"
-                            value={field.value}
-                            onChange={field.onChange}
-                          >
-                            {(
-                              inputProps: React.InputHTMLAttributes<HTMLInputElement>
-                            ) => <Input {...inputProps} />}
-                          </InputMask>
-                        )}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem className="col-span-4">
-                    <FormLabel>E-mail</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="Digite seu e-mail"
-                        {...field}
-                        onChange={(e) => {
-                          const value = e.target.value.toLowerCase().trim();
-                          field.onChange(value);
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="confirmarEmail"
-                render={({ field }) => (
-                  <FormItem className="col-span-4">
-                    <FormLabel>Confirmar E-mail</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="Confirme seu e-mail"
-                        {...field}
-                        onChange={(e) => {
-                          const value = e.target.value.toLowerCase().trim();
-                          field.onChange(value);
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          </div>
-
-          <div className="w-full max-w-[843px] bg-white shadow-md rounded-lg p-6 border border-gray-300 mt-8">
-            <h1 className="text-xl font-bold border-l-4 border-blue-500 pl-2 mb-6">
-              Senha de Acesso
-            </h1>
-            <div className="space-y-6">
-              <FormField
-                control={form.control}
-                name="senha"
-                render={({ field }) => {
-                  const strength = calculatePasswordStrength(field.value || "");
-                  const getStrengthColor = (percentage: number) => {
-                    if (percentage >= 80) return "text-green-600";
-                    if (percentage >= 60) return "text-yellow-600";
-                    return "text-red-600";
-                  };
-
-                  return (
-                    <FormItem className="col-span-2">
-                      <FormLabel>Senha</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Input
-                            type={showPassword ? "text" : "password"}
-                            placeholder="Digite sua senha"
-                            {...field}
-                          />
-                          <button
-                            type="button"
-                            className="absolute right-2 top-2.5 text-gray-500 hover:text-gray-700"
-                            onClick={() => setShowPassword(!showPassword)}
-                            tabIndex={-1}
-                          >
-                            {showPassword ? (
-                              <EyeOffIcon className="w-5 h-5" />
-                            ) : (
-                              <EyeIcon className="w-5 h-5" />
-                            )}
-                          </button>
-                        </div>
-                      </FormControl>
-
-                      {field.value && (
-                        <div className="space-y-2">
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-600">
-                              Força da senha:
-                            </span>
-                            <span
-                              className={`text-sm font-medium ${getStrengthColor(
-                                strength.percentage
-                              )}`}
-                            >
-                              {strength.text}
-                            </span>
-                          </div>
-                          <Progress
-                            value={strength.percentage}
-                            className="h-2"
-                          />
-                          <div className="text-xs text-gray-500 space-y-1">
-                            <div>Sua senha deve conter:</div>
-                            <div className="grid grid-cols-2 gap-2">
-                              <div
-                                className={`flex items-center ${
-                                  field.value.length >= 8
-                                    ? "text-green-600"
-                                    : "text-gray-400"
-                                }`}
-                              >
-                                <span className="mr-1">
-                                  {field.value.length >= 8 ? "✓" : "○"}
-                                </span>{" "}
-                                Mínimo 8 caracteres
-                              </div>
-                              <div
-                                className={`flex items-center ${
-                                  /[A-Z]/.test(field.value)
-                                    ? "text-green-600"
-                                    : "text-gray-400"
-                                }`}
-                              >
-                                <span className="mr-1">
-                                  {/[A-Z]/.test(field.value) ? "✓" : "○"}
-                                </span>{" "}
-                                Uma letra maiúscula
-                              </div>
-                              <div
-                                className={`flex items-center ${
-                                  /[a-z]/.test(field.value)
-                                    ? "text-green-600"
-                                    : "text-gray-400"
-                                }`}
-                              >
-                                <span className="mr-1">
-                                  {/[a-z]/.test(field.value) ? "✓" : "○"}
-                                </span>{" "}
-                                Uma letra minúscula
-                              </div>
-                              <div
-                                className={`flex items-center ${
-                                  /\d/.test(field.value)
-                                    ? "text-green-600"
-                                    : "text-gray-400"
-                                }`}
-                              >
-                                <span className="mr-1">
-                                  {/\d/.test(field.value) ? "✓" : "○"}
-                                </span>{" "}
-                                Um número
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </FormItem>
-                  );
-                }}
-              />
-
-              <FormField
-                control={form.control}
-                name="confirmarSenha"
-                render={({ field }) => (
-                  <FormItem className="col-span-2">
-                    <FormLabel>Confirmar Senha</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Input
-                          type={showConfirmPassword ? "text" : "password"}
-                          placeholder="Confirme sua senha"
-                          {...field}
-                        />
-                        <button
-                          type="button"
-                          className="absolute right-2 top-2.5 text-gray-500 hover:text-gray-700"
-                          onClick={() =>
-                            setShowConfirmPassword(!showConfirmPassword)
-                          }
-                          tabIndex={-1}
-                        >
-                          {showConfirmPassword ? (
-                            <EyeOffIcon className="w-5 h-5" />
-                          ) : (
-                            <EyeIcon className="w-5 h-5" />
-                          )}
-                        </button>
-                      </div>
-                    </FormControl>
-
-                    {field.value && senha && (
-                      <div
-                        className={`text-sm flex items-center ${
-                          passwordsMatch ? "text-green-600" : "text-red-600"
-                        }`}
-                      >
-                        {passwordsMatch
-                          ? "As senhas coincidem"
-                          : "As senhas não coincidem"}
-                      </div>
-                    )}
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          </div>
-
-          <div className="w-full max-w-[843px] mt-6">
-            <Button
-              type="submit"
-              className="w-full mb-6"
-              disabled={!canSubmit || isSubmitting}
-              onClick={(e) => {
-                if (!canSubmit) {
-                  e.preventDefault();
-                  focusFirstError();
-                }
-              }}
+    <div className="flex flex-col items-center py-8 px-4 min-h-screen" style={{ backgroundColor: '#E5E5E5' }}>
+      <div className="w-full" style={{ maxWidth: '1289px' }}>
+        {!showConfirmation ? (
+          // Tela de Cadastro
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-8"
             >
-              {isSubmitting ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                "Finalizar Cadastro"
-              )}
-            </Button>
-            {!passwordsMatch && senha && confirmarSenha && (
-              <p className="text-sm text-red-600 text-center mt-2">
-                As senhas devem ser iguais para finalizar o cadastro
-              </p>
-            )}
+              <div className="bg-white rounded-3xl shadow-sm border p-8">
+              <div className="space-y-8">
+                
+                {/* Título principal */}
+                <div className="text-left mb-12">
+                  <h1 className="mb-2" style={{
+                    fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                    fontWeight: 600,
+                    fontSize: '48px',
+                    lineHeight: '100%',
+                    letterSpacing: '-1%',
+                    textAlign: 'left',
+                    verticalAlign: 'middle',
+                    color: 'black'
+                  }}>
+                    Cadastro
+                  </h1>
+                  <p style={{
+                    fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                    fontWeight: 600,
+                    fontSize: '20px',
+                    lineHeight: '120%',
+                    letterSpacing: '-2%',
+                    textAlign: 'left',
+                    verticalAlign: 'middle',
+                    color: 'black'
+                  }}>
+                    Para prosseguir com seu cadastro, preencha os campos corretamente
+                  </p>
+                </div>
+                
+                {/* Informações pessoais */}
+                <div>
+                  <h2 className="text-black mb-6" style={{
+                    fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                    fontWeight: 600,
+                    fontSize: '30px',
+                    lineHeight: '100%',
+                    letterSpacing: '-1%',
+                    verticalAlign: 'middle'
+                  }}>
+                    Informações pessoais
+                  </h2>
+                   {/* 1ª fileira: CPF, Documento de identidade, Órgão expedidor */}
+                  <div className="flex gap-3 mb-6">
+                    <FormField
+                      control={form.control}
+                      name="cpf"
+                      render={() => (
+                        <FormItem>
+                          <FormLabel className="form-label-geist">CPF <span className="asterisk">*</span></FormLabel>
+                          <FormControl>
+                            <Controller
+                              name="cpf"
+                              control={form.control}
+                              render={({ field }) => (
+                                <InputMask
+                                  mask="999.999.999-99"
+                                  placeholder="000.000.000-00"
+                                  value={field.value}
+                                  onChange={field.onChange}
+                                  disabled={true}
+                                >
+                                  {(inputProps: React.InputHTMLAttributes<HTMLInputElement>) => 
+                                    <Input {...inputProps} className="form-input-disabled h-9 w-[320px]" />
+                                  }
+                                </InputMask>
+                              )}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-            {errorMessage && (
-              <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-sm text-red-700 text-center font-medium">
-                  ⚠️ {errorMessage}
+                    <FormField
+                      control={form.control}
+                      name="documentoIdentidade"
+                      render={() => (
+                        <FormItem>
+                          <FormLabel className="form-label-geist">Documento de identidade <span className="asterisk">*</span></FormLabel>
+                          <FormControl>
+                            <Controller
+                              name="documentoIdentidade"
+                              control={form.control}
+                              render={({ field }) => (
+                                <InputMask
+                                  mask="99.999.999-*"
+                                  placeholder="00.000.000-0"
+                                  value={field.value}
+                                  onChange={field.onChange}
+                                >
+                                  {(inputProps: React.InputHTMLAttributes<HTMLInputElement>) => 
+                                    <Input {...inputProps} className="form-input-custom h-9 w-[320px]" />
+                                  }
+                                </InputMask>
+                              )}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="ufIdentidade"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="form-label-geist">Órgão expedidor de documentos <span className="asterisk">*</span></FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Ex: SP"
+                              className="form-input-custom h-9 w-[320px]"
+                              {...field}
+                              maxLength={2}
+                              onChange={(e) => {
+                                const value = e.target.value.toUpperCase().replace(/[^A-Z]/g, "");
+                                field.onChange(value);
+                              }}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* 2ª fileira: Nome, Sexo, Data nascimento, Escolaridade */}
+                  <div className="flex gap-3 mb-6">
+                    <FormField
+                      control={form.control}
+                      name="nome"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="form-label-geist">Nome <span className="asterisk">*</span></FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Digite seu nome completo"
+                              className="form-input-custom h-9 w-[320px]"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="sexo"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="form-label-geist">Sexo <span className="asterisk">*</span></FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="form-input-custom h-9 w-[320px]">
+                                <SelectValue placeholder="Selecione" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="MASCULINO">Masculino</SelectItem>
+                              <SelectItem value="FEMININO">Feminino</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="dataNascimento"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="form-label-geist">Data de nascimento <span className="asterisk">*</span></FormLabel>
+                          <FormControl>
+                            <Input type="date" className="form-input-custom max-h-8 w-full max-w-[165px]" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="escolaridade"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="form-label-geist">Escolaridade <span className="asterisk">*</span></FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="form-input-custom h-9 w-[320px]">
+                                <SelectValue placeholder="Selecione" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="FUNDAMENTAL_INCOMPLETO">Fundamental Incompleto</SelectItem>
+                              <SelectItem value="FUNDAMENTAL_COMPLETO">Fundamental Completo</SelectItem>
+                              <SelectItem value="MEDIO_INCOMPLETO">Médio Incompleto</SelectItem>
+                              <SelectItem value="MEDIO_COMPLETO">Médio Completo</SelectItem>
+                              <SelectItem value="SUPERIOR_INCOMPLETO">Superior Incompleto</SelectItem>
+                              <SelectItem value="SUPERIOR_COMPLETO">Superior Completo</SelectItem>
+                              <SelectItem value="POS_GRADUACAO">Pós-graduação</SelectItem>
+                              <SelectItem value="MESTRADO">Mestrado</SelectItem>
+                              <SelectItem value="DOUTORADO">Doutorado</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* 3ª fileira: Nome da mãe, Nome do pai */}
+                  <div className="flex gap-3 mb-6">
+                    <FormField
+                      control={form.control}
+                      name="nomeMae"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="form-label-geist">Nome da mãe <span className="asterisk">*</span></FormLabel>
+                          <FormControl>
+                            <Input placeholder="Digite o nome da mãe" className="form-input-custom h-9 w-[320px]" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="nomePai"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="form-label-geist">Nome do pai <span className="asterisk">*</span></FormLabel>
+                          <FormControl>
+                            <Input placeholder="Digite o nome do pai" className="form-input-custom h-9 w-[320px]" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+
+                {/* Endereço e contato */}
+                <div>
+                  <h2 className="text-black mb-6 mt-16" style={{
+                    fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                    fontWeight: 600,
+                    fontSize: '30px',
+                    lineHeight: '100%',
+                    letterSpacing: '-1%',
+                    verticalAlign: 'middle'
+                  }}>
+                    Endereço e contato
+                  </h2>
+                  
+                  {/* 1ª fileira: CEP, UF, Cidade, Bairro */}
+                  <div className="flex gap-3 mb-6">
+                    <FormField
+                      control={form.control}
+                      name="cep"
+                      render={() => (
+                        <FormItem>
+                          <FormLabel className="form-label-geist">CEP <span className="asterisk">*</span></FormLabel>
+                          <FormControl>
+                            <Controller
+                              name="cep"
+                              control={form.control}
+                              render={({ field }) => (
+                                <InputMask
+                                  mask="99999-999"
+                                  placeholder="00000-000"
+                                  value={field.value}
+                                  onChange={field.onChange}
+                                >
+                                  {(inputProps: React.InputHTMLAttributes<HTMLInputElement>) => 
+                                    <Input {...inputProps} className="form-input-custom h-9 w-[320px]" />
+                                  }
+                                </InputMask>
+                              )}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="uf"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="form-label-geist">UF <span className="asterisk">*</span></FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Ex: SP"
+                              className="form-input-custom max-h-9 w-full max-w-[100px]"
+                              {...field}
+                              maxLength={2}
+                              onChange={(e) => {
+                                const value = e.target.value.toUpperCase().replace(/[^A-Z]/g, "");
+                                field.onChange(value);
+                              }}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="cidade"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="form-label-geist">Cidade <span className="asterisk">*</span></FormLabel>
+                          <FormControl>
+                            <Input placeholder="Digite a cidade" className="form-input-custom h-9 w-[320px]" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="bairro"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="form-label-geist">Bairro <span className="asterisk">*</span></FormLabel>
+                          <FormControl>
+                            <Input placeholder="Digite o bairro" className="form-input-custom h-9 w-[320px]" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* 2ª fileira: Logradouro, Complemento, Número */}
+                  <div className="flex gap-3 mb-6">
+                    <FormField
+                      control={form.control}
+                      name="logradouro"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="form-label-geist">Logradouro <span className="asterisk">*</span></FormLabel>
+                          <FormControl>
+                            <Input placeholder="Digite o logradouro" className="form-input-custom h-9 w-[320px]" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="complemento"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="form-label-geist">Complemento</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Apto, bloco..." className="form-input-custom h-9 w-[320px]" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="numero"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="form-label-geist">Número <span className="asterisk">*</span></FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="123"
+                              className="form-input-custom h-9 w-[320px]"
+                              {...field}
+                              onChange={(e) => {
+                                const value = e.target.value.replace(/\D/g, "");
+                                field.onChange(value);
+                              }}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* 3ª fileira: Email, Confirmar email, DDD, Celular */}
+                  <div className="flex gap-3 mb-6">
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="form-label-geist">E-mail <span className="asterisk">*</span></FormLabel>
+                          <FormControl>
+                            <Input
+                              type="email"
+                              placeholder="seuemail@exemplo.com"
+                              className="form-input-custom h-9 w-[320px]"
+                              {...field}
+                              onChange={(e) => {
+                                const value = e.target.value.toLowerCase().trim();
+                                field.onChange(value);
+                              }}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="confirmarEmail"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="form-label-geist">Confirmar e-mail <span className="asterisk">*</span></FormLabel>
+                          <FormControl>
+                            <Input
+                              type="email"
+                              placeholder="seuemail@exemplo.com"
+                              className="form-input-custom h-9 w-[320px]"
+                              {...field}
+                              onChange={(e) => {
+                                const value = e.target.value.toLowerCase().trim();
+                                field.onChange(value);
+                              }}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="dddCelular"
+                      render={() => (
+                        <FormItem>
+                          <FormLabel className="form-label-geist">DDD <span className="asterisk">*</span></FormLabel>
+                          <FormControl>
+                            <Controller
+                              name="dddCelular"
+                              control={form.control}
+                              render={({ field }) => (
+                                <InputMask
+                                  mask="99"
+                                  placeholder="11"
+                                  value={field.value}
+                                  onChange={field.onChange}
+                                >
+                                  {(inputProps: React.InputHTMLAttributes<HTMLInputElement>) => 
+                                    <Input {...inputProps} className="form-input-custom max-h-9 w-full max-w-[100px]" />
+                                  }
+                                </InputMask>
+                              )}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="celular"
+                      render={() => (
+                        <FormItem>
+                          <FormLabel className="form-label-geist">Celular <span className="asterisk">*</span></FormLabel>
+                          <FormControl>
+                            <Controller
+                              name="celular"
+                              control={form.control}
+                              render={({ field }) => (
+                                <InputMask
+                                  mask="99999-9999"
+                                  placeholder="00000-0000"
+                                  value={field.value}
+                                  onChange={field.onChange}
+                                >
+                                  {(inputProps: React.InputHTMLAttributes<HTMLInputElement>) => 
+                                    <Input {...inputProps} className="form-input-custom h-9 w-[320px]" />
+                                  }
+                                </InputMask>
+                              )}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* 4ª fileira: DDD, Telefone */}
+                  <div className="flex gap-3 mb-6">
+                    <FormField
+                      control={form.control}
+                      name="dddTelefone"
+                      render={() => (
+                        <FormItem>
+                          <FormLabel className="form-label-geist">DDD Telefone</FormLabel>
+                          <FormControl>
+                            <Controller
+                              name="dddTelefone"
+                              control={form.control}
+                              render={({ field }) => (
+                                <InputMask
+                                  mask="99"
+                                  placeholder="11"
+                                  value={field.value}
+                                  onChange={field.onChange}
+                                >
+                                  {(inputProps: React.InputHTMLAttributes<HTMLInputElement>) => 
+                                    <Input {...inputProps} className="form-input-custom max-h-9 w-full max-w-[100px]" />
+                                  }
+                                </InputMask>
+                              )}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="telefone"
+                      render={() => (
+                        <FormItem>
+                          <FormLabel className="form-label-geist">Telefone</FormLabel>
+                          <FormControl>
+                            <Controller
+                              name="telefone"
+                              control={form.control}
+                              render={({ field }) => (
+                                <InputMask
+                                  mask="9999-9999"
+                                  placeholder="0000-0000"
+                                  value={field.value}
+                                  onChange={field.onChange}
+                                >
+                                  {(inputProps: React.InputHTMLAttributes<HTMLInputElement>) => 
+                                    <Input {...inputProps} className="form-input-custom h-9 w-[320px]" />
+                                  }
+                                </InputMask>
+                              )}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+
+                {/* Dados de acesso */}
+                <div>
+                  <h2 className="text-black mb-6 mt-16" style={{
+                    fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                    fontWeight: 600,
+                    fontSize: '30px',
+                    lineHeight: '100%',
+                    letterSpacing: '-1%',
+                    verticalAlign: 'middle'
+                  }}>
+                    Dados de acesso
+                  </h2>
+                  
+                  {/* 1ª fileira: Senha e confirmar senha */}
+                  <div className="flex gap-3 mb-6">
+                    <FormField
+                      control={form.control}
+                      name="senha"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="form-label-geist">Senha <span className="asterisk">*</span></FormLabel>
+                          <FormControl>
+                            <div className="relative p-0 max-w-[320px]">
+                              <Input
+                                type={showPassword ? "text" : "password"}
+                                placeholder="Digite sua senha"
+                                className="form-input-custom h-9 pr-10 w-[320px]"
+                                {...field}
+                              />
+                              <button
+                                type="button"
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                                onClick={() => setShowPassword(!showPassword)}
+                                tabIndex={-1}
+                              >
+                                {showPassword ? (
+                                  <EyeOffIcon className="w-4 h-4" />
+                                ) : (
+                                  <EyeIcon className="w-4 h-4" />
+                                )}
+                              </button>
+                            </div>
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="confirmarSenha"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="form-label-geist">Confirmar senha <span className="asterisk">*</span></FormLabel>
+                          <FormControl>
+                            <div className="relative p-0 max-w-[320px]">
+                              <Input
+                                type={showConfirmPassword ? "text" : "password"}
+                                placeholder="Confirme sua senha"
+                                className="form-input-custom h-9 pr-10 w-[320px]"
+                                {...field}
+                              />
+                              <button
+                                type="button"
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                tabIndex={-1}
+                              >
+                                {showConfirmPassword ? (
+                                  <EyeOffIcon className="w-4 h-4" />
+                                ) : (
+                                  <EyeIcon className="w-4 h-4" />
+                                )}
+                              </button>
+                            </div>
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* Requisitos da senha */}
+                  <div className="relative p-4 rounded-lg mb-6 bg-transparent border border-blue-500 max-w-[650px]">
+                    {/* Animação das bordas com Framer Motion - só mostra quando há senha digitada */}
+                    <AnimatePresence>
+                      {senha && senha.length > 0 && (
+                        <>
+                          {/* Borda esquerda fixa quando há conteúdo */}
+                          <motion.div 
+                            className="absolute top-0 left-0 h-full w-1 bg-green-500 rounded-l-lg"
+                            style={{ transformOrigin: "top" }}
+                            initial={{ opacity: 0, scaleY: 0 }}
+                            animate={{ opacity: 1, scaleY: 1 }}
+                            exit={{ opacity: 0, scaleY: 0 }}
+                            transition={{ duration: 0.4, ease: "easeOut" }}
+                          />
+                          
+                          {/* Borda superior que preenche da esquerda para direita */}
+                          <motion.div 
+                            className="absolute top-0 left-0 h-1 bg-green-500 rounded-t-lg"
+                            initial={{ width: 0 }}
+                            animate={{ 
+                              width: (() => {
+                                const requirements = [
+                                  senha.length >= 8,
+                                  /[A-Z]/.test(senha),
+                                  /[a-z]/.test(senha),
+                                  /\d/.test(senha),
+                                  senha && confirmarSenha && senha.length > 0 && confirmarSenha.length > 0 && senha === confirmarSenha
+                                ];
+                                const fulfilled = requirements.filter(Boolean).length;
+                                return `${(fulfilled / requirements.length) * 100}%`;
+                              })()
+                            }}
+                            transition={{ duration: 0.6, ease: "easeInOut" }}
+                          />
+                          
+                          {/* Borda inferior que preenche da esquerda para direita */}
+                          <motion.div 
+                            className="absolute bottom-0 left-0 h-1 bg-green-500 rounded-b-lg"
+                            initial={{ width: 0 }}
+                            animate={{ 
+                              width: (() => {
+                                const requirements = [
+                                  senha.length >= 8,
+                                  /[A-Z]/.test(senha),
+                                  /[a-z]/.test(senha),
+                                  /\d/.test(senha),
+                                  senha && confirmarSenha && senha.length > 0 && confirmarSenha.length > 0 && senha === confirmarSenha
+                                ];
+                                const fulfilled = requirements.filter(Boolean).length;
+                                return `${(fulfilled / requirements.length) * 100}%`;
+                              })()
+                            }}
+                            transition={{ duration: 0.6, ease: "easeInOut" }}
+                          />
+                          
+                          {/* Borda direita aparece quando 100% completo */}
+                          <motion.div 
+                            className="absolute top-0 right-0 h-full w-1 bg-green-500 rounded-r-lg"
+                            style={{ transformOrigin: "bottom" }}
+                            initial={{ opacity: 0, scaleY: 0 }}
+                            animate={{ 
+                              opacity: (() => {
+                                const requirements = [
+                                  senha.length >= 8,
+                                  /[A-Z]/.test(senha),
+                                  /[a-z]/.test(senha),
+                                  /\d/.test(senha),
+                                  senha && confirmarSenha && senha.length > 0 && confirmarSenha.length > 0 && senha === confirmarSenha
+                                ];
+                                const fulfilled = requirements.filter(Boolean).length;
+                                return fulfilled === requirements.length ? 1 : 0;
+                              })(),
+                              scaleY: (() => {
+                                const requirements = [
+                                  senha.length >= 8,
+                                  /[A-Z]/.test(senha),
+                                  /[a-z]/.test(senha),
+                                  /\d/.test(senha),
+                                  senha && confirmarSenha && senha.length > 0 && confirmarSenha.length > 0 && senha === confirmarSenha
+                                ];
+                                const fulfilled = requirements.filter(Boolean).length;
+                                return fulfilled === requirements.length ? 1 : 0;
+                              })()
+                            }}
+                            transition={{ 
+                              duration: 0.5, 
+                              ease: "easeOut", 
+                              delay: (() => {
+                                const requirements = [
+                                  senha.length >= 8,
+                                  /[A-Z]/.test(senha),
+                                  /[a-z]/.test(senha),
+                                  /\d/.test(senha),
+                                  senha && confirmarSenha && senha.length > 0 && confirmarSenha.length > 0 && senha === confirmarSenha
+                                ];
+                                const fulfilled = requirements.filter(Boolean).length;
+                                return fulfilled === requirements.length ? 0.3 : 0;
+                              })()
+                            }}
+                          />
+                        </>
+                      )}
+                    </AnimatePresence>
+                    
+                    {/* Conteúdo */}
+                    <div className="relative z-10">
+                      <div className="text-sm text-gray-600 mb-3">Sua senha deve conter:</div>
+                      <div className="grid grid-cols-2 gap-3 text-sm">
+                        <div
+                          className={`flex items-center transition-colors duration-300 ${
+                            senha && senha.length >= 8 ? "text-green-600" : "text-blue-600"
+                          }`}
+                        >
+                          <span className="mr-2">
+                            {senha && senha.length >= 8 ? "✓" : "ⓘ"}
+                          </span>{" "}
+                          Mínimo 8 caracteres
+                        </div>
+                        <div
+                          className={`flex items-center transition-colors duration-300 ${
+                            senha && /[A-Z]/.test(senha) ? "text-green-600" : "text-blue-600"
+                          }`}
+                        >
+                          <span className="mr-2">
+                            {senha && /[A-Z]/.test(senha) ? "✓" : "ⓘ"}
+                          </span>{" "}
+                          Uma letra maiúscula
+                        </div>
+                        <div
+                          className={`flex items-center transition-colors duration-300 ${
+                            senha && /[a-z]/.test(senha) ? "text-green-600" : "text-blue-600"
+                          }`}
+                        >
+                          <span className="mr-2">
+                            {senha && /[a-z]/.test(senha) ? "✓" : "ⓘ"}
+                          </span>{" "}
+                          Uma letra minúscula
+                        </div>
+                        <div
+                          className={`flex items-center transition-colors duration-300 ${
+                            senha && /\d/.test(senha) ? "text-green-600" : "text-blue-600"
+                          }`}
+                        >
+                          <span className="mr-2">
+                            {senha && /\d/.test(senha) ? "✓" : "ⓘ"}
+                          </span>{" "}
+                          Um número
+                        </div>
+                        <div
+                          className={`flex items-center transition-colors duration-300 col-span-2 ${
+                            passwordsMatch ? "text-green-600" : "text-blue-600"
+                          }`}
+                        >
+                          <span className="mr-2">
+                            {passwordsMatch ? "✓" : "ⓘ"}
+                          </span>{" "}
+                          A senha e a confirmação de senha devem ser iguais
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Botões de navegação */}
+                <div className="pt-6 border-t border-white">
+                  <div className="flex justify-between items-center">
+                    {/* Botão Voltar */}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-12 w-full px-8 text-base font-medium text-gray-700 hover:text-gray-700 bg-white hover:bg-gray-50 max-w-[154px] max-h-[40px]"
+                      style={{ borderColor: '#172554' }}
+                      onClick={() => router.back()}
+                    >
+                      Voltar
+                    </Button>
+
+                    {/* Botão Avançar */}
+                    <Button
+                      type="button"
+                      className="h-12 w-full px-8 text-base font-medium text-white hover:opacity-90 max-w-[154px] max-h-[40px]"
+                      style={{ backgroundColor: '#172554' }}
+                      disabled={!canSubmit || isSubmitting}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (!canSubmit) {
+                          focusFirstError();
+                        } else {
+                          setShowConfirmation(true);
+                        }
+                      }}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                          Finalizando cadastro...
+                        </>
+                      ) : (
+                        "Avançar"
+                      )}
+                    </Button>
+                  </div>
+                  
+                  {errorMessage && (
+                    <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                      <p className="text-sm text-red-700 text-center font-medium">
+                        ⚠️ {errorMessage}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </form>
+        </Form>
+        ) : (
+          // Tela de Confirmação
+          <div className="bg-white rounded-3xl shadow-sm border p-8">
+            <div className="space-y-8">
+              {/* Título da confirmação */}
+              <div className="text-left mb-12">
+                <h1 className="mb-2" style={{
+                  fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                  fontWeight: 600,
+                  fontSize: '48px',
+                  lineHeight: '100%',
+                  letterSpacing: '-1%',
+                  textAlign: 'left',
+                  verticalAlign: 'middle',
+                  color: 'black'
+                }}>
+                  Cadastro
+                </h1>
+                <p style={{
+                  fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                  fontWeight: 600,
+                  fontSize: '20px',
+                  lineHeight: '120%',
+                  letterSpacing: '-2%',
+                  textAlign: 'left',
+                  verticalAlign: 'middle',
+                  color: 'black'
+                }}>
+                  Para finalizar seu cadastro, confira as informações com atenção
                 </p>
               </div>
-            )}
+
+              {/* Conteúdo da Confirmação */}
+              <div className="space-y-8">
+                {/* Informações Pessoais */}
+                <div>
+                  <h3 className="text-black mb-6" style={{
+                    fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                    fontWeight: 600,
+                    fontSize: '30px',
+                    lineHeight: '100%',
+                    letterSpacing: '-1%',
+                    verticalAlign: 'middle'
+                  }}>
+                    Informações pessoais
+                  </h3>
+                  <div className="space-y-4">
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>CPF:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>{form.getValues('cpf')}</span>
+                    </div>
+                    
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>Identidade:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>{form.getValues('documentoIdentidade')}</span>
+                    </div>
+                    
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>UF do Documento:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>{form.getValues('ufIdentidade')}</span>
+                    </div>
+                    
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>Nome:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>{form.getValues('nome')}</span>
+                    </div>
+                    
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>Sexo:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>{form.getValues('sexo')}</span>
+                    </div>
+                    
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>Data de Nascimento:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>{form.getValues('dataNascimento')}</span>
+                    </div>
+                    
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>Escolaridade:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>{form.getValues('escolaridade')}</span>
+                    </div>
+                    
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>Nome da Mãe:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>{form.getValues('nomeMae')}</span>
+                    </div>
+                    
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>Nome do Pai:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>{form.getValues('nomePai')}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Endereço e Contato */}
+                <div>
+                  <h3 className="text-black mb-6" style={{
+                    fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                    fontWeight: 600,
+                    fontSize: '30px',
+                    lineHeight: '100%',
+                    letterSpacing: '-1%',
+                    verticalAlign: 'middle'
+                  }}>
+                    Endereço e contato
+                  </h3>
+                  <div className="space-y-4">
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>CEP:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>{form.getValues('cep')}</span>
+                    </div>
+                    
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>UF:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>{form.getValues('uf')}</span>
+                    </div>
+                    
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>Cidade:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>{form.getValues('cidade')}</span>
+                    </div>
+                    
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>Bairro:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>{form.getValues('bairro')}</span>
+                    </div>
+                    
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>Logradouro:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>{form.getValues('logradouro')}</span>
+                    </div>
+                    
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>Número:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>{form.getValues('numero')}</span>
+                    </div>
+                    
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>Complemento:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>{form.getValues('complemento') || 'Não informado'}</span>
+                    </div>
+                    
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>Email:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>{form.getValues('email')}</span>
+                    </div>
+                    
+                    <div style={{
+                      fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                      fontSize: '16px',
+                      lineHeight: '150%',
+                      letterSpacing: '0%',
+                      color: 'black'
+                    }}>
+                      <span style={{ fontWeight: 500 }}>Celular:</span>
+                      <span style={{ fontWeight: 400, marginLeft: '8px' }}>({form.getValues('dddCelular')}) {form.getValues('celular')}</span>
+                    </div>
+                    
+                    {form.getValues('telefone') && (
+                      <div style={{
+                        fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                        fontSize: '16px',
+                        lineHeight: '150%',
+                        letterSpacing: '0%',
+                        color: 'black'
+                      }}>
+                        <span style={{ fontWeight: 500 }}>Telefone:</span>
+                        <span style={{ fontWeight: 400, marginLeft: '8px' }}>({form.getValues('dddTelefone')}) {form.getValues('telefone')}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Informação sobre a confirmação */}
+                <div className="p-6 bg-blue-50 rounded-lg border border-blue-200 mt-8">
+                  <div className="flex items-start text-blue-700">
+                    <span className="mr-3 mt-1 text-lg">ⓘ</span>
+                    <span className="text-base leading-relaxed">
+                      Os dados só poderão ser alterados durante períodos de inscrição e novos dados não servem para inscrições anteriores. Deseja confirmar suas informações, declarando-as como verdadeiras?
+                    </span>
+                  </div>
+                </div>
+
+                {/* Botões de navegação */}
+                <div className="pt-6 border-t border-gray-200">
+                  <div className="flex justify-between items-center">
+                    {/* Botão Voltar */}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-12 w-full px-8 text-base font-medium text-gray-700 hover:text-gray-700 bg-white hover:bg-gray-50 max-w-[154px] max-h-[40px]"
+                      style={{ borderColor: '#172554' }}
+                      onClick={() => setShowConfirmation(false)}
+                    >
+                      Voltar
+                    </Button>
+
+                    {/* Botão Finalizar */}
+                    <Button
+                      type="button"
+                      className="h-12 w-full px-8 text-base font-medium text-white hover:opacity-90 max-w-[154px] max-h-[40px]"
+                      style={{ backgroundColor: '#172554' }}
+                      disabled={isSubmitting}
+                      onClick={() => {
+                        const formData = form.getValues();
+                        onSubmit(formData);
+                      }}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                          Finalizando...
+                        </>
+                      ) : (
+                        'Finalizar'
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </form>
-      </Form>
+        )}
+      </div>
     </div>
   );
 }
