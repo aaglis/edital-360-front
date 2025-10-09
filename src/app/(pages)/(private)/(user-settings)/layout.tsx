@@ -18,7 +18,7 @@ export default function UserSettingsLayout({
         <div className="flex flex-col flex-1 rounded-3xl m-4 bg-white shadow-sm">
           <div className="w-full flex gap-4 items-center px-4 py-2">
             <SidebarTrigger />
-            <DashboardHeader currentPageLabel="Configurações" />
+            <DashboardHeader />
           </div>
           <Separator />
           <main className="p-6 flex-1">{children}</main>
