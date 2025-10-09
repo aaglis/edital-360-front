@@ -80,6 +80,30 @@ export const userService = {
       }
     }
   },
+
+  async getProfile() {
+    try {
+      const response = await api.get("profile/me");
+      return response.data;
+    } catch (error) {
+      if (isAxiosError(error)) {
+        return Promise.reject(error.response?.data);
+      } else {
+        return Promise.reject(new Error("Erro inesperado ao buscar o perfil do usuário"));
+      }
+    }
+  },
+  editProfile(data: Partial<CadastroUsuarioData>) {
+    return api.put("profile/me", data)
+      .then(response => response.data)
+      .catch(error => {
+        if (isAxiosError(error)) {
+          return Promise.reject(error.response?.data);
+        } else {
+          return Promise.reject(new Error("Erro inesperado ao editar o perfil do usuário"));
+        }
+      });
+  },
   isLoggedIn() {
     if (typeof window === "undefined") {
       return false; // SSR sempre retorna false

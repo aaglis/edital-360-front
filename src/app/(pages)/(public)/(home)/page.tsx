@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { cadastrarEditalService } from '@/core/services/editalService';
 import ExamCard from './components/ExamCard';
-import type { EditalRequest } from '@/core/types/editais.interface';
+import type { EditalData } from '@/core/types/editais.interface';
 
 export default function Homepage() {
   const [publicExam, setPublicExam] = useState([
@@ -29,7 +29,7 @@ export default function Homepage() {
       active: false
     }
   ])
-  const [editais, setEditais] = useState<EditalRequest[]>([]);
+  const [editais, setEditais] = useState<EditalData[]>([]);
 
   const setPublicExamsFilter = (index: number) => {
     setPublicExam(prevItems =>
@@ -51,7 +51,7 @@ export default function Homepage() {
   const fetchEditais = async () => {
     try {
       const response = await cadastrarEditalService.fetchAll();
-      setEditais(response);
+      setEditais(response.content);
     } catch (error) {
       console.error('Error fetching editais:', error);
       return [];
@@ -89,7 +89,7 @@ export default function Homepage() {
           <span className="text-2xl font-bold">Novos Concursos</span>
         </div>
         <div className="flex flex-wrap justify-center gap-6 p-0 md:px-6">
-          {editais.map(exam => (
+          {editais.length > 0 && editais.map(exam => (
             <ExamCard
               key={exam.id}
               id={exam.id}

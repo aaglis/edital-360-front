@@ -271,6 +271,6 @@ export const cadastrarEditalService = {
     }
   },
   async fetchAll() {
-    return FetchPublicApi<EditalRequest[]>('/editais/obter', 60);
+    return FetchPublicApi<EditalRequest>('/editais/obter', 60);
   },
 };

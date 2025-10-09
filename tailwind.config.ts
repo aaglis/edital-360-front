@@ -1,5 +1,4 @@
 import type { Config } from "tailwindcss";
-import tailwindcssAnimate from "tailwindcss-animate";
 
 const config: Config = {
   darkMode: ["class"],
@@ -9,42 +8,43 @@ const config: Config = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}"
   ],
   theme: {
-  	extend: {
-  		fontFamily: {
-  			geist: ['var(--font-geist-sans)', 'system-ui', 'sans-serif'],
-  		},
-		colors: {
-			background: 'hsl(var(--background))',
-			foreground: 'hsl(var(--foreground))',
+    extend: {
+      colors: {
+        background: 'hsl(var(--background))',
+        foreground: 'hsl(var(--foreground))',
 
-			text: 'hsl(var(--text))',
-			'text-list': 'hsl(var(--text-list))',
+        text: 'hsl(var(--text))',
+        'text-list': 'hsl(var(--text-list))',
 
-			primary: 'hsl(var(--primary))',
-			secondary: 'hsl(var(--secondary))',
+        primary: 'hsl(var(--primary))',
+        "primary-hover": 'hsl(var(--primary-hover))',
+        secondary: 'hsl(var(--secondary))',
 
-			success: 'hsl(var(--success))',
-			info: 'hsl(var(--info))',
-			warning: 'hsl(var(--warning))',
-			destructive: 'hsl(var(--destructive))',
+        success: 'hsl(var(--success))',
+        info: 'hsl(var(--info))',
+        warning: 'hsl(var(--warning))',
+        destructive: 'hsl(var(--destructive))',
 
-			card: {
-				DEFAULT: 'hsl(var(--card))',
-				foreground: 'hsl(var(--card-foreground))'
-			},
+        muted: 'hsl(var(--muted))',
+        popover: 'hsl(var(--popover))',
 
-			border: 'hsl(var(--border))',
-			input: 'hsl(var(--input))',
-			ring: 'hsl(var(--ring))'
-		},
-  		borderRadius: {
-  			lg: 'var(--radius)',
-  			md: 'calc(var(--radius) - 2px)',
-  			sm: 'calc(var(--radius) - 4px)'
-  		}
-  	}
+        card: {
+          DEFAULT: 'hsl(var(--card))',
+          foreground: 'hsl(var(--card-foreground))'
+        },
+
+        border: 'hsl(var(--border))',
+        input: 'hsl(var(--input))',
+        ring: 'hsl(var(--ring))'
+      },
+      borderRadius: {
+        lg: 'var(--radius)',
+        md: 'calc(var(--radius) - 2px)',
+        sm: 'calc(var(--radius) - 4px)'
+      }
+    }
   },
-  plugins: [tailwindcssAnimate],
+  plugins: [require("tailwindcss-animate")],
 };
 
 export default config;
