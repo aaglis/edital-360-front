@@ -55,11 +55,7 @@ export default function RegisterPage() {
         const cepLimpo = data.cep.replace(/\D/g, "");
 
         if (cpfLimpo.length === 11 && cepLimpo.length === 8) {
-          toast({
-            title: "Dados verificados localmente! ✅",
-            description: "API temporariamente indisponível. Redirecionando...",
-            variant: "default",
-          });
+        
 
           localStorage.setItem(
             "dadosIniciais",
@@ -86,11 +82,7 @@ export default function RegisterPage() {
         const { cpfValido, cepValido, endereco } = result.data;
 
         if (cpfValido && cepValido) {
-          toast({
-            title: "Dados verificados com sucesso! ✅",
-            description: "Redirecionando para finalizar cadastro...",
-            variant: "default",
-          });
+       
 
           localStorage.setItem(
             "dadosIniciais",
