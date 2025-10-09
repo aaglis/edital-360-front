@@ -25,8 +25,8 @@ const config: Config = {
         warning: 'hsl(var(--warning))',
         destructive: 'hsl(var(--destructive))',
 
-		muted: 'hsl(var(--muted))',
-		popover: 'hsl(var(--popover))',
+        muted: 'hsl(var(--muted))',
+        popover: 'hsl(var(--popover))',
 
         card: {
           DEFAULT: 'hsl(var(--card))',

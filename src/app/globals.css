@@ -60,6 +60,12 @@
     --border: 217 33% 17%;
     --input: 217 33% 17%;
     --ring: var(--secondary);
+
+    --muted: 214 32% 91%;
+    --popover: 0 0% 100%;
+
+    
+    --radius: 0.5rem;
   }
 }
 
