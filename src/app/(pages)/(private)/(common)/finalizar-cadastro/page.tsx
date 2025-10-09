@@ -11,6 +11,7 @@ import InputMask from "react-input-mask";
 import { EyeIcon, EyeOffIcon, Loader2 } from "lucide-react";
 import { userService, type CadastroUsuarioData } from "@/core/services/userService";
 import { useToast } from "@/hooks/use-toast";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -942,79 +943,108 @@ export default function RegisterComponent() {
 
                   {/* Requisitos da senha */}
                   <div className="relative p-4 rounded-lg mb-6 bg-transparent border border-blue-500 max-w-[650px]">
-                    {/* Borda verde animada que "preenche" da esquerda para direita */}
-                    <div 
-                      className="absolute top-0 left-0 h-full border-l border-t border-b border-green-500 rounded-l-lg transition-all duration-500 ease-out"
-                      style={{
-                        width: (() => {
-                          if (!senha || senha.length === 0) return '0%';
-                          const requirements = [
-                            senha.length >= 8,
-                            /[A-Z]/.test(senha),
-                            /[a-z]/.test(senha),
-                            /\d/.test(senha),
-                            senha && confirmarSenha && senha.length > 0 && confirmarSenha.length > 0 && senha === confirmarSenha
-                          ];
-                          const fulfilled = requirements.filter(Boolean).length;
-                          return `${(fulfilled / requirements.length) * 100}%`;
-                        })()
-                      }}
-                    />
-                    
-                    {/* Borda verde top e bottom que acompanha */}
-                    <div 
-                      className="absolute top-0 left-0 border-t border-green-500 transition-all duration-500 ease-out"
-                      style={{
-                        width: (() => {
-                          if (!senha || senha.length === 0) return '0%';
-                          const requirements = [
-                            senha.length >= 8,
-                            /[A-Z]/.test(senha),
-                            /[a-z]/.test(senha),
-                            /\d/.test(senha),
-                            senha && confirmarSenha && senha.length > 0 && confirmarSenha.length > 0 && senha === confirmarSenha
-                          ];
-                          const fulfilled = requirements.filter(Boolean).length;
-                          return `${(fulfilled / requirements.length) * 100}%`;
-                        })()
-                      }}
-                    />
-                    
-                    <div 
-                      className="absolute bottom-0 left-0 border-b border-green-500 transition-all duration-500 ease-out"
-                      style={{
-                        width: (() => {
-                          if (!senha || senha.length === 0) return '0%';
-                          const requirements = [
-                            senha.length >= 8,
-                            /[A-Z]/.test(senha),
-                            /[a-z]/.test(senha),
-                            /\d/.test(senha),
-                            senha && confirmarSenha && senha.length > 0 && confirmarSenha.length > 0 && senha === confirmarSenha
-                          ];
-                          const fulfilled = requirements.filter(Boolean).length;
-                          return `${(fulfilled / requirements.length) * 100}%`;
-                        })()
-                      }}
-                    />
-                    
-                    {/* Borda verde direita aparece quando 100% */}
-                    <div 
-                      className={`absolute top-0 right-0 h-full border-r border-green-500 rounded-r-lg transition-opacity duration-300 ${
-                        (() => {
-                          if (!senha || senha.length === 0) return 'opacity-0';
-                          const requirements = [
-                            senha.length >= 8,
-                            /[A-Z]/.test(senha),
-                            /[a-z]/.test(senha),
-                            /\d/.test(senha),
-                            senha && confirmarSenha && senha.length > 0 && confirmarSenha.length > 0 && senha === confirmarSenha
-                          ];
-                          const fulfilled = requirements.filter(Boolean).length;
-                          return fulfilled === requirements.length ? 'opacity-100' : 'opacity-0';
-                        })()
-                      }`}
-                    />
+                    {/* Animação das bordas com Framer Motion - só mostra quando há senha digitada */}
+                    <AnimatePresence>
+                      {senha && senha.length > 0 && (
+                        <>
+                          {/* Borda esquerda fixa quando há conteúdo */}
+                          <motion.div 
+                            className="absolute top-0 left-0 h-full w-1 bg-green-500 rounded-l-lg"
+                            style={{ transformOrigin: "top" }}
+                            initial={{ opacity: 0, scaleY: 0 }}
+                            animate={{ opacity: 1, scaleY: 1 }}
+                            exit={{ opacity: 0, scaleY: 0 }}
+                            transition={{ duration: 0.4, ease: "easeOut" }}
+                          />
+                          
+                          {/* Borda superior que preenche da esquerda para direita */}
+                          <motion.div 
+                            className="absolute top-0 left-0 h-1 bg-green-500 rounded-t-lg"
+                            initial={{ width: 0 }}
+                            animate={{ 
+                              width: (() => {
+                                const requirements = [
+                                  senha.length >= 8,
+                                  /[A-Z]/.test(senha),
+                                  /[a-z]/.test(senha),
+                                  /\d/.test(senha),
+                                  senha && confirmarSenha && senha.length > 0 && confirmarSenha.length > 0 && senha === confirmarSenha
+                                ];
+                                const fulfilled = requirements.filter(Boolean).length;
+                                return `${(fulfilled / requirements.length) * 100}%`;
+                              })()
+                            }}
+                            transition={{ duration: 0.6, ease: "easeInOut" }}
+                          />
+                          
+                          {/* Borda inferior que preenche da esquerda para direita */}
+                          <motion.div 
+                            className="absolute bottom-0 left-0 h-1 bg-green-500 rounded-b-lg"
+                            initial={{ width: 0 }}
+                            animate={{ 
+                              width: (() => {
+                                const requirements = [
+                                  senha.length >= 8,
+                                  /[A-Z]/.test(senha),
+                                  /[a-z]/.test(senha),
+                                  /\d/.test(senha),
+                                  senha && confirmarSenha && senha.length > 0 && confirmarSenha.length > 0 && senha === confirmarSenha
+                                ];
+                                const fulfilled = requirements.filter(Boolean).length;
+                                return `${(fulfilled / requirements.length) * 100}%`;
+                              })()
+                            }}
+                            transition={{ duration: 0.6, ease: "easeInOut" }}
+                          />
+                          
+                          {/* Borda direita aparece quando 100% completo */}
+                          <motion.div 
+                            className="absolute top-0 right-0 h-full w-1 bg-green-500 rounded-r-lg"
+                            style={{ transformOrigin: "bottom" }}
+                            initial={{ opacity: 0, scaleY: 0 }}
+                            animate={{ 
+                              opacity: (() => {
+                                const requirements = [
+                                  senha.length >= 8,
+                                  /[A-Z]/.test(senha),
+                                  /[a-z]/.test(senha),
+                                  /\d/.test(senha),
+                                  senha && confirmarSenha && senha.length > 0 && confirmarSenha.length > 0 && senha === confirmarSenha
+                                ];
+                                const fulfilled = requirements.filter(Boolean).length;
+                                return fulfilled === requirements.length ? 1 : 0;
+                              })(),
+                              scaleY: (() => {
+                                const requirements = [
+                                  senha.length >= 8,
+                                  /[A-Z]/.test(senha),
+                                  /[a-z]/.test(senha),
+                                  /\d/.test(senha),
+                                  senha && confirmarSenha && senha.length > 0 && confirmarSenha.length > 0 && senha === confirmarSenha
+                                ];
+                                const fulfilled = requirements.filter(Boolean).length;
+                                return fulfilled === requirements.length ? 1 : 0;
+                              })()
+                            }}
+                            transition={{ 
+                              duration: 0.5, 
+                              ease: "easeOut", 
+                              delay: (() => {
+                                const requirements = [
+                                  senha.length >= 8,
+                                  /[A-Z]/.test(senha),
+                                  /[a-z]/.test(senha),
+                                  /\d/.test(senha),
+                                  senha && confirmarSenha && senha.length > 0 && confirmarSenha.length > 0 && senha === confirmarSenha
+                                ];
+                                const fulfilled = requirements.filter(Boolean).length;
+                                return fulfilled === requirements.length ? 0.3 : 0;
+                              })()
+                            }}
+                          />
+                        </>
+                      )}
+                    </AnimatePresence>
                     
                     {/* Conteúdo */}
                     <div className="relative z-10">
