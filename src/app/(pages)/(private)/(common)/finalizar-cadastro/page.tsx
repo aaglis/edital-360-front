@@ -47,8 +47,8 @@ export default function RegisterComponent() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showModal, setShowModal] = useState(false);
   const [showReloadWarning, setShowReloadWarning] = useState(false);
+  const [currentStep, setCurrentStep] = useState<'form' | 'confirmation'>('form');
 
   const fieldOrder = [
     "nome",
@@ -366,41 +366,44 @@ export default function RegisterComponent() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <div className="bg-white rounded-3xl shadow-sm border p-8">
               <div className="space-y-8">
-                {/* Título principal */}
-                <div className="text-left mb-12">
-                  <h1
-                    className="mb-2"
-                    style={{
-                      fontFamily:
-                        "var(--font-geist-sans), system-ui, sans-serif",
-                      fontWeight: 600,
-                      fontSize: "48px",
-                      lineHeight: "100%",
-                      letterSpacing: "-1%",
-                      textAlign: "left",
-                      verticalAlign: "middle",
-                      color: "black",
-                    }}
-                  >
-                    Cadastro
-                  </h1>
-                  <p
-                    style={{
-                      fontFamily:
-                        "var(--font-geist-sans), system-ui, sans-serif",
-                      fontWeight: 600,
-                      fontSize: "20px",
-                      lineHeight: "120%",
-                      letterSpacing: "-2%",
-                      textAlign: "left",
-                      verticalAlign: "middle",
-                      color: "black",
-                    }}
-                  >
-                    Para prosseguir com seu cadastro, preencha os campos
-                    corretamente
-                  </p>
-                </div>
+                
+                {currentStep === 'form' && (
+                  <>
+                    {/* Título principal */}
+                    <div className="text-left mb-12">
+                      <h1
+                        className="mb-2"
+                        style={{
+                          fontFamily:
+                            "var(--font-geist-sans), system-ui, sans-serif",
+                          fontWeight: 600,
+                          fontSize: "48px",
+                          lineHeight: "100%",
+                          letterSpacing: "-1%",
+                          textAlign: "left",
+                          verticalAlign: "middle",
+                          color: "black",
+                        }}
+                      >
+                        Cadastro
+                      </h1>
+                      <p
+                        style={{
+                          fontFamily:
+                            "var(--font-geist-sans), system-ui, sans-serif",
+                          fontWeight: 600,
+                          fontSize: "20px",
+                          lineHeight: "120%",
+                          letterSpacing: "-2%",
+                          textAlign: "left",
+                          verticalAlign: "middle",
+                          color: "black",
+                        }}
+                      >
+                        Para prosseguir com seu cadastro, preencha os campos
+                        corretamente
+                      </p>
+                    </div>
 
                 {/* Informações pessoais */}
                 <div>
@@ -1361,7 +1364,7 @@ export default function RegisterComponent() {
                         if (!canSubmit) {
                           focusFirstError();
                         } else {
-                          setShowModal(true);
+                          setCurrentStep('confirmation');
                         }
                       }}
                     >
@@ -1384,235 +1387,193 @@ export default function RegisterComponent() {
                     </div>
                   )}
                 </div>
+                    </>
+                )}
+
+                {currentStep === 'confirmation' && (
+                  <>
+                    {/* Título da confirmação */}
+                    <div className="text-left mb-12">
+                      <h1 className="mb-2" style={{
+                        fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                        fontWeight: 600,
+                        fontSize: '48px',
+                        lineHeight: '100%',
+                        letterSpacing: '-1%',
+                        textAlign: 'left',
+                        verticalAlign: 'middle',
+                        color: 'black'
+                      }}>
+                        Cadastro
+                      </h1>
+                      <p style={{
+                        fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                        fontWeight: 600,
+                        fontSize: '20px',
+                        lineHeight: '120%',
+                        letterSpacing: '-2%',
+                        textAlign: 'left',
+                        verticalAlign: 'middle',
+                        color: 'black'
+                      }}>
+                        Para finalizar seu cadastro, confira as informações com atenção
+                      </p>
+                    </div>
+                    
+                    {/* Conteúdo da confirmação */}
+                    <div className="space-y-8">
+                      {/* Informações Pessoais */}
+                      <div>
+                        <h3 className="text-black mb-4" style={{
+                          fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                          fontWeight: 600,
+                          fontSize: '30px',
+                          lineHeight: '100%',
+                          letterSpacing: '-1%',
+                          verticalAlign: 'middle'
+                        }}>
+                          Informações pessoais
+                        </h3>
+                        <div className="space-y-3 text-sm">
+                          <div>
+                            <span className="font-medium text-gray-700">CPF:</span>
+                            <span className="ml-2 text-gray-900">{form.getValues('cpf')}</span>
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-700">Identidade:</span>
+                            <span className="ml-2 text-gray-900">{form.getValues('documentoIdentidade')}</span>
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-700">Nome:</span>
+                            <span className="ml-2 text-gray-900">{form.getValues('nome')}</span>
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-700">Sexo:</span>
+                            <span className="ml-2 text-gray-900">{form.getValues('sexo')}</span>
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-700">Data de Nascimento:</span>
+                            <span className="ml-2 text-gray-900">{form.getValues('dataNascimento')}</span>
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-700">Escolaridade:</span>
+                            <span className="ml-2 text-gray-900">{form.getValues('escolaridade')}</span>
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-700">Nome da Mãe:</span>
+                            <span className="ml-2 text-gray-900">{form.getValues('nomeMae')}</span>
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-700">Nome do Pai:</span>
+                            <span className="ml-2 text-gray-900">{form.getValues('nomePai')}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Endereço e Contato */}
+                      <div>
+                        <h3 className="text-black mb-4" style={{
+                          fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
+                          fontWeight: 600,
+                          fontSize: '30px',
+                          lineHeight: '100%',
+                          letterSpacing: '-1%',
+                          verticalAlign: 'middle'
+                        }}>
+                          Endereço e contato
+                        </h3>
+                        <div className="space-y-3 text-sm">
+                          <div>
+                            <span className="font-medium text-gray-700">CEP:</span>
+                            <span className="ml-2 text-gray-900">{form.getValues('cep')}</span>
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-700">Bairro:</span>
+                            <span className="ml-2 text-gray-900">{form.getValues('bairro')}</span>
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-700">Logradouro:</span>
+                            <span className="ml-2 text-gray-900">{form.getValues('logradouro')}</span>
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-700">Complemento:</span>
+                            <span className="ml-2 text-gray-900">{form.getValues('complemento') || 'Não informado'}</span>
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-700">Número:</span>
+                            <span className="ml-2 text-gray-900">{form.getValues('numero')}</span>
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-700">Email:</span>
+                            <span className="ml-2 text-gray-900">{form.getValues('email')}</span>
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-700">Celular:</span>
+                            <span className="ml-2 text-gray-900">({form.getValues('dddCelular')}) {form.getValues('celular')}</span>
+                          </div>
+                          {form.getValues('telefone') && (
+                            <div>
+                              <span className="font-medium text-gray-700">Telefone:</span>
+                              <span className="ml-2 text-gray-900">({form.getValues('dddTelefone')}) {form.getValues('telefone')}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Informação sobre a senha */}
+                      <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                        <div className="flex items-center text-blue-700">
+                          <span className="mr-2">ⓘ</span>
+                          <span className="text-sm">
+                            Os dados só poderão ser alterados durante períodos de inscrição e novos dados não servem para inscrições anteriores. Deseja confirmar suas informações, declarando-as como verdadeiras?
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Botões da confirmação */}
+                    <div className="pt-6 border-t border-white">
+                      <div className="flex justify-between items-center">
+                        {/* Botão Voltar */}
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="h-12 w-full px-8 text-base font-medium text-gray-700 hover:text-gray-700 bg-white hover:bg-gray-50 max-w-[154px] max-h-[40px]"
+                          style={{ borderColor: '#172554' }}
+                          onClick={() => setCurrentStep('form')}
+                        >
+                          Voltar
+                        </Button>
+
+                        {/* Botão Finalizar */}
+                        <Button
+                          type="button"
+                          className="h-12 w-full px-8 text-base font-medium text-white hover:opacity-90 max-w-[154px] max-h-[40px]"
+                          style={{ backgroundColor: '#172554' }}
+                          disabled={isSubmitting}
+                          onClick={() => {
+                            const formData = form.getValues();
+                            onSubmit(formData);
+                          }}
+                        >
+                          {isSubmitting ? (
+                            <>
+                              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                              Finalizando...
+                            </>
+                          ) : (
+                            'Finalizar'
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </form>
         </Form>
       </div>
-
-      {/* Modal de Confirmação */}
-      <Dialog open={showModal} onOpenChange={setShowModal}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white">
-          <DialogHeader>
-            <DialogTitle
-              style={{
-                fontFamily: "var(--font-geist-sans), system-ui, sans-serif",
-                fontWeight: 600,
-                fontSize: "48px",
-                lineHeight: "100%",
-                letterSpacing: "-0.5%",
-                color: "black",
-              }}
-            >
-              Cadastro
-            </DialogTitle>
-            <DialogDescription
-              style={{
-                fontFamily: "var(--font-geist-sans), system-ui, sans-serif",
-                fontWeight: 600,
-                fontSize: "20px",
-                lineHeight: "120%",
-                letterSpacing: "-0.5%",
-                color: "black",
-                marginTop: "8px",
-              }}
-            >
-              Para finalizar seu cadastro, confira as informações com atenção
-            </DialogDescription>
-          </DialogHeader>
-
-          {/* Conteúdo do Modal */}
-          <div className="space-y-8 py-4">
-            {/* Informações Pessoais */}
-            <div>
-              <h3
-                className="text-black mb-4"
-                style={{
-                  fontFamily: "var(--font-geist-sans), system-ui, sans-serif",
-                  fontWeight: 600,
-                  fontSize: "24px",
-                  lineHeight: "100%",
-                  letterSpacing: "-0.5%",
-                }}
-              >
-                Informações pessoais
-              </h3>
-              <div className="space-y-3 text-sm">
-                <div>
-                  <span className="font-medium text-gray-700">CPF:</span>
-                  <span className="ml-2 text-gray-900">
-                    {form.getValues("cpf")}
-                  </span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">Identidade:</span>
-                  <span className="ml-2 text-gray-900">
-                    {form.getValues("documentoIdentidade")}
-                  </span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">Nome:</span>
-                  <span className="ml-2 text-gray-900">
-                    {form.getValues("nome")}
-                  </span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">Sexo:</span>
-                  <span className="ml-2 text-gray-900">
-                    {form.getValues("sexo")}
-                  </span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">
-                    Data de Nascimento:
-                  </span>
-                  <span className="ml-2 text-gray-900">
-                    {form.getValues("dataNascimento")}
-                  </span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">
-                    Escolaridade:
-                  </span>
-                  <span className="ml-2 text-gray-900">
-                    {form.getValues("escolaridade")}
-                  </span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">
-                    Nome da Mãe:
-                  </span>
-                  <span className="ml-2 text-gray-900">
-                    {form.getValues("nomeMae")}
-                  </span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">
-                    Nome do Pai:
-                  </span>
-                  <span className="ml-2 text-gray-900">
-                    {form.getValues("nomePai")}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Endereço e Contato */}
-            <div>
-              <h3
-                className="text-black mb-4"
-                style={{
-                  fontFamily: "var(--font-geist-sans), system-ui, sans-serif",
-                  fontWeight: 600,
-                  fontSize: "24px",
-                  lineHeight: "100%",
-                  letterSpacing: "-0.5%",
-                }}
-              >
-                Endereço e contato
-              </h3>
-              <div className="space-y-3 text-sm">
-                <div>
-                  <span className="font-medium text-gray-700">CEP:</span>
-                  <span className="ml-2 text-gray-900">
-                    {form.getValues("cep")}
-                  </span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">Bairro:</span>
-                  <span className="ml-2 text-gray-900">
-                    {form.getValues("bairro")}
-                  </span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">Logradouro:</span>
-                  <span className="ml-2 text-gray-900">
-                    {form.getValues("logradouro")}
-                  </span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">
-                    Complemento:
-                  </span>
-                  <span className="ml-2 text-gray-900">
-                    {form.getValues("complemento") || "Não informado"}
-                  </span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">Número:</span>
-                  <span className="ml-2 text-gray-900">
-                    {form.getValues("numero")}
-                  </span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">Email:</span>
-                  <span className="ml-2 text-gray-900">
-                    {form.getValues("email")}
-                  </span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">Celular:</span>
-                  <span className="ml-2 text-gray-900">
-                    ({form.getValues("dddCelular")}) {form.getValues("celular")}
-                  </span>
-                </div>
-                {form.getValues("telefone") && (
-                  <div>
-                    <span className="font-medium text-gray-700">Telefone:</span>
-                    <span className="ml-2 text-gray-900">
-                      ({form.getValues("dddTelefone")}){" "}
-                      {form.getValues("telefone")}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Informação sobre a senha */}
-            <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <div className="flex items-center text-blue-700">
-                <span className="mr-2">ⓘ</span>
-                <span className="text-sm">
-                  Os dados só poderão ser alterados durante períodos de
-                  inscrição e novos dados não servem para inscrições anteriores.
-                  Deseja confirmar suas informações, declarando-as como
-                  verdadeiras?
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <DialogFooter className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-            <Button
-              variant="outline"
-              onClick={() => setShowModal(false)}
-              className="bg-white text-gray-700 hover:bg-gray-50"
-              style={{ borderColor: "#172554" }}
-            >
-              Voltar
-            </Button>
-            <Button
-              onClick={() => {
-                setShowModal(false);
-                const formData = form.getValues();
-                onSubmit(formData);
-              }}
-              className="text-white hover:opacity-90"
-              style={{ backgroundColor: "#172554" }}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  Finalizando...
-                </>
-              ) : (
-                "Finalizar"
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Modal de aviso para recarregamento da página */}
       <Dialog open={showReloadWarning} onOpenChange={setShowReloadWarning}>
