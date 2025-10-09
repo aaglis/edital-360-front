@@ -28,37 +28,37 @@ export default function ConcursoDisponiveisPage() {
 
   const concursos = [
     {
-      id: 1,
+      id: "1",
       title: "Receita Federal",
       vacancies: 230,
-      salary: "R$ 15.000",
+      salary: 15.000,
       period: "15/08 - 30/09",
       isOpenForApplications: true,
       category: "fazenda",
     },
     {
-      id: 2,
+      id: "2",
       title: "Tribunal de Justiça",
       vacancies: 150,
-      salary: "R$ 12.000",
+      salary: 12.000,
       period: "01/09 - 15/10",
       isOpenForApplications: true,
       category: "justica",
     },
     {
-      id: 3,
+      id: "3",
       title: "Controladoria Geral",
       vacancies: 80,
-      salary: "R$ 18.000",
+      salary: 18.000,
       period: "10/08 - 25/09",
       isOpenForApplications: true,
       category: "controle",
     },
     {
-      id: 4,
+      id: "4",
       title: "Secretaria da Fazenda",
       vacancies: 120,
-      salary: "R$ 8.500",
+      salary: 8.500,
       period: "10/08 - 25/09",
       isOpenForApplications: true,
       category: "fazenda",
@@ -126,7 +126,7 @@ export default function ConcursoDisponiveisPage() {
             id={concurso.id}
             title={concurso.title}
             vacancies={concurso.vacancies}
-            salary={concurso.salary}
+            remuneration={concurso.salary}
             period={concurso.period}
             isOpenForApplications={concurso.isOpenForApplications}
           />

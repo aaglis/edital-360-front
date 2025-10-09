@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cadastrarEditalSchema, CadastrarEditalSchema } from "@/core/schemas/cadastrar-edital.schema";
-import { cadastrarEditalService } from "@/core/services/cadastrar-edital-service";
+import { cadastrarEditalService } from "@/core/services/editalService";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray } from "react-hook-form";
 import { Plus, Trash2, CheckCircle } from "lucide-react";

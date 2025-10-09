@@ -1,5 +1,7 @@
 import api from "./api";
+import { FetchPublicApi } from "./fetchPublicApi";
 import { CadastrarEditalSchema } from "../schemas/cadastrar-edital.schema";
+import { EditalRequest } from "../types/editais.interface";
 
 export interface CadastrarEditalRequest {
   title: string;
@@ -245,5 +247,8 @@ export const cadastrarEditalService = {
         message: 'Erro inesperado ao cadastrar edital. Tente novamente.'
       };
     }
-  }
+  },
+  async fetchAll() {
+    return FetchPublicApi<EditalRequest[]>('/editais/obter', 60);
+  },
 };
