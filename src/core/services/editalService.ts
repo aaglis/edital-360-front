@@ -36,6 +36,12 @@ export interface CadastrarEditalRequest {
     description: string;
     date: string; 
   }>;
+  exemption?: {
+    exemptionStartDate: string;
+    exemptionEndDate: string;
+    eligibleCategories: string[];
+    documentationDescription: string;
+  };
 }
 
 export interface CadastrarEditalResponse {
@@ -119,7 +125,14 @@ export const cadastrarEditalService = {
         schedule: data.cronograma && data.cronograma.length > 0 ? data.cronograma.map((item) => ({
           description: item.evento,
           date: new Date(item.data).toISOString()
-        })).filter(item => item.description && item.description.trim() !== "") : undefined
+        })).filter(item => item.description && item.description.trim() !== "") : undefined,
+        
+        exemption: data.exemption?.periodos?.length > 0 ? {
+          exemptionStartDate: data.exemption.periodos[0].dataInicio.toISOString().split('T')[0],
+          exemptionEndDate: data.exemption.periodos[0].dataFim.toISOString().split('T')[0],
+          eligibleCategories: data.exemption.periodos.map(periodo => periodo.descricao),
+          documentationDescription: data.exemption.periodos[0].criterios
+        } : undefined
       };
 
       const formData = new FormData();
@@ -185,6 +198,15 @@ export const cadastrarEditalService = {
           const date = new Date(item.date);
           const formattedDate = date.toISOString().replace('Z', '');
           formData.append(`schedule[${index}].date`, formattedDate);
+        });
+      }
+      
+      if (payload.exemption) {
+        formData.append('exemption.exemptionStartDate', payload.exemption.exemptionStartDate);
+        formData.append('exemption.exemptionEndDate', payload.exemption.exemptionEndDate);
+        formData.append('exemption.documentationDescription', payload.exemption.documentationDescription);
+        payload.exemption.eligibleCategories.forEach((category, index) => {
+          formData.append(`exemption.eligibleCategories[${index}]`, category);
         });
       }
       

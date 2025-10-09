@@ -111,13 +111,56 @@ export const cadastrarEditalSchema = z.object({
   }
 ).refine(
   (data) => {
-    if (data.exemption?.temIsencao && data.exemption?.periodos) {
+    if (data.exemption?.periodos?.length > 0) {
       return data.exemption.periodos.every(periodo => periodo.dataFim > periodo.dataInicio);
     }
     return true;
   },
   {
     message: "Data de fim da isenção deve ser posterior à data de início",
+    path: ["exemption", "periodos"]
+  }
+).refine(
+  (data) => {
+    if (data.exemption?.periodos?.length > 0) {
+      const hoje = new Date();
+      const hojeStr = hoje.toISOString().split('T')[0];
+      return data.exemption.periodos.every(periodo => {
+        const dataInicioStr = periodo.dataInicio.toISOString().split('T')[0];
+        return dataInicioStr >= hojeStr;
+      });
+    }
+    return true;
+  },
+  {
+    message: "Data inicial da isenção deve ser hoje ou futura",
+    path: ["exemption", "periodos"]
+  }
+).refine(
+  (data) => {
+    if (data.exemption?.periodos?.length > 0) {
+      const hoje = new Date();
+      const hojeStr = hoje.toISOString().split('T')[0];
+      return data.exemption.periodos.every(periodo => {
+        const dataFimStr = periodo.dataFim.toISOString().split('T')[0];
+        return dataFimStr >= hojeStr;
+      });
+    }
+    return true;
+  },
+  {
+    message: "Data final da isenção deve ser hoje ou futura",
+    path: ["exemption", "periodos"]
+  }
+).refine(
+  (data) => {
+    if (data.exemption?.periodos?.length > 0) {
+      return data.exemption.periodos.every(periodo => periodo.dataFim < data.dataInicioInscricoes);
+    }
+    return true;
+  },
+  {
+    message: "Data final da isenção deve ser anterior à data de início das inscrições",
     path: ["exemption", "periodos"]
   }
 ).refine(

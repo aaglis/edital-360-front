@@ -1099,6 +1099,9 @@ export default function CadastrarEditalPage() {
                                   onChange={(e) => handleDateChange(e.target.value, field.onChange)}
                                 />
                               </FormControl>
+                              <p className="text-xs text-gray-600">
+                                Deve ser hoje ou uma data futura
+                              </p>
                               <FormMessage />
                             </FormItem>
                           )}
@@ -1118,6 +1121,9 @@ export default function CadastrarEditalPage() {
                                   onChange={(e) => handleDateChange(e.target.value, field.onChange)}
                                 />
                               </FormControl>
+                              <p className="text-xs text-gray-600">
+                                Deve ser hoje ou futura e anterior ao início das inscrições
+                              </p>
                               <FormMessage />
                             </FormItem>
                           )}
