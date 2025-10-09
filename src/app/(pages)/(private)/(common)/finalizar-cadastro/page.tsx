@@ -45,7 +45,6 @@ export default function RegisterComponent() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showReloadWarning, setShowReloadWarning] = useState(false);
   const [currentStep, setCurrentStep] = useState<'form' | 'confirmation'>('form');
@@ -77,15 +76,13 @@ export default function RegisterComponent() {
     "confirmarSenha",
   ];
 
-  const focusElementWithMessage = (fieldName: string, message: string) => {
+  const focusElementWithMessage = (fieldName: string) => {
     const element = document.querySelector(
       `[name="${fieldName}"]`
     ) as HTMLElement;
     if (element) {
       element.focus();
       element.scrollIntoView({ behavior: "smooth", block: "center" });
-      setErrorMessage(message);
-      setTimeout(() => setErrorMessage(""), 5000);
       return true;
     }
     return false;
@@ -94,66 +91,32 @@ export default function RegisterComponent() {
   const focusFirstError = () => {
     const errors = form.formState.errors;
     const formValues = form.getValues();
+    const camposOpcionais = ['complemento', 'dddTelefone', 'telefone'];
 
+    // Primeiro, verifica se as senhas coincidem
     if (!passwordsMatch && formValues.senha && formValues.confirmarSenha) {
-      focusElementWithMessage(
-        "confirmarSenha",
-        "As senhas devem ser iguais para finalizar o cadastro"
-      );
+      focusElementWithMessage("confirmarSenha");
       return;
     }
 
+    // Verifica erros de validação primeiro (campos com formato incorreto)
     for (const field of fieldOrder) {
       const fieldError = errors[field as keyof CadastroCompletoSchema];
       if (fieldError) {
-        const message = `Por favor, corrija o campo "${getFieldLabel(
-          field
-        )}": ${fieldError.message}`;
-        if (focusElementWithMessage(field, message)) break;
+        if (focusElementWithMessage(field)) return;
       }
     }
 
+    // Depois verifica campos obrigatórios vazios
     for (const field of fieldOrder) {
       const value = formValues[field as keyof CadastroCompletoSchema];
-      const isEmpty =
-        !value || (typeof value === "string" && value.trim() === "");
-      if (isEmpty) {
-        const message = `Por favor, preencha o campo obrigatório: "${getFieldLabel(
-          field
-        )}"`;
-        if (focusElementWithMessage(field, message)) break;
+      const isEmpty = !value || (typeof value === "string" && value.trim() === "");
+      const isObrigatorio = !camposOpcionais.includes(field);
+      
+      if (isEmpty && isObrigatorio) {
+        if (focusElementWithMessage(field)) return;
       }
     }
-  };
-
-  const getFieldLabel = (fieldName: string): string => {
-    const labels: Record<string, string> = {
-      nome: "Nome",
-      dataNascimento: "Data de Nascimento",
-      sexo: "Sexo",
-      nomePai: "Nome do Pai",
-      nomeMae: "Nome da Mãe",
-      escolaridade: "Escolaridade",
-      cpf: "CPF",
-      documentoIdentidade: "Documento de Identidade",
-      ufIdentidade: "UF do Documento",
-      cep: "CEP",
-      uf: "UF",
-      cidade: "Cidade",
-      bairro: "Bairro",
-      logradouro: "Logradouro",
-      complemento: "Complemento",
-      numero: "Número",
-      dddTelefone: "DDD Telefone",
-      telefone: "Telefone",
-      dddCelular: "DDD Celular",
-      celular: "Celular",
-      email: "E-mail",
-      confirmarEmail: "Confirmar E-mail",
-      senha: "Senha",
-      confirmarSenha: "Confirmar Senha",
-    };
-    return labels[fieldName] || fieldName;
   };
 
   const form = useForm<CadastroCompletoSchema>({
@@ -1358,9 +1321,12 @@ export default function RegisterComponent() {
                       type="button"
                       className="h-12 w-full px-8 text-base font-medium text-white hover:opacity-90 max-w-[154px] max-h-[40px]"
                       style={{ backgroundColor: "#172554" }}
-                      disabled={!canSubmit || isSubmitting}
+                      disabled={isSubmitting}
                       onClick={(e) => {
                         e.preventDefault();
+                        // Força a validação de todos os campos
+                        form.trigger();
+                        
                         if (!canSubmit) {
                           focusFirstError();
                         } else {
@@ -1379,13 +1345,7 @@ export default function RegisterComponent() {
                     </Button>
                   </div>
 
-                  {errorMessage && (
-                    <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                      <p className="text-sm text-red-700 text-center font-medium">
-                        ⚠️ {errorMessage}
-                      </p>
-                    </div>
-                  )}
+                  {/* Removido o errorMessage - validações aparecem apenas nos campos individuais */}
                 </div>
                     </>
                 )}
