@@ -9,7 +9,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
 import InputMask from "react-input-mask";
 import { EyeIcon, EyeOffIcon, Loader2 } from "lucide-react";
-import { userService, type CadastroUsuarioData } from "@/core/services/userService";
+import {
+  userService,
+  type CadastroUsuarioData,
+} from "@/core/services/userService";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,6 +48,7 @@ export default function RegisterComponent() {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [showReloadWarning, setShowReloadWarning] = useState(false);
 
   const fieldOrder = [
     "nome",
@@ -213,6 +217,58 @@ export default function RegisterComponent() {
     }
   }, [form]);
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "F5" || (event.ctrlKey && event.key === "r")) {
+        event.preventDefault();
+        setShowReloadWarning(true);
+      }
+    };
+
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      const message =
+        "Você tem certeza que deseja sair? Todo o progresso do formulário será perdido.";
+      event.preventDefault();
+      event.returnValue = message;
+      return message;
+    };
+
+    const handleUnload = () => {
+      try {
+        localStorage.setItem("redirectToCadastro", "true");
+      } catch (error) {
+        console.error("Erro ao salvar no localStorage:", error);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener("unload", handleUnload);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener("unload", handleUnload);
+    };
+  }, []);
+
+  useEffect(() => {
+    const shouldRedirect = localStorage.getItem("redirectToCadastro");
+    if (shouldRedirect === "true") {
+      localStorage.removeItem("redirectToCadastro");
+      router.push("/cadastro");
+    }
+  }, [router]);
+
+  const handleConfirmReload = () => {
+    setShowReloadWarning(false);
+    router.push("/cadastro");
+  };
+
+  const handleCancelReload = () => {
+    setShowReloadWarning(false);
+  };
+
   const onSubmit = async (data: CadastroCompletoSchema) => {
     setIsSubmitting(true);
 
@@ -287,7 +343,13 @@ export default function RegisterComponent() {
   const confirmarSenha = form.watch("confirmarSenha");
 
   const passwordsMatch = useMemo(() => {
-    return senha && confirmarSenha && senha.length > 0 && confirmarSenha.length > 0 && senha === confirmarSenha;
+    return (
+      senha &&
+      confirmarSenha &&
+      senha.length > 0 &&
+      confirmarSenha.length > 0 &&
+      senha === confirmarSenha
+    );
   }, [senha, confirmarSenha]);
 
   const canSubmit = useMemo(() => {
@@ -295,64 +357,77 @@ export default function RegisterComponent() {
   }, [passwordsMatch, form.formState.isValid]);
 
   return (
-    <div className="flex flex-col items-center py-8 px-4 min-h-screen" style={{ backgroundColor: '#E5E5E5' }}>
-      <div className="w-full" style={{ maxWidth: '1289px' }}>
+    <div
+      className="flex flex-col items-center py-8 px-4 min-h-screen"
+      style={{ backgroundColor: "#E5E5E5" }}
+    >
+      <div className="w-full" style={{ maxWidth: "1289px" }}>
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-8"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <div className="bg-white rounded-3xl shadow-sm border p-8">
               <div className="space-y-8">
-                
                 {/* Título principal */}
                 <div className="text-left mb-12">
-                  <h1 className="mb-2" style={{
-                    fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
-                    fontWeight: 600,
-                    fontSize: '48px',
-                    lineHeight: '100%',
-                    letterSpacing: '-1%',
-                    textAlign: 'left',
-                    verticalAlign: 'middle',
-                    color: 'black'
-                  }}>
+                  <h1
+                    className="mb-2"
+                    style={{
+                      fontFamily:
+                        "var(--font-geist-sans), system-ui, sans-serif",
+                      fontWeight: 600,
+                      fontSize: "48px",
+                      lineHeight: "100%",
+                      letterSpacing: "-1%",
+                      textAlign: "left",
+                      verticalAlign: "middle",
+                      color: "black",
+                    }}
+                  >
                     Cadastro
                   </h1>
-                  <p style={{
-                    fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
-                    fontWeight: 600,
-                    fontSize: '20px',
-                    lineHeight: '120%',
-                    letterSpacing: '-2%',
-                    textAlign: 'left',
-                    verticalAlign: 'middle',
-                    color: 'black'
-                  }}>
-                    Para prosseguir com seu cadastro, preencha os campos corretamente
+                  <p
+                    style={{
+                      fontFamily:
+                        "var(--font-geist-sans), system-ui, sans-serif",
+                      fontWeight: 600,
+                      fontSize: "20px",
+                      lineHeight: "120%",
+                      letterSpacing: "-2%",
+                      textAlign: "left",
+                      verticalAlign: "middle",
+                      color: "black",
+                    }}
+                  >
+                    Para prosseguir com seu cadastro, preencha os campos
+                    corretamente
                   </p>
                 </div>
-                
+
                 {/* Informações pessoais */}
                 <div>
-                  <h2 className="text-black mb-6" style={{
-                    fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
-                    fontWeight: 600,
-                    fontSize: '30px',
-                    lineHeight: '100%',
-                    letterSpacing: '-1%',
-                    verticalAlign: 'middle'
-                  }}>
+                  <h2
+                    className="text-black mb-6"
+                    style={{
+                      fontFamily:
+                        "var(--font-geist-sans), system-ui, sans-serif",
+                      fontWeight: 600,
+                      fontSize: "30px",
+                      lineHeight: "100%",
+                      letterSpacing: "-1%",
+                      verticalAlign: "middle",
+                    }}
+                  >
                     Informações pessoais
                   </h2>
-                   {/* 1ª fileira: CPF, Documento de identidade, Órgão expedidor */}
+                  {/* 1ª fileira: CPF, Documento de identidade, Órgão expedidor */}
                   <div className="flex flex-col lg:flex-row gap-3 mb-6">
                     <FormField
                       control={form.control}
                       name="cpf"
                       render={() => (
                         <FormItem className="w-full max-w-[100%] lg:max-w-[320px]">
-                          <FormLabel className="form-label-geist" >CPF <span className="asterisk">*</span></FormLabel>
+                          <FormLabel className="form-label-geist">
+                            CPF <span className="asterisk">*</span>
+                          </FormLabel>
                           <FormControl>
                             <Controller
                               name="cpf"
@@ -365,9 +440,14 @@ export default function RegisterComponent() {
                                   onChange={field.onChange}
                                   disabled={true}
                                 >
-                                  {(inputProps: React.InputHTMLAttributes<HTMLInputElement>) => 
-                                    <Input {...inputProps} className="form-input-disabled h-9 w-full " />
-                                  }
+                                  {(
+                                    inputProps: React.InputHTMLAttributes<HTMLInputElement>
+                                  ) => (
+                                    <Input
+                                      {...inputProps}
+                                      className="form-input-disabled h-9 w-full "
+                                    />
+                                  )}
                                 </InputMask>
                               )}
                             />
@@ -382,7 +462,10 @@ export default function RegisterComponent() {
                       name="documentoIdentidade"
                       render={() => (
                         <FormItem className="w-full max-w-[100%] lg:max-w-[320px]">
-                          <FormLabel className="form-label-geist">Documento de identidade <span className="asterisk">*</span></FormLabel>
+                          <FormLabel className="form-label-geist">
+                            Documento de identidade{" "}
+                            <span className="asterisk">*</span>
+                          </FormLabel>
                           <FormControl>
                             <Controller
                               name="documentoIdentidade"
@@ -394,9 +477,14 @@ export default function RegisterComponent() {
                                   value={field.value}
                                   onChange={field.onChange}
                                 >
-                                  {(inputProps: React.InputHTMLAttributes<HTMLInputElement>) => 
-                                    <Input {...inputProps} className="form-input-custom h-9 w-full" />
-                                  }
+                                  {(
+                                    inputProps: React.InputHTMLAttributes<HTMLInputElement>
+                                  ) => (
+                                    <Input
+                                      {...inputProps}
+                                      className="form-input-custom h-9 w-full"
+                                    />
+                                  )}
                                 </InputMask>
                               )}
                             />
@@ -411,7 +499,10 @@ export default function RegisterComponent() {
                       name="ufIdentidade"
                       render={({ field }) => (
                         <FormItem className="w-full max-w-[100%] lg:max-w-[320px]">
-                          <FormLabel className="form-label-geist">Órgão expedidor de documentos <span className="asterisk">*</span></FormLabel>
+                          <FormLabel className="form-label-geist">
+                            Órgão expedidor de documentos{" "}
+                            <span className="asterisk">*</span>
+                          </FormLabel>
                           <FormControl>
                             <Input
                               placeholder="Ex: SP"
@@ -419,7 +510,9 @@ export default function RegisterComponent() {
                               {...field}
                               maxLength={2}
                               onChange={(e) => {
-                                const value = e.target.value.toUpperCase().replace(/[^A-Z]/g, "");
+                                const value = e.target.value
+                                  .toUpperCase()
+                                  .replace(/[^A-Z]/g, "");
                                 field.onChange(value);
                               }}
                             />
@@ -437,7 +530,9 @@ export default function RegisterComponent() {
                       name="nome"
                       render={({ field }) => (
                         <FormItem className="max-w-[100%] lg:max-w-[320px]">
-                          <FormLabel className="form-label-geist">Nome <span className="asterisk">*</span></FormLabel>
+                          <FormLabel className="form-label-geist">
+                            Nome <span className="asterisk">*</span>
+                          </FormLabel>
                           <FormControl>
                             <Input
                               placeholder="Digite seu nome completo"
@@ -454,16 +549,23 @@ export default function RegisterComponent() {
                       control={form.control}
                       name="sexo"
                       render={({ field }) => (
-                        <FormItem className="w-full max-w-[100%] lg:max-w-[320px]"> 
-                          <FormLabel className="form-label-geist">Sexo <span className="asterisk">*</span></FormLabel>
-                          <Select onValueChange={field.onChange} value={field.value}>
+                        <FormItem className="w-full max-w-[100%] lg:max-w-[320px]">
+                          <FormLabel className="form-label-geist">
+                            Sexo <span className="asterisk">*</span>
+                          </FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value}
+                          >
                             <FormControl>
                               <SelectTrigger className="form-input-custom h-9 w-full">
                                 <SelectValue placeholder="Selecione" />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="MASCULINO">Masculino</SelectItem>
+                              <SelectItem value="MASCULINO">
+                                Masculino
+                              </SelectItem>
                               <SelectItem value="FEMININO">Feminino</SelectItem>
                             </SelectContent>
                           </Select>
@@ -477,9 +579,16 @@ export default function RegisterComponent() {
                       name="dataNascimento"
                       render={({ field }) => (
                         <FormItem className="w-full max-w-[100%] lg:max-w-[165px]">
-                          <FormLabel className="form-label-geist">Data de nascimento <span className="asterisk">*</span></FormLabel>
+                          <FormLabel className="form-label-geist">
+                            Data de nascimento{" "}
+                            <span className="asterisk">*</span>
+                          </FormLabel>
                           <FormControl>
-                            <Input type="date" className="form-input-custom max-h-8 w-full" {...field} />
+                            <Input
+                              type="date"
+                              className="form-input-custom max-h-8 w-full"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -491,23 +600,44 @@ export default function RegisterComponent() {
                       name="escolaridade"
                       render={({ field }) => (
                         <FormItem className="w-full max-w-[100%] lg:max-w-[320px]">
-                          <FormLabel className="form-label-geist">Escolaridade <span className="asterisk">*</span></FormLabel>
-                          <Select onValueChange={field.onChange} value={field.value}>
+                          <FormLabel className="form-label-geist">
+                            Escolaridade <span className="asterisk">*</span>
+                          </FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value}
+                          >
                             <FormControl>
                               <SelectTrigger className="form-input-custom h-9 w-full">
                                 <SelectValue placeholder="Selecione" />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="FUNDAMENTAL_INCOMPLETO">Fundamental Incompleto</SelectItem>
-                              <SelectItem value="FUNDAMENTAL_COMPLETO">Fundamental Completo</SelectItem>
-                              <SelectItem value="MEDIO_INCOMPLETO">Médio Incompleto</SelectItem>
-                              <SelectItem value="MEDIO_COMPLETO">Médio Completo</SelectItem>
-                              <SelectItem value="SUPERIOR_INCOMPLETO">Superior Incompleto</SelectItem>
-                              <SelectItem value="SUPERIOR_COMPLETO">Superior Completo</SelectItem>
-                              <SelectItem value="POS_GRADUACAO">Pós-graduação</SelectItem>
+                              <SelectItem value="FUNDAMENTAL_INCOMPLETO">
+                                Fundamental Incompleto
+                              </SelectItem>
+                              <SelectItem value="FUNDAMENTAL_COMPLETO">
+                                Fundamental Completo
+                              </SelectItem>
+                              <SelectItem value="MEDIO_INCOMPLETO">
+                                Médio Incompleto
+                              </SelectItem>
+                              <SelectItem value="MEDIO_COMPLETO">
+                                Médio Completo
+                              </SelectItem>
+                              <SelectItem value="SUPERIOR_INCOMPLETO">
+                                Superior Incompleto
+                              </SelectItem>
+                              <SelectItem value="SUPERIOR_COMPLETO">
+                                Superior Completo
+                              </SelectItem>
+                              <SelectItem value="POS_GRADUACAO">
+                                Pós-graduação
+                              </SelectItem>
                               <SelectItem value="MESTRADO">Mestrado</SelectItem>
-                              <SelectItem value="DOUTORADO">Doutorado</SelectItem>
+                              <SelectItem value="DOUTORADO">
+                                Doutorado
+                              </SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -523,9 +653,15 @@ export default function RegisterComponent() {
                       name="nomeMae"
                       render={({ field }) => (
                         <FormItem className="w-full max-w-[100%] lg:max-w-[320px]">
-                          <FormLabel className="form-label-geist">Nome da mãe <span className="asterisk">*</span></FormLabel>
+                          <FormLabel className="form-label-geist">
+                            Nome da mãe <span className="asterisk">*</span>
+                          </FormLabel>
                           <FormControl>
-                            <Input placeholder="Digite o nome da mãe" className="form-input-custom h-9 w-full" {...field} />
+                            <Input
+                              placeholder="Digite o nome da mãe"
+                              className="form-input-custom h-9 w-full"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -537,9 +673,15 @@ export default function RegisterComponent() {
                       name="nomePai"
                       render={({ field }) => (
                         <FormItem className="w-full max-w-[100%] lg:max-w-[320px]">
-                          <FormLabel className="form-label-geist">Nome do pai <span className="asterisk">*</span></FormLabel>
+                          <FormLabel className="form-label-geist">
+                            Nome do pai <span className="asterisk">*</span>
+                          </FormLabel>
                           <FormControl>
-                            <Input placeholder="Digite o nome do pai" className="form-input-custom h-9 w-full" {...field} />
+                            <Input
+                              placeholder="Digite o nome do pai"
+                              className="form-input-custom h-9 w-full"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -550,17 +692,21 @@ export default function RegisterComponent() {
 
                 {/* Endereço e contato */}
                 <div className="">
-                  <h2 className="text-black mb-6 mt-16" style={{
-                    fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
-                    fontWeight: 600,
-                    fontSize: '30px',
-                    lineHeight: '100%',
-                    letterSpacing: '-1%',
-                    verticalAlign: 'middle'
-                  }}>
+                  <h2
+                    className="text-black mb-6 mt-16"
+                    style={{
+                      fontFamily:
+                        "var(--font-geist-sans), system-ui, sans-serif",
+                      fontWeight: 600,
+                      fontSize: "30px",
+                      lineHeight: "100%",
+                      letterSpacing: "-1%",
+                      verticalAlign: "middle",
+                    }}
+                  >
                     Endereço e contato
                   </h2>
-                  
+
                   {/* 1ª fileira: CEP, UF, Cidade, Bairro */}
                   <div className="flex flex-col lg:flex-row gap-3 mb-6">
                     <FormField
@@ -568,7 +714,9 @@ export default function RegisterComponent() {
                       name="cep"
                       render={() => (
                         <FormItem className="w-full max-w-[100%] lg:max-w-[320px]">
-                          <FormLabel className="form-label-geist">CEP <span className="asterisk">*</span></FormLabel>
+                          <FormLabel className="form-label-geist">
+                            CEP <span className="asterisk">*</span>
+                          </FormLabel>
                           <FormControl>
                             <Controller
                               name="cep"
@@ -580,9 +728,14 @@ export default function RegisterComponent() {
                                   value={field.value}
                                   onChange={field.onChange}
                                 >
-                                  {(inputProps: React.InputHTMLAttributes<HTMLInputElement>) => 
-                                    <Input {...inputProps} className="form-input-custom h-9 w-full" />
-                                  }
+                                  {(
+                                    inputProps: React.InputHTMLAttributes<HTMLInputElement>
+                                  ) => (
+                                    <Input
+                                      {...inputProps}
+                                      className="form-input-custom h-9 w-full"
+                                    />
+                                  )}
                                 </InputMask>
                               )}
                             />
@@ -591,13 +744,15 @@ export default function RegisterComponent() {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={form.control}
                       name="uf"
                       render={({ field }) => (
                         <FormItem className="w-full max-w-[100%] lg:max-w-[100px]">
-                          <FormLabel className="form-label-geist">UF <span className="asterisk">*</span></FormLabel>
+                          <FormLabel className="form-label-geist">
+                            UF <span className="asterisk">*</span>
+                          </FormLabel>
                           <FormControl>
                             <Input
                               placeholder="Ex: SP"
@@ -605,7 +760,9 @@ export default function RegisterComponent() {
                               {...field}
                               maxLength={2}
                               onChange={(e) => {
-                                const value = e.target.value.toUpperCase().replace(/[^A-Z]/g, "");
+                                const value = e.target.value
+                                  .toUpperCase()
+                                  .replace(/[^A-Z]/g, "");
                                 field.onChange(value);
                               }}
                             />
@@ -614,29 +771,41 @@ export default function RegisterComponent() {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={form.control}
                       name="cidade"
                       render={({ field }) => (
                         <FormItem className="w-full max-w-[100%] lg:max-w-[320px]">
-                          <FormLabel className="form-label-geist">Cidade <span className="asterisk">*</span></FormLabel>
+                          <FormLabel className="form-label-geist">
+                            Cidade <span className="asterisk">*</span>
+                          </FormLabel>
                           <FormControl>
-                            <Input placeholder="Digite a cidade" className="form-input-custom h-9 w-full" {...field} />
+                            <Input
+                              placeholder="Digite a cidade"
+                              className="form-input-custom h-9 w-full"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={form.control}
                       name="bairro"
                       render={({ field }) => (
                         <FormItem className="w-full max-w-[320px]">
-                          <FormLabel className="form-label-geist">Bairro <span className="asterisk">*</span></FormLabel>
+                          <FormLabel className="form-label-geist">
+                            Bairro <span className="asterisk">*</span>
+                          </FormLabel>
                           <FormControl>
-                            <Input placeholder="Digite o bairro" className="form-input-custom h-9 w-full" {...field} />
+                            <Input
+                              placeholder="Digite o bairro"
+                              className="form-input-custom h-9 w-full"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -651,35 +820,49 @@ export default function RegisterComponent() {
                       name="logradouro"
                       render={({ field }) => (
                         <FormItem className="w-full max-w-[100%] lg:max-w-[320px]">
-                          <FormLabel className="form-label-geist">Logradouro <span className="asterisk">*</span></FormLabel>
+                          <FormLabel className="form-label-geist">
+                            Logradouro <span className="asterisk">*</span>
+                          </FormLabel>
                           <FormControl>
-                            <Input placeholder="Digite o logradouro" className="form-input-custom h-9 w-full" {...field} />
+                            <Input
+                              placeholder="Digite o logradouro"
+                              className="form-input-custom h-9 w-full"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={form.control}
                       name="complemento"
                       render={({ field }) => (
                         <FormItem className="w-full max-w-[100%] lg:max-w-[320px]">
-                          <FormLabel className="form-label-geist">Complemento</FormLabel>
+                          <FormLabel className="form-label-geist">
+                            Complemento
+                          </FormLabel>
                           <FormControl>
-                            <Input placeholder="Apto, bloco..." className="form-input-custom h-9 w-full" {...field} />
+                            <Input
+                              placeholder="Apto, bloco..."
+                              className="form-input-custom h-9 w-full"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={form.control}
                       name="numero"
                       render={({ field }) => (
                         <FormItem className="w-full max-w-[100%] lg:max-w-[320px]">
-                          <FormLabel className="form-label-geist">Número <span className="asterisk">*</span></FormLabel>
+                          <FormLabel className="form-label-geist">
+                            Número <span className="asterisk">*</span>
+                          </FormLabel>
                           <FormControl>
                             <Input
                               placeholder="123"
@@ -704,7 +887,9 @@ export default function RegisterComponent() {
                       name="email"
                       render={({ field }) => (
                         <FormItem className="w-full max-w-[100%] lg:max-w-[320px]">
-                          <FormLabel className="form-label-geist">E-mail <span className="asterisk">*</span></FormLabel>
+                          <FormLabel className="form-label-geist">
+                            E-mail <span className="asterisk">*</span>
+                          </FormLabel>
                           <FormControl>
                             <Input
                               type="email"
@@ -712,7 +897,9 @@ export default function RegisterComponent() {
                               className="form-input-custom h-9 w-full"
                               {...field}
                               onChange={(e) => {
-                                const value = e.target.value.toLowerCase().trim();
+                                const value = e.target.value
+                                  .toLowerCase()
+                                  .trim();
                                 field.onChange(value);
                               }}
                             />
@@ -727,7 +914,9 @@ export default function RegisterComponent() {
                       name="confirmarEmail"
                       render={({ field }) => (
                         <FormItem className="w-full max-w-[100%] lg:max-w-[320px]">
-                          <FormLabel className="form-label-geist">Confirmar e-mail <span className="asterisk">*</span></FormLabel>
+                          <FormLabel className="form-label-geist">
+                            Confirmar e-mail <span className="asterisk">*</span>
+                          </FormLabel>
                           <FormControl>
                             <Input
                               type="email"
@@ -735,7 +924,9 @@ export default function RegisterComponent() {
                               className="form-input-custom h-9 w-full"
                               {...field}
                               onChange={(e) => {
-                                const value = e.target.value.toLowerCase().trim();
+                                const value = e.target.value
+                                  .toLowerCase()
+                                  .trim();
                                 field.onChange(value);
                               }}
                             />
@@ -750,7 +941,9 @@ export default function RegisterComponent() {
                       name="dddCelular"
                       render={() => (
                         <FormItem className="w-full max-w-[100%] lg:max-w-[100px]">
-                          <FormLabel className="form-label-geist">DDD <span className="asterisk">*</span></FormLabel>
+                          <FormLabel className="form-label-geist">
+                            DDD <span className="asterisk">*</span>
+                          </FormLabel>
                           <FormControl>
                             <Controller
                               name="dddCelular"
@@ -762,9 +955,14 @@ export default function RegisterComponent() {
                                   value={field.value}
                                   onChange={field.onChange}
                                 >
-                                  {(inputProps: React.InputHTMLAttributes<HTMLInputElement>) => 
-                                    <Input {...inputProps} className="form-input-custom max-h-9 w-full" />
-                                  }
+                                  {(
+                                    inputProps: React.InputHTMLAttributes<HTMLInputElement>
+                                  ) => (
+                                    <Input
+                                      {...inputProps}
+                                      className="form-input-custom max-h-9 w-full"
+                                    />
+                                  )}
                                 </InputMask>
                               )}
                             />
@@ -779,7 +977,9 @@ export default function RegisterComponent() {
                       name="celular"
                       render={() => (
                         <FormItem className="w-full max-w-[100%] lg:max-w-[320px]">
-                          <FormLabel className="form-label-geist">Celular <span className="asterisk">*</span></FormLabel>
+                          <FormLabel className="form-label-geist">
+                            Celular <span className="asterisk">*</span>
+                          </FormLabel>
                           <FormControl>
                             <Controller
                               name="celular"
@@ -791,9 +991,14 @@ export default function RegisterComponent() {
                                   value={field.value}
                                   onChange={field.onChange}
                                 >
-                                  {(inputProps: React.InputHTMLAttributes<HTMLInputElement>) => 
-                                    <Input {...inputProps} className="form-input-custom h-9 w-full" />
-                                  }
+                                  {(
+                                    inputProps: React.InputHTMLAttributes<HTMLInputElement>
+                                  ) => (
+                                    <Input
+                                      {...inputProps}
+                                      className="form-input-custom h-9 w-full"
+                                    />
+                                  )}
                                 </InputMask>
                               )}
                             />
@@ -811,7 +1016,9 @@ export default function RegisterComponent() {
                       name="dddTelefone"
                       render={() => (
                         <FormItem className="w-full max-w-[100%] lg:max-w-[100px]">
-                          <FormLabel className="form-label-geist">DDD Telefone</FormLabel>
+                          <FormLabel className="form-label-geist">
+                            DDD Telefone
+                          </FormLabel>
                           <FormControl>
                             <Controller
                               name="dddTelefone"
@@ -823,9 +1030,14 @@ export default function RegisterComponent() {
                                   value={field.value}
                                   onChange={field.onChange}
                                 >
-                                  {(inputProps: React.InputHTMLAttributes<HTMLInputElement>) => 
-                                    <Input {...inputProps} className="form-input-custom max-h-9 w-full" />
-                                  }
+                                  {(
+                                    inputProps: React.InputHTMLAttributes<HTMLInputElement>
+                                  ) => (
+                                    <Input
+                                      {...inputProps}
+                                      className="form-input-custom max-h-9 w-full"
+                                    />
+                                  )}
                                 </InputMask>
                               )}
                             />
@@ -840,7 +1052,9 @@ export default function RegisterComponent() {
                       name="telefone"
                       render={() => (
                         <FormItem className="w-full max-w-[100%] lg:max-w-[320px]">
-                          <FormLabel className="form-label-geist">Telefone</FormLabel>
+                          <FormLabel className="form-label-geist">
+                            Telefone
+                          </FormLabel>
                           <FormControl>
                             <Controller
                               name="telefone"
@@ -852,9 +1066,14 @@ export default function RegisterComponent() {
                                   value={field.value}
                                   onChange={field.onChange}
                                 >
-                                  {(inputProps: React.InputHTMLAttributes<HTMLInputElement>) => 
-                                    <Input {...inputProps} className="form-input-custom h-9 w-full" />
-                                  }
+                                  {(
+                                    inputProps: React.InputHTMLAttributes<HTMLInputElement>
+                                  ) => (
+                                    <Input
+                                      {...inputProps}
+                                      className="form-input-custom h-9 w-full"
+                                    />
+                                  )}
                                 </InputMask>
                               )}
                             />
@@ -868,17 +1087,21 @@ export default function RegisterComponent() {
 
                 {/* Dados de acesso */}
                 <div>
-                  <h2 className="text-black mb-6 mt-16" style={{
-                    fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
-                    fontWeight: 600,
-                    fontSize: '30px',
-                    lineHeight: '100%',
-                    letterSpacing: '-1%',
-                    verticalAlign: 'middle'
-                  }}>
+                  <h2
+                    className="text-black mb-6 mt-16"
+                    style={{
+                      fontFamily:
+                        "var(--font-geist-sans), system-ui, sans-serif",
+                      fontWeight: 600,
+                      fontSize: "30px",
+                      lineHeight: "100%",
+                      letterSpacing: "-1%",
+                      verticalAlign: "middle",
+                    }}
+                  >
                     Dados de acesso
                   </h2>
-                  
+
                   {/* 1ª fileira: Senha e confirmar senha */}
                   <div className="flex flex-col lg:flex-row gap-3 mb-6">
                     <FormField
@@ -886,7 +1109,9 @@ export default function RegisterComponent() {
                       name="senha"
                       render={({ field }) => (
                         <FormItem className="w-full max-w-[100%] lg:max-w-[320px]">
-                          <FormLabel className="form-label-geist">Senha <span className="asterisk">*</span></FormLabel>
+                          <FormLabel className="form-label-geist">
+                            Senha <span className="asterisk">*</span>
+                          </FormLabel>
                           <FormControl>
                             <div className="relative p-0 max-w-[100%] lg:max-w-[320px]">
                               <Input
@@ -918,7 +1143,9 @@ export default function RegisterComponent() {
                       name="confirmarSenha"
                       render={({ field }) => (
                         <FormItem className="w-full max-w-[100%] lg:max-w-[320px]">
-                          <FormLabel className="form-label-geist">Confirmar senha <span className="asterisk">*</span></FormLabel>
+                          <FormLabel className="form-label-geist">
+                            Confirmar senha <span className="asterisk">*</span>
+                          </FormLabel>
                           <FormControl>
                             <div className="relative p-0 max-w-[100%] lg:max-w-[320px]">
                               <Input
@@ -930,7 +1157,9 @@ export default function RegisterComponent() {
                               <button
                                 type="button"
                                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                onClick={() =>
+                                  setShowConfirmPassword(!showConfirmPassword)
+                                }
                                 tabIndex={-1}
                               >
                                 {showConfirmPassword ? (
@@ -949,86 +1178,106 @@ export default function RegisterComponent() {
                   {/* Requisitos da senha */}
                   <div className="relative p-4 rounded-lg mb-6 bg-transparent border border-blue-500 max-w-[650px]">
                     {/* Borda verde animada que "preenche" da esquerda para direita */}
-                    <div 
+                    <div
                       className="absolute top-0 left-0 h-full border-l border-t border-b border-green-500 rounded-l-lg transition-all duration-500 ease-out"
                       style={{
                         width: (() => {
-                          if (!senha || senha.length === 0) return '0%';
+                          if (!senha || senha.length === 0) return "0%";
                           const requirements = [
                             senha.length >= 8,
                             /[A-Z]/.test(senha),
                             /[a-z]/.test(senha),
                             /\d/.test(senha),
-                            senha && confirmarSenha && senha.length > 0 && confirmarSenha.length > 0 && senha === confirmarSenha
+                            senha &&
+                              confirmarSenha &&
+                              senha.length > 0 &&
+                              confirmarSenha.length > 0 &&
+                              senha === confirmarSenha,
                           ];
                           const fulfilled = requirements.filter(Boolean).length;
                           return `${(fulfilled / requirements.length) * 100}%`;
-                        })()
+                        })(),
                       }}
                     />
-                    
+
                     {/* Borda verde top e bottom que acompanha */}
-                    <div 
+                    <div
                       className="absolute top-0 left-0 border-t border-green-500 transition-all duration-500 ease-out"
                       style={{
                         width: (() => {
-                          if (!senha || senha.length === 0) return '0%';
+                          if (!senha || senha.length === 0) return "0%";
                           const requirements = [
                             senha.length >= 8,
                             /[A-Z]/.test(senha),
                             /[a-z]/.test(senha),
                             /\d/.test(senha),
-                            senha && confirmarSenha && senha.length > 0 && confirmarSenha.length > 0 && senha === confirmarSenha
+                            senha &&
+                              confirmarSenha &&
+                              senha.length > 0 &&
+                              confirmarSenha.length > 0 &&
+                              senha === confirmarSenha,
                           ];
                           const fulfilled = requirements.filter(Boolean).length;
                           return `${(fulfilled / requirements.length) * 100}%`;
-                        })()
+                        })(),
                       }}
                     />
-                    
-                    <div 
+
+                    <div
                       className="absolute bottom-0 left-0 border-b border-green-500 transition-all duration-500 ease-out"
                       style={{
                         width: (() => {
-                          if (!senha || senha.length === 0) return '0%';
+                          if (!senha || senha.length === 0) return "0%";
                           const requirements = [
                             senha.length >= 8,
                             /[A-Z]/.test(senha),
                             /[a-z]/.test(senha),
                             /\d/.test(senha),
-                            senha && confirmarSenha && senha.length > 0 && confirmarSenha.length > 0 && senha === confirmarSenha
+                            senha &&
+                              confirmarSenha &&
+                              senha.length > 0 &&
+                              confirmarSenha.length > 0 &&
+                              senha === confirmarSenha,
                           ];
                           const fulfilled = requirements.filter(Boolean).length;
                           return `${(fulfilled / requirements.length) * 100}%`;
-                        })()
+                        })(),
                       }}
                     />
-                    
+
                     {/* Borda verde direita aparece quando 100% */}
-                    <div 
-                      className={`absolute top-0 right-0 h-full border-r border-green-500 rounded-r-lg transition-opacity duration-300 ${
-                        (() => {
-                          if (!senha || senha.length === 0) return 'opacity-0';
-                          const requirements = [
-                            senha.length >= 8,
-                            /[A-Z]/.test(senha),
-                            /[a-z]/.test(senha),
-                            /\d/.test(senha),
-                            senha && confirmarSenha && senha.length > 0 && confirmarSenha.length > 0 && senha === confirmarSenha
-                          ];
-                          const fulfilled = requirements.filter(Boolean).length;
-                          return fulfilled === requirements.length ? 'opacity-100' : 'opacity-0';
-                        })()
-                      }`}
+                    <div
+                      className={`absolute top-0 right-0 h-full border-r border-green-500 rounded-r-lg transition-opacity duration-300 ${(() => {
+                        if (!senha || senha.length === 0) return "opacity-0";
+                        const requirements = [
+                          senha.length >= 8,
+                          /[A-Z]/.test(senha),
+                          /[a-z]/.test(senha),
+                          /\d/.test(senha),
+                          senha &&
+                            confirmarSenha &&
+                            senha.length > 0 &&
+                            confirmarSenha.length > 0 &&
+                            senha === confirmarSenha,
+                        ];
+                        const fulfilled = requirements.filter(Boolean).length;
+                        return fulfilled === requirements.length
+                          ? "opacity-100"
+                          : "opacity-0";
+                      })()}`}
                     />
-                    
+
                     {/* Conteúdo */}
                     <div className="relative z-10">
-                      <div className="text-sm text-gray-600 mb-3">Sua senha deve conter:</div>
+                      <div className="text-sm text-gray-600 mb-3">
+                        Sua senha deve conter:
+                      </div>
                       <div className="grid grid-cols-2 gap-3 text-sm">
                         <div
                           className={`flex items-center transition-colors duration-300 ${
-                            senha && senha.length >= 8 ? "text-green-600" : "text-blue-600"
+                            senha && senha.length >= 8
+                              ? "text-green-600"
+                              : "text-blue-600"
                           }`}
                         >
                           <span className="mr-2">
@@ -1038,7 +1287,9 @@ export default function RegisterComponent() {
                         </div>
                         <div
                           className={`flex items-center transition-colors duration-300 ${
-                            senha && /[A-Z]/.test(senha) ? "text-green-600" : "text-blue-600"
+                            senha && /[A-Z]/.test(senha)
+                              ? "text-green-600"
+                              : "text-blue-600"
                           }`}
                         >
                           <span className="mr-2">
@@ -1048,7 +1299,9 @@ export default function RegisterComponent() {
                         </div>
                         <div
                           className={`flex items-center transition-colors duration-300 ${
-                            senha && /[a-z]/.test(senha) ? "text-green-600" : "text-blue-600"
+                            senha && /[a-z]/.test(senha)
+                              ? "text-green-600"
+                              : "text-blue-600"
                           }`}
                         >
                           <span className="mr-2">
@@ -1058,7 +1311,9 @@ export default function RegisterComponent() {
                         </div>
                         <div
                           className={`flex items-center transition-colors duration-300 ${
-                            senha && /\d/.test(senha) ? "text-green-600" : "text-blue-600"
+                            senha && /\d/.test(senha)
+                              ? "text-green-600"
+                              : "text-blue-600"
                           }`}
                         >
                           <span className="mr-2">
@@ -1089,7 +1344,7 @@ export default function RegisterComponent() {
                       type="button"
                       variant="outline"
                       className="h-12 w-full px-8 text-base font-medium text-gray-700 hover:text-gray-700 bg-white hover:bg-gray-50 max-w-[154px] max-h-[40px]"
-                      style={{ borderColor: '#172554' }}
+                      style={{ borderColor: "#172554" }}
                       onClick={() => router.back()}
                     >
                       Voltar
@@ -1099,7 +1354,7 @@ export default function RegisterComponent() {
                     <Button
                       type="button"
                       className="h-12 w-full px-8 text-base font-medium text-white hover:opacity-90 max-w-[154px] max-h-[40px]"
-                      style={{ backgroundColor: '#172554' }}
+                      style={{ backgroundColor: "#172554" }}
                       disabled={!canSubmit || isSubmitting}
                       onClick={(e) => {
                         e.preventDefault();
@@ -1120,7 +1375,7 @@ export default function RegisterComponent() {
                       )}
                     </Button>
                   </div>
-                  
+
                   {errorMessage && (
                     <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
                       <p className="text-sm text-red-700 text-center font-medium">
@@ -1139,122 +1394,175 @@ export default function RegisterComponent() {
       <Dialog open={showModal} onOpenChange={setShowModal}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white">
           <DialogHeader>
-            <DialogTitle style={{
-              fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
-              fontWeight: 600,
-              fontSize: '48px',
-              lineHeight: '100%',
-              letterSpacing: '-0.5%',
-              color: 'black'
-            }}>
+            <DialogTitle
+              style={{
+                fontFamily: "var(--font-geist-sans), system-ui, sans-serif",
+                fontWeight: 600,
+                fontSize: "48px",
+                lineHeight: "100%",
+                letterSpacing: "-0.5%",
+                color: "black",
+              }}
+            >
               Cadastro
             </DialogTitle>
-            <DialogDescription style={{
-              fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
-              fontWeight: 600,
-              fontSize: '20px',
-              lineHeight: '120%',
-              letterSpacing: '-0.5%',
-              color: 'black',
-              marginTop: '8px'
-            }}>
+            <DialogDescription
+              style={{
+                fontFamily: "var(--font-geist-sans), system-ui, sans-serif",
+                fontWeight: 600,
+                fontSize: "20px",
+                lineHeight: "120%",
+                letterSpacing: "-0.5%",
+                color: "black",
+                marginTop: "8px",
+              }}
+            >
               Para finalizar seu cadastro, confira as informações com atenção
             </DialogDescription>
           </DialogHeader>
-          
+
           {/* Conteúdo do Modal */}
           <div className="space-y-8 py-4">
             {/* Informações Pessoais */}
             <div>
-              <h3 className="text-black mb-4" style={{
-                fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
-                fontWeight: 600,
-                fontSize: '24px',
-                lineHeight: '100%',
-                letterSpacing: '-0.5%',
-              }}>
+              <h3
+                className="text-black mb-4"
+                style={{
+                  fontFamily: "var(--font-geist-sans), system-ui, sans-serif",
+                  fontWeight: 600,
+                  fontSize: "24px",
+                  lineHeight: "100%",
+                  letterSpacing: "-0.5%",
+                }}
+              >
                 Informações pessoais
               </h3>
               <div className="space-y-3 text-sm">
                 <div>
                   <span className="font-medium text-gray-700">CPF:</span>
-                  <span className="ml-2 text-gray-900">{form.getValues('cpf')}</span>
+                  <span className="ml-2 text-gray-900">
+                    {form.getValues("cpf")}
+                  </span>
                 </div>
                 <div>
                   <span className="font-medium text-gray-700">Identidade:</span>
-                  <span className="ml-2 text-gray-900">{form.getValues('documentoIdentidade')}</span>
+                  <span className="ml-2 text-gray-900">
+                    {form.getValues("documentoIdentidade")}
+                  </span>
                 </div>
                 <div>
                   <span className="font-medium text-gray-700">Nome:</span>
-                  <span className="ml-2 text-gray-900">{form.getValues('nome')}</span>
+                  <span className="ml-2 text-gray-900">
+                    {form.getValues("nome")}
+                  </span>
                 </div>
                 <div>
                   <span className="font-medium text-gray-700">Sexo:</span>
-                  <span className="ml-2 text-gray-900">{form.getValues('sexo')}</span>
+                  <span className="ml-2 text-gray-900">
+                    {form.getValues("sexo")}
+                  </span>
                 </div>
                 <div>
-                  <span className="font-medium text-gray-700">Data de Nascimento:</span>
-                  <span className="ml-2 text-gray-900">{form.getValues('dataNascimento')}</span>
+                  <span className="font-medium text-gray-700">
+                    Data de Nascimento:
+                  </span>
+                  <span className="ml-2 text-gray-900">
+                    {form.getValues("dataNascimento")}
+                  </span>
                 </div>
                 <div>
-                  <span className="font-medium text-gray-700">Escolaridade:</span>
-                  <span className="ml-2 text-gray-900">{form.getValues('escolaridade')}</span>
+                  <span className="font-medium text-gray-700">
+                    Escolaridade:
+                  </span>
+                  <span className="ml-2 text-gray-900">
+                    {form.getValues("escolaridade")}
+                  </span>
                 </div>
                 <div>
-                  <span className="font-medium text-gray-700">Nome da Mãe:</span>
-                  <span className="ml-2 text-gray-900">{form.getValues('nomeMae')}</span>
+                  <span className="font-medium text-gray-700">
+                    Nome da Mãe:
+                  </span>
+                  <span className="ml-2 text-gray-900">
+                    {form.getValues("nomeMae")}
+                  </span>
                 </div>
                 <div>
-                  <span className="font-medium text-gray-700">Nome do Pai:</span>
-                  <span className="ml-2 text-gray-900">{form.getValues('nomePai')}</span>
+                  <span className="font-medium text-gray-700">
+                    Nome do Pai:
+                  </span>
+                  <span className="ml-2 text-gray-900">
+                    {form.getValues("nomePai")}
+                  </span>
                 </div>
               </div>
             </div>
 
             {/* Endereço e Contato */}
             <div>
-              <h3 className="text-black mb-4" style={{
-                fontFamily: 'var(--font-geist-sans), system-ui, sans-serif',
-                fontWeight: 600,
-                fontSize: '24px',
-                lineHeight: '100%',
-                letterSpacing: '-0.5%',
-              }}>
+              <h3
+                className="text-black mb-4"
+                style={{
+                  fontFamily: "var(--font-geist-sans), system-ui, sans-serif",
+                  fontWeight: 600,
+                  fontSize: "24px",
+                  lineHeight: "100%",
+                  letterSpacing: "-0.5%",
+                }}
+              >
                 Endereço e contato
               </h3>
               <div className="space-y-3 text-sm">
                 <div>
                   <span className="font-medium text-gray-700">CEP:</span>
-                  <span className="ml-2 text-gray-900">{form.getValues('cep')}</span>
+                  <span className="ml-2 text-gray-900">
+                    {form.getValues("cep")}
+                  </span>
                 </div>
                 <div>
                   <span className="font-medium text-gray-700">Bairro:</span>
-                  <span className="ml-2 text-gray-900">{form.getValues('bairro')}</span>
+                  <span className="ml-2 text-gray-900">
+                    {form.getValues("bairro")}
+                  </span>
                 </div>
                 <div>
                   <span className="font-medium text-gray-700">Logradouro:</span>
-                  <span className="ml-2 text-gray-900">{form.getValues('logradouro')}</span>
+                  <span className="ml-2 text-gray-900">
+                    {form.getValues("logradouro")}
+                  </span>
                 </div>
                 <div>
-                  <span className="font-medium text-gray-700">Complemento:</span>
-                  <span className="ml-2 text-gray-900">{form.getValues('complemento') || 'Não informado'}</span>
+                  <span className="font-medium text-gray-700">
+                    Complemento:
+                  </span>
+                  <span className="ml-2 text-gray-900">
+                    {form.getValues("complemento") || "Não informado"}
+                  </span>
                 </div>
                 <div>
                   <span className="font-medium text-gray-700">Número:</span>
-                  <span className="ml-2 text-gray-900">{form.getValues('numero')}</span>
+                  <span className="ml-2 text-gray-900">
+                    {form.getValues("numero")}
+                  </span>
                 </div>
                 <div>
                   <span className="font-medium text-gray-700">Email:</span>
-                  <span className="ml-2 text-gray-900">{form.getValues('email')}</span>
+                  <span className="ml-2 text-gray-900">
+                    {form.getValues("email")}
+                  </span>
                 </div>
                 <div>
                   <span className="font-medium text-gray-700">Celular:</span>
-                  <span className="ml-2 text-gray-900">({form.getValues('dddCelular')}) {form.getValues('celular')}</span>
+                  <span className="ml-2 text-gray-900">
+                    ({form.getValues("dddCelular")}) {form.getValues("celular")}
+                  </span>
                 </div>
-                {form.getValues('telefone') && (
+                {form.getValues("telefone") && (
                   <div>
                     <span className="font-medium text-gray-700">Telefone:</span>
-                    <span className="ml-2 text-gray-900">({form.getValues('dddTelefone')}) {form.getValues('telefone')}</span>
+                    <span className="ml-2 text-gray-900">
+                      ({form.getValues("dddTelefone")}){" "}
+                      {form.getValues("telefone")}
+                    </span>
                   </div>
                 )}
               </div>
@@ -1265,7 +1573,10 @@ export default function RegisterComponent() {
               <div className="flex items-center text-blue-700">
                 <span className="mr-2">ⓘ</span>
                 <span className="text-sm">
-                  Os dados só poderão ser alterados durante períodos de inscrição e novos dados não servem para inscrições anteriores. Deseja confirmar suas informações, declarando-as como verdadeiras?
+                  Os dados só poderão ser alterados durante períodos de
+                  inscrição e novos dados não servem para inscrições anteriores.
+                  Deseja confirmar suas informações, declarando-as como
+                  verdadeiras?
                 </span>
               </div>
             </div>
@@ -1276,7 +1587,7 @@ export default function RegisterComponent() {
               variant="outline"
               onClick={() => setShowModal(false)}
               className="bg-white text-gray-700 hover:bg-gray-50"
-              style={{ borderColor: '#172554' }}
+              style={{ borderColor: "#172554" }}
             >
               Voltar
             </Button>
@@ -1287,7 +1598,7 @@ export default function RegisterComponent() {
                 onSubmit(formData);
               }}
               className="text-white hover:opacity-90"
-              style={{ backgroundColor: '#172554' }}
+              style={{ backgroundColor: "#172554" }}
               disabled={isSubmitting}
             >
               {isSubmitting ? (
@@ -1296,8 +1607,45 @@ export default function RegisterComponent() {
                   Finalizando...
                 </>
               ) : (
-                'Finalizar'
+                "Finalizar"
               )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal de aviso para recarregamento da página */}
+      <Dialog open={showReloadWarning} onOpenChange={setShowReloadWarning}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="text-amber-600 font-semibold">
+              Aviso de Recarregamento
+            </DialogTitle>
+            <DialogDescription className="text-gray-700">
+              Você está prestes a recarregar a página. Todo o progresso do
+              formulário será perdido.
+              <br />
+              <br />
+              Deseja continuar? Você será redirecionado para a página inicial de
+              cadastro.
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
+            <Button
+              variant="outline"
+              onClick={handleCancelReload}
+              className="bg-white text-gray-700 hover:bg-gray-50"
+              style={{ borderColor: "#172554" }}
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleConfirmReload}
+              className="text-white hover:opacity-90"
+              style={{ backgroundColor: "#dc2626" }}
+            >
+              Continuar e Perder Progresso
             </Button>
           </DialogFooter>
         </DialogContent>
