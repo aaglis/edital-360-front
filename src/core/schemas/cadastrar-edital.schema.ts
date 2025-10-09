@@ -71,6 +71,16 @@ export const cadastrarEditalSchema = z.object({
     .optional()
     .or(z.literal(undefined)),
   
+  exemption: z.object({
+    temIsencao: z.boolean().default(true),
+    periodos: z.array(z.object({
+      dataInicio: z.date(),
+      dataFim: z.date(),
+      descricao: z.string().min(1, "Descrição é obrigatória").max(200, "Descrição deve ter no máximo 200 caracteres"),
+      criterios: z.string().min(1, "Critérios são obrigatórios").max(500, "Critérios devem ter no máximo 500 caracteres")
+    })).min(1, "É obrigatório adicionar pelo menos um período de isenção")
+  }),
+  
   documentosExigidos: z.array(z.string().min(2, "Nome do documento deve ter pelo menos 2 caracteres"))
     .min(1, "Selecione pelo menos um documento exigido"),
   
@@ -98,6 +108,17 @@ export const cadastrarEditalSchema = z.object({
   {
     message: "Idade máxima deve ser maior ou igual à idade mínima",
     path: ["idadeMaxima"]
+  }
+).refine(
+  (data) => {
+    if (data.exemption?.temIsencao && data.exemption?.periodos) {
+      return data.exemption.periodos.every(periodo => periodo.dataFim > periodo.dataInicio);
+    }
+    return true;
+  },
+  {
+    message: "Data de fim da isenção deve ser posterior à data de início",
+    path: ["exemption", "periodos"]
   }
 ).refine(
   (data) => {

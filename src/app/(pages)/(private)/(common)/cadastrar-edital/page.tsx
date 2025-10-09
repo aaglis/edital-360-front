@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cadastrarEditalSchema, CadastrarEditalSchema } from "@/core/schemas/cadastrar-edital.schema";
 import { cadastrarEditalService } from "@/core/services/editalService";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -91,6 +92,7 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
 export default function CadastrarEditalPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isExemptionModalOpen, setIsExemptionModalOpen] = useState(false);
 
   const handleDateChange = (dateString: string, onChange: (date: Date | undefined) => void) => {
     if (!dateString) {
@@ -118,6 +120,10 @@ export default function CadastrarEditalPage() {
       tipoProva: [],
       cargos: [{ nomeCargo: "", numeroVagas: 1 }],
       taxaInscricao: undefined,
+      exemption: {
+        temIsencao: true,
+        periodos: []
+      },
       documentosExigidos: [""],
       cronograma: [{ data: new Date(), evento: "Início das inscrições", observacoes: "" }],
       cotas: {
@@ -137,6 +143,11 @@ export default function CadastrarEditalPage() {
   const { fields: cronogramaFields, append: appendCronograma, remove: removeCronograma } = useFieldArray({
     control: form.control,
     name: "cronograma"
+  });
+
+  const { fields: exemptionFields, append: appendExemption, remove: removeExemption } = useFieldArray({
+    control: form.control,
+    name: "exemption.periodos"
   });
 
  
@@ -213,7 +224,7 @@ export default function CadastrarEditalPage() {
     if (currentStep === 1) {
       fieldsToValidate = ["titulo", "descricao", "dataInicioInscricoes", "dataFimInscricoes", "dataProva"];
     } else if (currentStep === 2) {
-      fieldsToValidate = ["tipoProva", "cargos", "taxaInscricao", "escolaridadeMinima", "documentosExigidos", "cotas"];
+      fieldsToValidate = ["tipoProva", "cargos", "taxaInscricao", "escolaridadeMinima", "documentosExigidos", "cotas", "exemption"];
       
       const values = form.getValues();
       if (values.cotas?.pcd === undefined) {
@@ -571,6 +582,62 @@ export default function CadastrarEditalPage() {
                         </FormItem>
                       )}
                     />
+
+                    {/* Campo de Isenção */}
+                    <div className="col-span-2">
+                      <FormLabel>Período de Isenção *</FormLabel>
+                      <div className="flex items-center gap-4 mt-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setIsExemptionModalOpen(true)}
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Configurar Períodos de Isenção
+                        </Button>
+                      </div>
+                      
+                      {exemptionFields.length > 0 && (
+                        <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                          <h4 className="text-sm font-medium text-blue-900 mb-2">
+                            Períodos de Isenção Configurados:
+                          </h4>
+                          <div className="space-y-2">
+                            {exemptionFields.map((field, index) => {
+                              const periodo = form.watch(`exemption.periodos.${index}`);
+                              return (
+                                <div key={field.id} className="text-sm text-blue-800">
+                                  <strong>Período {index + 1}:</strong> {periodo?.descricao || "Não informado"} 
+                                  {periodo?.dataInicio && periodo?.dataFim && (
+                                    <span className="text-blue-600 ml-2">
+                                      ({periodo.dataInicio.toLocaleDateString()} a {periodo.dataFim.toLocaleDateString()})
+                                    </span>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {exemptionFields.length === 0 && (
+                        <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                          <p className="text-sm text-yellow-800">
+                            <strong>⚠️ Atenção:</strong> É obrigatório configurar pelo menos um período de isenção. Clique no botão acima para adicionar.
+                          </p>
+                        </div>
+                      )}
+                      
+                      <FormField
+                        control={form.control}
+                        name="exemption.periodos"
+                        render={() => (
+                          <FormItem className="mt-2">
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -982,8 +1049,149 @@ export default function CadastrarEditalPage() {
               </div>
             </div>
 
+            {/* Modal de Isenção */}
+            <Dialog open={isExemptionModalOpen} onOpenChange={setIsExemptionModalOpen}>
+              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Configurar Período de Isenção</DialogTitle>
+                </DialogHeader>
+                
+                <div className="space-y-6">
+                  {exemptionFields.length === 0 && (
+                    <div className="text-center p-8 border-2 border-dashed border-gray-300 rounded-lg">
+                      <p className="text-gray-600 mb-4">
+                        Nenhum período de isenção configurado ainda.
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        Clique no botão &quot;Adicionar Período&quot; abaixo para começar.
+                      </p>
+                    </div>
+                  )}
+
+                  {exemptionFields.map((field, index) => (
+                    <div key={field.id} className="border border-gray-300 rounded-lg p-4 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-medium">Período {index + 1}</h4>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => removeExemption(index)}
+                          disabled={exemptionFields.length === 1}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name={`exemption.periodos.${index}.dataInicio`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Data de Início *</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="date"
+                                  {...field}
+                                  value={field.value ? field.value.toISOString().split('T')[0] : ""}
+                                  onChange={(e) => handleDateChange(e.target.value, field.onChange)}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name={`exemption.periodos.${index}.dataFim`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Data de Fim *</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="date"
+                                  {...field}
+                                  value={field.value ? field.value.toISOString().split('T')[0] : ""}
+                                  onChange={(e) => handleDateChange(e.target.value, field.onChange)}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <FormField
+                        control={form.control}
+                        name={`exemption.periodos.${index}.descricao`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Descrição do Período *</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="Ex: Período de isenção para candidatos de baixa renda"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name={`exemption.periodos.${index}.criterios`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Critérios para Isenção *</FormLabel>
+                            <FormControl>
+                              <Textarea
+                                placeholder="Descreva os critérios necessários para solicitar a isenção..."
+                                rows={3}
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  ))}
+
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => appendExemption({
+                        dataInicio: new Date(),
+                        dataFim: new Date(),
+                        descricao: "",
+                        criterios: ""
+                      })}
+                      className="w-full sm:w-auto"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Adicionar Período
+                    </Button>
+                    
+                    <Button
+                      type="button"
+                      onClick={() => setIsExemptionModalOpen(false)}
+                      className="w-full sm:w-auto"
+                    >
+                      Salvar e Fechar
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+
           </form>
         </Form>
+
       </div>
     </div>
   );
