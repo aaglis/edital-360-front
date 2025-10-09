@@ -276,7 +276,7 @@ export default function RegisterComponent() {
 
       if (result.success) {
         toast({
-          title: "Cadastro realizado com sucesso! 🎉",
+          title: "Cadastro realizado com sucesso!",
           description: "Redirecionando para a página de login...",
           variant: "default",
           duration: 3000,
