@@ -1163,6 +1163,7 @@ export default function RegisterComponent() {
                           const fulfilled = requirements.filter(Boolean).length;
                           return `${(fulfilled / requirements.length) * 100}%`;
                         })(),
+                        opacity: (!senha || senha.length === 0) ? 0 : 1
                       }}
                     />
 
@@ -1186,6 +1187,7 @@ export default function RegisterComponent() {
                           const fulfilled = requirements.filter(Boolean).length;
                           return `${(fulfilled / requirements.length) * 100}%`;
                         })(),
+                        opacity: (!senha || senha.length === 0) ? 0 : 1
                       }}
                     />
 
@@ -1208,6 +1210,7 @@ export default function RegisterComponent() {
                           const fulfilled = requirements.filter(Boolean).length;
                           return `${(fulfilled / requirements.length) * 100}%`;
                         })(),
+                        opacity: (!senha || senha.length === 0) ? 0 : 1
                       }}
                     />
 
