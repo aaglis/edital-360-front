@@ -19,7 +19,7 @@ const SidebarComponent = ({ ...props }: React.ComponentProps<typeof Sidebar>) =>
     {
       groupTitle: "Conta",
       items: [
-        { title: "Meu Perfil", url: "/perfil", icon: User },
+        { title: "Meu Perfil", url: "/configuracoes/perfil", icon: User },
         { title: "Configurações", url: "/configuracoes", icon: Settings },
       ],
     },
@@ -42,8 +42,8 @@ const SidebarComponent = ({ ...props }: React.ComponentProps<typeof Sidebar>) =>
   ]
 
   return (
-    <Sidebar collapsible="none" {...props} className="bg-white h-screen pl-2">
-      <SidebarHeader className="pt-9">
+    <Sidebar collapsible="icon" {...props} className="bg-white border-r">
+      <SidebarHeader className="pt-8">
         <Logo />
       </SidebarHeader>
       <SidebarContent>
@@ -54,8 +54,8 @@ const SidebarComponent = ({ ...props }: React.ComponentProps<typeof Sidebar>) =>
               <SidebarMenu>
                 {group.items.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-1.5">
-                      <a href={item.url} className="flex items-center gap-2">
+                    <SidebarMenuButton asChild>
+                      <a href={item.url} className="flex items-center gap-3">
                         <item.icon className="w-4 h-4" />
                         <span>{item.title}</span>
                       </a>
