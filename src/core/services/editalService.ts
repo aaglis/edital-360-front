@@ -1,9 +1,9 @@
 import api from "./api";
 import { FetchPublicApi } from "./fetchPublicApi";
 import { CadastrarEditalSchema } from "../schemas/cadastrar-edital.schema";
-import { EditalRequest } from "../types/editais.interface";
+import { EditalResponse } from "../types/editais.interface";
 
-export interface CadastrarEditalRequest {
+export interface CadastrarEditalResponse {
   title: string;
   description: string;
   remuneration?: number;
@@ -77,10 +77,10 @@ const escolaridadeMap: Record<string, RequirementType> = {
   "doutorado": "DOUTORADO",
 };
 
-export const cadastrarEditalService = {
+export const EditalService = {
   async cadastrar(data: CadastrarEditalSchema): Promise<CadastrarEditalResponse> {
     try {
-      const payload: CadastrarEditalRequest = {
+      const payload: CadastrarEditalResponse = {
         title: data.titulo,
         description: data.descricao,
         remuneration: data.taxaInscricao || 0,
@@ -270,7 +270,21 @@ export const cadastrarEditalService = {
       };
     }
   },
-  async fetchAll() {
-    return FetchPublicApi<EditalRequest>('/editais/obter', 60);
+  async fetchAll(params?: {
+    statusNotice?: string;
+    search?: string;
+    page?: number;
+    size?: number;
+    sort?: string;
+  }) {
+    const queries = {
+      statusNotice: params?.statusNotice || "",
+      search: params?.search || "",
+      page: params?.page?.toString() || "0",
+      size: params?.size?.toString() || "10",
+      sort: params?.sort || "desc",
+    };
+  
+    return FetchPublicApi<EditalResponse>("/editais/obter", 60, queries);
   },
 };

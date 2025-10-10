@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { cadastrarEditalService } from '@/core/services/editalService';
+import { EditalService } from '@/core/services/editalService';
 import ExamCard from './components/ExamCard';
 import type { EditalData } from '@/core/types/editais.interface';
 
@@ -50,7 +50,7 @@ export default function Homepage() {
 
   const fetchEditais = async () => {
     try {
-      const response = await cadastrarEditalService.fetchAll();
+      const response = await EditalService.fetchAll();
       setEditais(response.content);
     } catch (error) {
       console.error('Error fetching editais:', error);

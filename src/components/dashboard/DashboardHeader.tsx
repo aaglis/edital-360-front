@@ -22,6 +22,7 @@ const routeTitles: Record<string, string> = {
   "/": "Início",
   "/configuracoes": "Configurações",
   "/configuracoes/perfil": "Meu Perfil",
+  "/configuracoes/gerenciar-editais": "Gerenciar editais",
   "/concursos/meus": "Meus Concursos",
   "/concursos/inscricoes": "Inscrições",
   "/concursos/calendario": "Calendário de Concursos",

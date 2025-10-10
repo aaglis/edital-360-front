@@ -42,6 +42,7 @@ const SidebarComponent = ({ ...props }: React.ComponentProps<typeof Sidebar>) =>
       groupTitle: "Concursos",
       items: [
         { title: "Meus Concursos", url: "/concursos/meus", icon: FileText },
+        { title: "Gerenciar editais", url: "/configuracoes/gerenciar-editais", icon: FileText},
         { title: "Inscrições", url: "/concursos/inscricoes", icon: CreditCard },
         { title: "Calendário", url: "/concursos/calendario", icon: CalendarCheck },
         { title: "Resultados", url: "/concursos/resultados", icon: BarChart2 },

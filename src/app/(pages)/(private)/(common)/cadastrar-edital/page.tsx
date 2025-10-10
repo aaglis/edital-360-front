@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cadastrarEditalSchema, CadastrarEditalSchema } from "@/core/schemas/cadastrar-edital.schema";
-import { cadastrarEditalService } from "@/core/services/editalService";
+import { EditalService } from "@/core/services/editalService";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray } from "react-hook-form";
 import { Plus, Trash2, CheckCircle } from "lucide-react";
@@ -188,7 +188,7 @@ export default function CadastrarEditalPage() {
     try {
       toast.loading("Cadastrando edital...", { id: "cadastrar-edital" });
       
-      const result = await cadastrarEditalService.cadastrar(data);
+      const result = await EditalService.cadastrar(data);
       
       if (result.success) {
         toast.success(result.message, { 

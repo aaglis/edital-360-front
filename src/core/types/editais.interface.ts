@@ -1,4 +1,4 @@
-export interface EditalRequest {
+export interface EditalResponse {
   content: EditalData[];
   totalElements: number;
   totalPages: number;
@@ -62,4 +62,6 @@ export interface EditalData {
     date: string;
   }[];
   vacancies: number;
+  createdAt?: string;
+  statusNotice: string;
 }
