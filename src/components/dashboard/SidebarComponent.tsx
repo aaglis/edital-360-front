@@ -35,26 +35,20 @@ const SidebarComponent = ({ ...props }: React.ComponentProps<typeof Sidebar>) =>
       groupTitle: "Conta",
       items: [
         { title: "Meu Perfil", url: "/configuracoes/perfil", icon: User },
-        { title: "Configurações", url: "/configuracoes/configurar", icon: Settings },
       ],
     },
     {
       groupTitle: "Concursos",
       items: [
-        { title: "Meus Concursos", url: "/concursos/meus", icon: FileText },
         { title: "Gerenciar editais", url: "/configuracoes/gerenciar-editais", icon: FileText},
-        { title: "Inscrições", url: "/concursos/inscricoes", icon: CreditCard },
-        { title: "Calendário", url: "/concursos/calendario", icon: CalendarCheck },
-        { title: "Resultados", url: "/concursos/resultados", icon: BarChart2 },
-        { title: "Cadastrar um concurso", url: "/cadastrar-edital", icon: FileText },
       ],
     },
-    {
-      groupTitle: "Notificações",
-      items: [
-        { title: "Avisos", url: "/notificacoes", icon: Bell },
-      ],
-    },
+    // {
+    //   groupTitle: "Notificações",
+    //   items: [
+    //     { title: "Avisos", url: "/notificacoes", icon: Bell },
+    //   ],
+    // },
   ];
 
   return (

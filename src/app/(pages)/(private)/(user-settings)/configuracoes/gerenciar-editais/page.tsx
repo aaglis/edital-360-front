@@ -52,7 +52,7 @@ export default function GerenciarEditais() {
     setLoading(true);
     try {
       const response = await EditalService.fetchAll({
-        statusNotice: statusFilter || undefined,
+        statusNotice: statusFilter === 'All' ? undefined : statusFilter,
         search: searchTerm || undefined,
         page: currentPage - 1,
         size: pageSize,
@@ -227,10 +227,17 @@ export default function GerenciarEditais() {
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="ALL">Todos</SelectItem>
-                    <SelectItem value="ABERTO">Aberto</SelectItem>
-                    <SelectItem value="FECHADO">Fechado</SelectItem>
-                    <SelectItem value="EM_ANDAMENTO">Em Andamento</SelectItem>
+                    <SelectItem value="All">Todos</SelectItem>
+                    <SelectItem value="PUBLICADO">Publicado</SelectItem>
+                    <SelectItem value="EM_ANALISE">Em análise</SelectItem>
+                    <SelectItem value="EM_ANDAMENTO">Em andamento</SelectItem>
+                    <SelectItem value="INSCRICOES_ABERTAS">Inscrições abertas</SelectItem>
+                    <SelectItem value="INSCRICOES_ENCERRADAS">Inscrições encerradas</SelectItem>
+                    <SelectItem value="PEDIDO_ISENCAO">Pedido de isenção</SelectItem>
+                    <SelectItem value="RESULTADO_PRELIMINAR">Resultado preliminar</SelectItem>
+                    <SelectItem value="RESULTADO_FINAL">Resultado final</SelectItem>
+                    <SelectItem value="CANCELADO">Cancelado</SelectItem>
+                    <SelectItem value="ENCERRADO">Encerrado</SelectItem>
                   </SelectContent>
                 </Select>
 
@@ -283,27 +290,29 @@ export default function GerenciarEditais() {
                   <table className="w-full">
                     <thead className="bg-muted/50">
                       <tr className="border-b">
-                        <th className="text-left p-4 font-medium text-sm w-[100px]">ID</th>
-                        <th className="text-left p-4 font-medium text-sm">Nome do Edital</th>
-                        <th className="text-left p-4 font-medium text-sm w-[140px]">Data de Criação</th>
-                        <th className="text-center p-4 font-medium text-sm w-[140px]">Status</th>
+                        <th className="text-left p-4 font-medium text-sm">Nome</th>
+                        <th className="text-left p-4 font-medium text-sm w-[200px]">Data de Criação</th>
+                        <th className="text-left p-4 font-medium text-sm w-[200px]">Data de Encerramento</th>
+                        <th className="text-center p-4 font-medium text-sm w-[200px]">Status</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredRows.map((r) => (
-                        <tr key={r.id} className="border-b hover:bg-muted/50 transition-colors">
-                          <td className="p-4 font-medium">#{r.id}</td>
-                          <td className="p-4 max-w-[400px]">{r.title}</td>
+                        {filteredRows.map((edital) => (
+                        <tr key={edital.id} className="border-b hover:bg-muted/50 transition-colors">
+                          <td className="p-4 max-w-[400px] truncate">{edital.title}</td>
                           <td className="p-4 text-muted-foreground">
-                            {r.createdAt ? new Date(r.createdAt).toLocaleDateString('pt-BR') : '-'}
+                            {edital.createdAt ? new Date(edital.createdAt).toLocaleDateString('pt-BR') : '-'}
+                          </td>
+                          <td className="p-4 text-muted-foreground">
+                            {edital.endDate ? new Date(edital.endDate).toLocaleDateString('pt-BR') : '-'}
                           </td>
                           <td className="p-4 text-center">
                           <span
                             className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              STATUS_COLORS[r.statusNotice as keyof typeof STATUS_COLORS] || STATUS_COLORS.INSCRITO
+                              STATUS_COLORS[edital.statusNotice as keyof typeof STATUS_COLORS] || STATUS_COLORS.INSCRITO
                             }`}
                           >
-                            {r.statusNotice || 'N/A'}
+                            {edital.statusNotice || 'N/A'}
                           </span>
                           </td>
                         </tr>
