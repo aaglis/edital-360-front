@@ -16,12 +16,7 @@ import {
 import Logo from "../Logo";
 import {
   User,
-  Settings,
   FileText,
-  CalendarCheck,
-  Bell,
-  BarChart2,
-  CreditCard,
 } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import clsx from "clsx";

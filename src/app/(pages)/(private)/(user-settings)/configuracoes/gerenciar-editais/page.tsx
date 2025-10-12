@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -48,7 +48,7 @@ export default function GerenciarEditais() {
   const [totalItems, setTotalItems] = useState(0);
   const [sortOrder, setSortOrder] = useState("desc");
 
-  const fetchEditais = async () => {
+  const fetchEditais = useCallback(async () => {
     setLoading(true);
     try {
       const response = await EditalService.fetchAll({
@@ -74,16 +74,16 @@ export default function GerenciarEditais() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [statusFilter, searchTerm, currentPage, pageSize, sortOrder])
   
 
   useEffect(() => {
     const delay = setTimeout(() => {
       fetchEditais();
-    }, 500); // espera 500ms após o último caractere
+    }, 500);
   
     return () => clearTimeout(delay);
-  }, [statusFilter, currentPage, pageSize, sortOrder, searchTerm]);
+  }, [fetchEditais]);
 
   const filteredRows = rows.filter(row =>
     row.title?.toLowerCase().includes(searchTerm.toLowerCase())
