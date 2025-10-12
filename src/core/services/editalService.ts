@@ -1,54 +1,7 @@
 import api from "./api";
 import { FetchPublicApi } from "./fetchPublicApi";
 import { CadastrarEditalSchema } from "../schemas/cadastrar-edital.schema";
-import { EditalRequest } from "../types/editais.interface";
-
-export interface CadastrarEditalRequest {
-  title: string;
-  description: string;
-  remuneration?: number;
-  initialDate: string; 
-  endDate: string; 
-  examDate: string; 
-  phases: Array<{
-    order: number;
-    exam: "OBJETIVA" | "DISCURSIVA" | "TESTE_FISICO" | "TESTE_PSICOLOGICO" | "PERICIAS" | "ENTREVISTAS";
-  }>;
-  roles: Array<{
-    role: string;
-    vacancies: number;
-  }>;
-  requirements: {
-    requirementType: "FUNDAMENTAL_INCOMPLETO" | "FUNDAMENTAL_COMPLETO" | "MEDIO_INCOMPLETO" | "MEDIO_COMPLETO" | "SUPERIOR_INCOMPLETO" | "SUPERIOR_COMPLETO" | "POS_GRADUACAO" | "MESTRADO" | "DOUTORADO";
-    minimumAge?: number;
-    maximumAge?: number;
-  };
-  documents: string[];
-  quotas?: {
-    vagasPcd: number;
-    vagasNegros: number;
-    vagasIndigenas: number;
-    outrasCotas?: string;
-  };
-  subscription: number;
-  pdf: File; 
-  schedule?: Array<{
-    description: string;
-    date: string; 
-  }>;
-  exemption?: {
-    exemptionStartDate: string;
-    exemptionEndDate: string;
-    eligibleCategories: string[];
-    documentationDescription: string;
-  };
-}
-
-export interface CadastrarEditalResponse {
-  success: boolean;
-  message: string;
-  data?: Record<string, unknown>;
-}
+import { EditalResponse, type CadastrarEditalRequest, type CadastrarEditalResponse } from "../types/editais.interface";
 
 
 type ExamType = "OBJETIVA" | "DISCURSIVA" | "TESTE_FISICO" | "TESTE_PSICOLOGICO" | "PERICIAS" | "ENTREVISTAS";
@@ -77,7 +30,7 @@ const escolaridadeMap: Record<string, RequirementType> = {
   "doutorado": "DOUTORADO",
 };
 
-export const cadastrarEditalService = {
+export const EditalService = {
   async cadastrar(data: CadastrarEditalSchema): Promise<CadastrarEditalResponse> {
     try {
       const payload: CadastrarEditalRequest = {
@@ -270,7 +223,21 @@ export const cadastrarEditalService = {
       };
     }
   },
-  async fetchAll() {
-    return FetchPublicApi<EditalRequest>('/editais/obter', 60);
+  async fetchAll(params?: {
+    statusNotice?: string;
+    search?: string;
+    page?: number;
+    size?: number;
+    sort?: string;
+  }) {
+    const queries = {
+      statusNotice: params?.statusNotice || "",
+      search: params?.search || "",
+      page: params?.page?.toString() || "0",
+      size: params?.size?.toString() || "10",
+      sort: params?.sort || "desc",
+    };
+  
+    return FetchPublicApi<EditalResponse>("/editais/obter", 60, queries);
   },
 };
