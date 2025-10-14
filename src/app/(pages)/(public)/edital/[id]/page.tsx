@@ -1,19 +1,20 @@
 'use client';
 
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { editalDetalhesService, EditalDetalhes } from '@/core/services/editalDetalhesService';
-import { pedidoIsencaoService } from '@/core/services/pedidoIsencaoService';
+import { pedidoIsencaoService, PedidoIsencaoStatus } from '@/core/services/pedidoIsencaoService';
 
 export default function EditalDetalhesPage() {
   const params = useParams();
+  const router = useRouter();
   const id = params?.id as string;
   const [edital, setEdital] = useState<EditalDetalhes | null>(null);
   const [loading, setLoading] = useState(true);
@@ -23,11 +24,84 @@ export default function EditalDetalhesPage() {
   const [isIsencaoDialogOpen, setIsIsencaoDialogOpen] = useState(false);
   const [arquivosIsencao, setArquivosIsencao] = useState<File[]>([]);
   const [isSubmittingIsencao, setIsSubmittingIsencao] = useState(false);
+  const [pedidoExistente, setPedidoExistente] = useState<PedidoIsencaoStatus | null>(null);
+
+  // Função para verificar se o usuário está autenticado
+  const isAuthenticated = () => {
+    if (typeof window !== 'undefined') {
+      const token = sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token');
+      return !!token;
+    }
+    return false;
+  };
+
+  // Função para redirecionar para login com returnUrl
+  const redirectToLogin = () => {
+    const currentUrl = window.location.pathname;
+    router.push(`/login?returnUrl=${encodeURIComponent(currentUrl)}`);
+  };
+
+  // Função para lidar com o clique no botão de isenção
+  const handleIsencaoClick = async () => {
+    if (!isAuthenticated()) {
+      toast.info('Você precisa fazer login para solicitar isenção');
+      redirectToLogin();
+      return;
+    }
+
+    // Verificar se já existe um pedido
+    try {
+      const response = await pedidoIsencaoService.verificarPedidoExistente(id);
+      
+      if (response.success && response.data) {
+        const status = response.data.status;
+        const statusText = {
+          'PENDENTE': 'em análise',
+          'APROVADO': 'aprovado',
+          'REJEITADO': 'rejeitado'
+        }[status] || status;
+        
+        setPedidoExistente(response.data);
+        toast.info(`Você já possui um pedido de isenção ${statusText} para este edital.`);
+        return;
+      }
+    } catch {
+      console.log('Nenhum pedido existente encontrado, pode continuar');
+    }
+    
+    setIsIsencaoDialogOpen(true);
+  };
 
   // Função para lidar com a seleção de arquivos
   const handleArquivosChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
+    
+    // Validar tamanho total (máximo 50MB)
+    const tamanhoTotal = files.reduce((total, file) => total + file.size, 0);
+    const maxSize = 50 * 1024 * 1024; // 50MB
+    
+    if (tamanhoTotal > maxSize) {
+      toast.error('Tamanho total dos arquivos não pode exceder 50MB');
+      return;
+    }
+    
+    // Validar quantidade (máximo 10 arquivos)
+    if (files.length > 10) {
+      toast.error('Máximo de 10 arquivos permitido');
+      return;
+    }
+    
     setArquivosIsencao(files);
+    
+    if (files.length > 0) {
+      console.log(`📎 ${files.length} arquivo(s) selecionado(s):`, files.map(f => f.name));
+      toast.success(`${files.length} arquivo(s) selecionado(s)`);
+    }
+  };
+
+  // Função para remover um arquivo específico
+  const removeArquivo = (index: number) => {
+    setArquivosIsencao(prev => prev.filter((_, i) => i !== index));
   };
 
   // Função para enviar pedido de isenção
@@ -40,12 +114,24 @@ export default function EditalDetalhesPage() {
     try {
       setIsSubmittingIsencao(true);
       
+      toast.info(`Enviando ${arquivosIsencao.length} arquivo(s)...`);
+      
       const response = await pedidoIsencaoService.solicitar(id, arquivosIsencao);
 
       if (response.success) {
-        toast.success(response.message || 'Pedido de isenção enviado com sucesso!');
+        toast.success(response.message || `Pedido de isenção enviado com sucesso! ${arquivosIsencao.length} arquivo(s) anexado(s).`);
         setIsIsencaoDialogOpen(false);
         setArquivosIsencao([]);
+        
+        // Recarregar o status do pedido
+        try {
+          const pedidoResponse = await pedidoIsencaoService.verificarPedidoExistente(id);
+          if (pedidoResponse.success && pedidoResponse.data) {
+            setPedidoExistente(pedidoResponse.data);
+          }
+        } catch {
+          // Não há problema se não conseguir buscar o status
+        }
       } else {
         toast.error(response.message || 'Erro ao enviar pedido de isenção');
       }
@@ -67,6 +153,18 @@ export default function EditalDetalhesPage() {
         
         if (response.success && response.data) {
           setEdital(response.data);
+          
+          // Se o usuário estiver logado, verificar se já tem pedido de isenção
+          if (isAuthenticated()) {
+            try {
+              const pedidoResponse = await pedidoIsencaoService.verificarPedidoExistente(id);
+              if (pedidoResponse.success && pedidoResponse.data) {
+                setPedidoExistente(pedidoResponse.data);
+              }
+            } catch {
+              // Usuário não tem pedido existente, isso é normal
+            }
+          }
         } else {
           setError(response.message || 'Erro ao carregar detalhes do edital');
         }
@@ -347,12 +445,20 @@ export default function EditalDetalhesPage() {
                 📝 Fazer Inscrição
               </Button>
               
+              <Button 
+                variant={pedidoExistente ? "outline" : "secondary"}
+                size="lg" 
+                className="px-8"
+                onClick={handleIsencaoClick}
+                disabled={!!pedidoExistente}
+              >
+                {pedidoExistente 
+                  ? `✅ Isenção ${pedidoExistente.status === 'PENDENTE' ? 'em Análise' : pedidoExistente.status === 'APROVADO' ? 'Aprovada' : 'Rejeitada'}`
+                  : '💰 Solicitar Isenção'
+                }
+              </Button>
+              
               <Dialog open={isIsencaoDialogOpen} onOpenChange={setIsIsencaoDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="secondary" size="lg" className="px-8">
-                    💰 Solicitar Isenção
-                  </Button>
-                </DialogTrigger>
                 <DialogContent className="sm:max-w-md">
                   <DialogHeader>
                     <DialogTitle>Solicitar Isenção de Taxa</DialogTitle>
@@ -369,20 +475,37 @@ export default function EditalDetalhesPage() {
                         className="mt-2"
                       />
                       <p className="text-xs text-gray-600 mt-1">
-                        Selecione os documentos que comprovem a necessidade de isenção
+                        Selecione <strong>múltiplos documentos</strong> (PDF, DOC, JPG, PNG) que comprovem a necessidade de isenção
                       </p>
                     </div>
                     
                     {arquivosIsencao.length > 0 && (
                       <div>
-                        <Label>Arquivos selecionados:</Label>
-                        <ul className="text-sm text-gray-600 mt-1">
+                        <Label>📎 {arquivosIsencao.length} arquivo(s) selecionado(s):</Label>
+                        <div className="space-y-2 mt-2 max-h-32 overflow-y-auto">
                           {arquivosIsencao.map((arquivo, index) => (
-                            <li key={index} className="flex items-center gap-2">
-                              📎 {arquivo.name}
-                            </li>
+                            <div key={index} className="flex items-center justify-between gap-2 p-2 bg-gray-50 rounded-md">
+                              <div className="flex items-center gap-2 flex-1 min-w-0">
+                                <span className="text-blue-600">📎</span>
+                                <span className="text-sm truncate" title={arquivo.name}>
+                                  {arquivo.name}
+                                </span>
+                                <span className="text-xs text-gray-500">
+                                  ({(arquivo.size / 1024).toFixed(1)} KB)
+                                </span>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeArquivo(index)}
+                                className="h-6 w-6 p-0 hover:bg-red-100"
+                                title="Remover arquivo"
+                              >
+                                ❌
+                              </Button>
+                            </div>
                           ))}
-                        </ul>
+                        </div>
                       </div>
                     )}
                     
@@ -398,7 +521,10 @@ export default function EditalDetalhesPage() {
                         onClick={handleSubmitIsencao}
                         disabled={isSubmittingIsencao || arquivosIsencao.length === 0}
                       >
-                        {isSubmittingIsencao ? 'Enviando...' : 'Enviar Solicitação'}
+                        {isSubmittingIsencao 
+                          ? 'Enviando...' 
+                          : `Enviar ${arquivosIsencao.length} Arquivo(s)`
+                        }
                       </Button>
                     </div>
                   </div>

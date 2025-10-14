@@ -20,7 +20,7 @@ import {
 import { userService } from "@/core/services/userService";
 import ReCAPTCHA  from "react-google-recaptcha";
 import { toast } from "sonner"
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Card,
   CardHeader,
@@ -33,10 +33,14 @@ import Cookies from "js-cookie";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const recaptchaRef = useRef<ReCAPTCHA>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { login } = userService;
+  
+  // Capturar returnUrl dos parâmetros da URL
+  const returnUrl = searchParams.get('returnUrl') || '/configuracoes';
 
   const form = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
@@ -57,7 +61,7 @@ export default function LoginPage() {
 
         setIsLoading(false);
         recaptchaRef.current?.reset();
-        router.push("/configuracoes");
+        router.push(returnUrl);
       })
       .catch((error) => {
         toast.error("Erro ao realizar login: ", {
