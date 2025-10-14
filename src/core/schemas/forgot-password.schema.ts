@@ -34,7 +34,6 @@ export const recoverPasswordSchema = z.object({
   cpf: z.string().min(11, "Informe um CPF válido").refine((cpf) => validarCPF(cpf), {
     message: "CPF inválido",
   }),
-  channel: z.enum(["EMAIL", "SMS"], { error: "Selecione um canal" }),
   recaptchaToken: z.string().min(1, "Confirme o reCAPTCHA"),
 });
 
