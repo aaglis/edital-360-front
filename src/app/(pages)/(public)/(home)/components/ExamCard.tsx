@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 type ExamCardProps = {
   id: string;
@@ -11,6 +12,13 @@ type ExamCardProps = {
 
 // eslint-disable-next-line
 const ExamCard = ({ id, title, remuneration, vacancies,period, isOpenForApplications = false}: ExamCardProps) => {
+  const router = useRouter();
+
+  const handleVerEdital = () => {
+    router.push(`/edital/${id}`);
+    console.log(`Navegando para o edital com ID: ${id}`);
+  };
+
   return (
     <div className={`border border-zinc-200 bg-white rounded-lg w-96 flex flex-col shadow-md`}>
       <div className="p-6 pb-0 flex flex-col gap-4">
@@ -43,7 +51,10 @@ const ExamCard = ({ id, title, remuneration, vacancies,period, isOpenForApplicat
           </div>
         </div>
       </div>
-      <Button className={`flex h-10 bg-zinc-100 text-primary hover:bg-primary hover:text-white ${isOpenForApplications ? 'bg-secondary hover:bg-secondary-light text-white' : ''} rounded-t-none`}>
+      <Button 
+        onClick={handleVerEdital}
+        className={`flex h-10 bg-zinc-100 text-primary hover:bg-primary hover:text-white ${isOpenForApplications ? 'bg-secondary hover:bg-secondary-light text-white' : ''} rounded-t-none`}
+      >
         Ver Edital
       </Button>
     </div>
