@@ -3,7 +3,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -26,6 +25,7 @@ import { Search, Plus, Filter } from "lucide-react";
 import Link from "next/link";
 import { EditalService } from "@/core/services/editalService";
 import type { EditalData } from "@/core/types/editais.interface";
+import Exemptions from "./components/Exemptions";
 
 const STATUS_COLORS: Record<string, string> = {
   INSCRITO: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
@@ -47,6 +47,8 @@ export default function GerenciarEditais() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [sortOrder, setSortOrder] = useState("desc");
+  const [selectedEdital, setSelectedEdital] = useState<EditalData | null>(null);
+  const [showIsencoes, setShowIsencoes] = useState(false);
 
   const fetchEditais = useCallback(async () => {
     setLoading(true);
@@ -187,6 +189,45 @@ export default function GerenciarEditais() {
     return items;
   };
 
+  const handleVerIsencoes = (edital: EditalData) => {
+    setSelectedEdital(edital);
+    setShowIsencoes(true);
+  };
+
+  const handleVoltarListagem = () => {
+    setShowIsencoes(false);
+    setSelectedEdital(null);
+  };
+
+  const handleValidarIsencao = (isencaoId: string) => {
+    // Implementar lógica de validação
+    console.log('Validar isenção:', isencaoId);
+  };
+
+  // Renderização condicional para tela de isenções
+  if (showIsencoes && selectedEdital) {
+    return (
+      <div className="space-y-6 p-6">
+        <div>
+          <Button 
+            variant="ghost" 
+            onClick={handleVoltarListagem}
+            className="mb-4"
+          >
+            ← Voltar para lista de editais
+          </Button>
+          <h1 className="text-3xl font-bold tracking-tight">Gerenciar Isenções</h1>
+          <p className="text-muted-foreground mt-2">
+            Edital: {selectedEdital.title}
+          </p>
+        </div>
+
+        <Exemptions id={selectedEdital.id}/>
+      </div>
+    );
+  }
+
+  // Renderização da lista de editais
   return (
     <div className="space-y-6 p-6">
       <div>
@@ -293,7 +334,8 @@ export default function GerenciarEditais() {
                         <th className="text-left p-4 font-medium text-sm">Nome</th>
                         <th className="text-left p-4 font-medium text-sm w-[200px]">Data de Criação</th>
                         <th className="text-left p-4 font-medium text-sm w-[200px]">Data de Encerramento</th>
-                        <th className="text-center p-4 font-medium text-sm w-[200px]">Status</th>
+                        <th className="text-center p-4 font-medium text-sm w-[140px]">Status</th>
+                        <th className="text-center p-4 font-medium text-sm w-[200px]">Ações</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -307,13 +349,21 @@ export default function GerenciarEditais() {
                             {edital.endDate ? new Date(edital.endDate).toLocaleDateString('pt-BR') : '-'}
                           </td>
                           <td className="p-4 text-center">
-                          <span
-                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              STATUS_COLORS[edital.statusNotice as keyof typeof STATUS_COLORS] || STATUS_COLORS.INSCRITO
-                            }`}
-                          >
-                            {edital.statusNotice || 'N/A'}
-                          </span>
+                            <span
+                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                STATUS_COLORS[edital.statusNotice as keyof typeof STATUS_COLORS] || STATUS_COLORS.INSCRITO
+                              }`}
+                            >
+                              {edital.statusNotice || 'N/A'}
+                            </span>
+                          </td>
+                          <td className="p-4 text-center">
+                            <Button 
+                              size="sm"
+                              onClick={() => handleVerIsencoes(edital)}
+                            >
+                              Ver Isenções
+                            </Button>
                           </td>
                         </tr>
                       ))}

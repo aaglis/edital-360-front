@@ -26,6 +26,7 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
+import Link from "next/link";
 
 const RecoverPasswordRequestStep = ({ onSuccess }: { onSuccess: () => void }) => {
   const recaptchaRef = useRef<ReCAPTCHA>(null);
@@ -138,10 +139,17 @@ const RecoverPasswordRequestStep = ({ onSuccess }: { onSuccess: () => void }) =>
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading && <Loader2Icon className="animate-spin w-5 h-5 mr-2" />}
-                Enviar
-              </Button>
+              <div className="flex flex-col gap-3">
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading && <Loader2Icon className="animate-spin w-5 h-5 mr-2" />}
+                  Enviar
+                </Button>
+                <Link href={'/'}>
+                  <Button className="w-full" variant={'outline'}>
+                    Voltar
+                  </Button>
+                </Link>
+              </div>
             </form>
           </Form>
         </CardContent>

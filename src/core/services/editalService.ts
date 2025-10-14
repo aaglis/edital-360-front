@@ -2,6 +2,8 @@ import api from "./api";
 import { FetchPublicApi } from "./fetchPublicApi";
 import { CadastrarEditalSchema } from "../schemas/cadastrar-edital.schema";
 import { EditalResponse, type CadastrarEditalRequest, type CadastrarEditalResponse } from "../types/editais.interface";
+import type { ExemptionResponse } from "../types/exemptions";
+import { isAxiosError } from "axios";
 
 
 type ExamType = "OBJETIVA" | "DISCURSIVA" | "TESTE_FISICO" | "TESTE_PSICOLOGICO" | "PERICIAS" | "ENTREVISTAS";
@@ -240,4 +242,18 @@ export const EditalService = {
   
     return FetchPublicApi<EditalResponse>("/editais/obter", 60, queries);
   },
+  async fetchEditalExemptions(id: string): Promise<ExemptionResponse[]> {
+    try {
+      const data = await api.get<ExemptionResponse[]>(`editais/${id}/pedidos-isencao`)
+      console.log(data.data, 'data buscada isenções')
+      return data.data
+    }  catch (error) {
+      if (isAxiosError(error)) {
+        return Promise.reject(error.response?.data);
+      } else {
+        return Promise.reject(new Error("Erro inesperado durante a recuperação de senha"));
+      }
+    }
+
+  }
 };
