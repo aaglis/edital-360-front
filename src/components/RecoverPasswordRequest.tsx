@@ -16,8 +16,6 @@ import {
   FormLabel,
   FormMessage
 } from "@/components/ui/form";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Loader2Icon } from "lucide-react";
 import { recoverPasswordSchema, type RecoverPasswordSchema } from "@/core/schemas/forgot-password.schema";
 import { userService } from "@/core/services/userService";
@@ -38,7 +36,6 @@ const RecoverPasswordRequestStep = ({ onSuccess }: { onSuccess: () => void }) =>
     resolver: zodResolver(recoverPasswordSchema),
     defaultValues: {
       cpf: "",
-      channel: "EMAIL",
       recaptchaToken: "",
     },
   });
@@ -48,9 +45,13 @@ const RecoverPasswordRequestStep = ({ onSuccess }: { onSuccess: () => void }) =>
     recoverPasswordRequest(data)
       .then((response) => {
         console.log('resposta da solicitacao de recuperacao de senha:', response);
-        toast.success("Solicitação de recuperação de senha enviada com sucesso!");
+        toast.success("Solicitação de recuperação de senha enviada com sucesso!", {
+          position: "top-right",
+          closeButton: true,
+          duration: 5000,
+        });
         recaptchaRef.current?.reset();
-        onSuccess(); // Navega para a próxima etapa
+        onSuccess();
       })
       .catch((error) => {
         toast.error("Erro ao enviar solicitação de recuperação de senha", {
@@ -104,34 +105,6 @@ const RecoverPasswordRequestStep = ({ onSuccess }: { onSuccess: () => void }) =>
                           </InputMask>
                         )}
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Canal de envio */}
-              <FormField
-                control={form.control}
-                name="channel"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Como deseja receber a verificação?</FormLabel>
-                    <FormControl>
-                      <RadioGroup
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        className="grid grid-cols-2 gap-3"
-                      >
-                        <div className="flex items-center space-x-2 border rounded-lg p-3">
-                          <RadioGroupItem id="channel-email" value="EMAIL" />
-                          <Label htmlFor="channel-email">E-mail</Label>
-                        </div>
-                        <div className="flex items-center space-x-2 border rounded-lg p-3">
-                          <RadioGroupItem id="channel-sms" value="SMS" />
-                          <Label htmlFor="channel-sms">SMS</Label>
-                        </div>
-                      </RadioGroup>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

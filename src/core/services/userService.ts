@@ -1,5 +1,6 @@
 import type { RecoverPasswordSchema } from "../schemas/forgot-password.schema";
 import type { LoginSchema } from "../schemas/login.schema";
+import type { ResetPasswordSchema } from "../schemas/reset-password.schema";
 import api from "./api";
 import axios, { isAxiosError } from "axios";
 import Cookies from "js-cookie";
@@ -118,7 +119,7 @@ export const userService = {
   },
   async recoverPasswordRequest(data: RecoverPasswordSchema) {
     try {
-      const response = await api.post("api/recuperacao/password/request", data); 
+      const response = await api.post("api/recuperacao/password/request-link", data); 
       return response.data;
     } catch (error) {
       if (isAxiosError(error)) {
@@ -128,18 +129,32 @@ export const userService = {
       }
     }
   },
-  async recoverPasswordConfirm(data: { code: string, channel: string, senha: string, confirmarSenha: string }) {
+  async validateRecoverPasswordToken(token: string) {
     try {
-      const response = await api.post("api/recuperacao/password/reset", data);
+      const response = await api.get("api/recuperacao/password/validate-token",{
+        params: { token }
+      });
       return response.data;
     } catch (error) {
       if (isAxiosError(error)) {
         return Promise.reject(error.response?.data);
       } else {
-        return Promise.reject(new Error("Erro inesperado durante a confirmação de recuperação de senha"));
+        return Promise.reject(new Error("Erro inesperado durante a recuperação de senha"));
       }
     }
   },
+  async resetPasswordWithToken(data: ResetPasswordSchema, token: string) {
+    try {
+      const response = await api.post("api/recuperacao/password/reset-with-token", {...data, token});
+      return response.data;
+    } catch (error) {
+      if (isAxiosError(error)) {
+        return Promise.reject(error.response?.data);
+      } else {
+        return Promise.reject(new Error("Erro inesperado durante a redefinição de senha"));
+      }
+    }
+  }
 };
 
 export default userService;

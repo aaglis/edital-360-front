@@ -6,6 +6,7 @@ const publicRoutes = [
   { path: '/cadastro', whenAuthenticated: 'redirect'},
   { path: '/finalizar-cadastro', whenAuthenticated: 'redirect'},
   { path: '/recuperar-senha', whenAuthenticated: 'next'},
+  { path: '/reset-password', whenAuthenticated: 'next'},
   { path: '/concursos', whenAuthenticated: 'next'},
   { path: '/cadastrar-edital', whenAuthenticated: 'next'},
   { path: '/', whenAuthenticated: 'next' },
